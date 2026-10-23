@@ -1,0 +1,113 @@
+name: Qualified IOMAD matrix
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - iomad: '4.5.15'
+            commit: 3e7d23c1b60018f8f540c1fbf929e1baa6755b7f
+            php: '8.1'
+            database: mysqli
+            mysql: '8.0'
+          - iomad: '4.5.15'
+            commit: 3e7d23c1b60018f8f540c1fbf929e1baa6755b7f
+            php: '8.3'
+            database: mysqli
+            mysql: '8.0'
+          - iomad: '4.5.15'
+            commit: 3e7d23c1b60018f8f540c1fbf929e1baa6755b7f
+            php: '8.3'
+            database: pgsql
+            mysql: '8.0'
+          - iomad: '5.0.9'
+            commit: 0616692c833c495436eda551a4e972c2934f6257
+            php: '8.2'
+            database: mysqli
+            mysql: '8.4'
+          - iomad: '5.0.9'
+            commit: 0616692c833c495436eda551a4e972c2934f6257
+            php: '8.3'
+            database: mysqli
+            mysql: '8.4'
+          - iomad: '5.0.9'
+            commit: 0616692c833c495436eda551a4e972c2934f6257
+            php: '8.3'
+            database: pgsql
+            mysql: '8.4'
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+          - 3306/tcp
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      DB_TYPE: ${{ matrix.database }}
+      DB_HOST: 127.0.0.1
+      DB_USER: ${{ matrix.database == 'pgsql' && 'postgres' || 'root' }}
+      DB_PASS: ${{ matrix.database == 'pgsql' && 'postgres' || '' }}
+      DB_PORT: ${{ matrix.database == 'pgsql' && job.services.postgres.ports['5432'] || job.services.mysql.ports['3306'] }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: plugin
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, pgsql, gd, intl, soap, zip, mbstring
+          coverage: none
+          ini-values: max_input_vars=5000
+      - name: Prepare pinned tooling and native source
+        run: |
+          composer create-project --no-dev --prefer-dist --no-interaction moodlehq/moodle-plugin-ci ci 4.5.11
+          git init iomad-reference
+          git -C iomad-reference fetch --depth=1 https://github.com/iomad/iomad.git '${{ matrix.commit }}'
+          git -C iomad-reference checkout -b codex/qualified FETCH_HEAD
+          sudo locale-gen en_AU.UTF-8
+          echo "NVM_DIR=$HOME/.nvm" >> "$GITHUB_ENV"
+      - name: Install isolated test site
+        run: >-
+          ci/bin/moodle-plugin-ci install --plugin=plugin --moodle=moodle
+          --repo="$GITHUB_WORKSPACE/iomad-reference" --branch=codex/qualified
+          --db-type="$DB_TYPE" --db-host="$DB_HOST" --db-user="$DB_USER"
+          --db-pass="$DB_PASS" --db-port="$DB_PORT" --no-plugin-node --no-init
+      - name: Register the bundled documentation checker
+        run: |
+          cp -R ci/vendor/moodlehq/moodle-local_moodlecheck moodle/local/moodlecheck
+          php moodle/admin/cli/purge_caches.php
+      - name: Initialise PHPUnit only
+        working-directory: moodle
+        run: php admin/tool/phpunit/cli/init.php --disable-composer
+      - name: Check syntax, style, documentation and upgrade
+        run: |
+          ci/bin/moodle-plugin-ci phplint plugin
+          ci/bin/moodle-plugin-ci phpcs --max-warnings=0 plugin
+          ci/bin/moodle-plugin-ci phpmd plugin
+          ci/bin/moodle-plugin-ci phpdoc --max-warnings=0 --moodle=moodle plugin > phpdoc.log
+          cat phpdoc.log
+          python3 -c "from pathlib import Path; output=Path('phpdoc.log').read_text(); assert all(str(p.resolve()) in output for p in Path('plugin').rglob('*.php')) and '!!!' not in output"
+          ci/bin/moodle-plugin-ci validate --moodle=moodle plugin
+          ci/bin/moodle-plugin-ci savepoints plugin
+      - name: Run plugin PHPUnit suite
+        run: >-
+          ci/bin/moodle-plugin-ci phpunit --moodle=moodle --fail-on-warning
+          --fail-on-risky --fail-on-incomplete --fail-on-skipped plugin

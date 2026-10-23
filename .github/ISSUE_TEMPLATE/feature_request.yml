@@ -1,0 +1,15 @@
+name: Feature request
+description: Explain a user need and a proposed improvement.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: User need
+      description: Explain the workflow using fictitious examples, without client or learner information.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed result
+      description: Describe the useful behaviour and any compatibility or historical-integrity constraints.

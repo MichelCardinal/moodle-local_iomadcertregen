@@ -1,0 +1,153 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * IOMAD Certificate Regenerator.
+ *
+ * @package    local_iomadcertregen
+ * @copyright  2026 Michel Cardinal
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require_once(__DIR__ . '/../../config.php');
+
+use local_iomadcertregen\local\access;
+use local_iomadcertregen\local\adapter;
+
+$id = optional_param('id', 0, PARAM_INT);
+$page = max(0, optional_param('page', 0, PARAM_INT));
+$search = optional_param('search', '', PARAM_TEXT);
+$url = new moodle_url('/local/iomadcertregen/index.php', ['id' => $id]);
+if (!$id) {
+    require_login();
+    access::require_permission_for_site();
+    $PAGE->set_url($url);
+    $PAGE->set_context(context_system::instance());
+    $PAGE->set_title(get_string('pluginname', 'local_iomadcertregen'));
+    $PAGE->set_heading(get_string('pluginname', 'local_iomadcertregen'));
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('chooseactivity', 'local_iomadcertregen'));
+    $sql = "SELECT cm.id, c.fullname, ic.name FROM {course_modules} cm
+              JOIN {modules} m ON m.id = cm.module
+              JOIN {iomadcertificate} ic ON ic.id = cm.instance
+              JOIN {course} c ON c.id = cm.course WHERE m.name = :module AND cm.deletioninprogress = 0
+              ORDER BY c.fullname, ic.name, cm.id";
+    $count = $DB->count_records_sql(
+        "SELECT COUNT(1) FROM {course_modules} cm JOIN {modules} m ON m.id = cm.module
+          WHERE m.name = :module AND cm.deletioninprogress = 0",
+        ['module' => 'iomadcertificate']
+    );
+    foreach ($DB->get_records_sql($sql, ['module' => 'iomadcertificate'], $page * 30, 30) as $activity) {
+        echo html_writer::div(html_writer::link(
+            new moodle_url($url, ['id' => $activity->id]),
+            format_string($activity->fullname) . ' — ' . format_string($activity->name)
+        ));
+    }
+    echo $OUTPUT->paging_bar($count, $page, 30, $url);
+    echo $OUTPUT->footer();
+    exit;
+}
+$cm = get_coursemodule_from_id('iomadcertificate', $id, 0, false, MUST_EXIST);
+$course = get_course($cm->course);
+require_login($course, false, $cm);
+$context = context_module::instance($id);
+access::require_permission($context);
+$certificate = $DB->get_record('iomadcertificate', ['id' => $cm->instance], '*', MUST_EXIST);
+$PAGE->set_url($url);
+$PAGE->set_cm($cm, $course);
+$PAGE->set_title(get_string('pluginname', 'local_iomadcertregen'));
+$PAGE->set_heading(format_string($course->fullname));
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('pluginname', 'local_iomadcertregen'));
+echo $OUTPUT->notification(get_string('scope', 'local_iomadcertregen'), 'info');
+$version = core_plugin_manager::instance()->get_plugin_info('mod_iomadcertificate')->versiondisk;
+echo html_writer::tag('p', get_string('moduleversion', 'local_iomadcertregen', s($version)));
+try {
+    adapter::require_compatible($certificate);
+    echo html_writer::tag('p', get_string('qualified', 'local_iomadcertregen'));
+} catch (moodle_exception $error) {
+    echo $OUTPUT->notification($error->getMessage(), 'warning');
+    echo $OUTPUT->footer();
+    exit;
+}
+echo html_writer::start_tag('form', ['method' => 'get', 'action' => $url->out(false), 'class' => 'mb-3']);
+echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'id', 'value' => $id]);
+echo html_writer::tag('label', get_string('searchlearner', 'local_iomadcertregen'), ['for' => 'icr-search']);
+echo html_writer::empty_tag('input', [
+    'id' => 'icr-search', 'name' => 'search', 'value' => $search, 'class' => 'form-control',
+]);
+echo html_writer::tag('button', get_string('search'), ['type' => 'submit', 'class' => 'btn btn-secondary mt-2']);
+echo html_writer::end_tag('form');
+$where = 'i.iomadcertificateid = :instance';
+$params = ['instance' => $certificate->id];
+if ($search !== '') {
+    $where .= ' AND (' . $DB->sql_like('u.firstname', ':firstname', false) . ' OR ' .
+        $DB->sql_like('u.lastname', ':lastname', false) . ')';
+    $params['firstname'] = '%' . $DB->sql_like_escape($search) . '%';
+    $params['lastname'] = $params['firstname'];
+}
+$sql = " FROM {iomadcertificate_issues} i JOIN {user} u ON u.id = i.userid WHERE " . $where;
+$total = $DB->count_records_sql('SELECT COUNT(1)' . $sql, $params);
+$rows = $DB->get_records_sql('SELECT i.*, u.firstname, u.lastname, u.deleted, u.suspended' . $sql .
+    ' ORDER BY u.lastname, u.firstname, i.id', $params, $page * 30, 30);
+$table = new html_table();
+$table->head = [get_string('fullname'), get_string('issuedate', 'local_iomadcertregen'),
+    get_string('status'), get_string('actions')];
+$table->attributes['class'] = 'generaltable';
+foreach ($rows as $row) {
+    $state = 'eligible';
+    $action = '';
+    try {
+        $data = \local_iomadcertregen\local\records::issue($id, $row->id);
+        adapter::original_url($data[0], $data[4], $context);
+        $action = html_writer::link(
+            new moodle_url(
+                '/local/iomadcertregen/prepare.php',
+                ['id' => $id, 'issueid' => $row->id]
+            ),
+            get_string('prepare', 'local_iomadcertregen'),
+            ['class' => 'btn btn-secondary']
+        );
+    } catch (moodle_exception $error) {
+        $state = 'ineligible';
+    }
+    $copies = $DB->get_records_select(
+        'local_iomadcertregen_op',
+        'cmid = :cmid AND issueid = :issueid AND status = :status AND (timeexpires = 0 OR timeexpires > :now)',
+        ['cmid' => $id, 'issueid' => $row->id, 'status' => 'confirmed', 'now' => time()],
+        'timecreated DESC, id DESC',
+        '*',
+        0,
+        1
+    );
+    if ($copies) {
+        $copy = reset($copies);
+        $action .= ' ' . html_writer::link(new moodle_url(
+            '/local/iomadcertregen/confirm.php',
+            ['id' => $id, 'operationid' => $copy->id]
+        ), get_string('lastcopy', 'local_iomadcertregen'));
+    }
+    $table->data[] = [s(fullname($row)), userdate($row->timecreated),
+        get_string($state, 'local_iomadcertregen'), $action];
+}
+if (!$rows) {
+    echo $OUTPUT->notification(get_string('noissues', 'local_iomadcertregen'), 'info');
+} else {
+    echo html_writer::div(html_writer::table($table), 'table-responsive');
+}
+$pagingurl = new moodle_url($url, ['search' => $search]);
+echo $OUTPUT->paging_bar($total, $page, 30, $pagingurl);
+echo $OUTPUT->footer();

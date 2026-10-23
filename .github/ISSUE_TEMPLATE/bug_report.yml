@@ -1,0 +1,27 @@
+name: Bug report
+description: Report an ordinary defect using a fictitious example.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For suspected vulnerabilities, use the private route in SECURITY.md.
+        Do not include learner data, PDFs, credentials, database exports or private server details.
+  - type: input
+    id: environment
+    attributes:
+      label: Versions
+      description: IOMAD, IOMAD Certificate, this plugin, PHP and database versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps and expected behaviour
+      description: Use a fictitious learner and explain what happened and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostic
+    attributes:
+      label: Relevant diagnostic
+      description: A short, redacted error message only. Do not attach certificates or a full server log.
