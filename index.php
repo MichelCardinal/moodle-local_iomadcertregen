@@ -101,7 +101,8 @@ if ($search !== '') {
 }
 $sql = " FROM {iomadcertificate_issues} i JOIN {user} u ON u.id = i.userid WHERE " . $where;
 $total = $DB->count_records_sql('SELECT COUNT(1)' . $sql, $params);
-$rows = $DB->get_records_sql('SELECT i.*, u.firstname, u.lastname, u.deleted, u.suspended' . $sql .
+$namefields = \core_user\fields::for_name()->get_sql('u')->selects;
+$rows = $DB->get_records_sql('SELECT i.*' . $namefields . ', u.deleted, u.suspended' . $sql .
     ' ORDER BY u.lastname, u.firstname, i.id', $params, $page * 30, 30);
 $table = new html_table();
 $table->head = [get_string('fullname'), get_string('issuedate', 'local_iomadcertregen'),

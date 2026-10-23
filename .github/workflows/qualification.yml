@@ -60,6 +60,7 @@ jobs:
           --health-cmd="pg_isready -U postgres"
           --health-interval=10s --health-timeout=5s --health-retries=10
     env:
+      MOODLE_BEHAT_WWWROOT: http://127.0.0.1:8000
       DB_TYPE: ${{ matrix.database }}
       DB_HOST: 127.0.0.1
       DB_USER: ${{ matrix.database == 'pgsql' && 'postgres' || 'root' }}
@@ -100,14 +101,28 @@ jobs:
       - name: Check syntax, style, documentation and upgrade
         run: |
           ci/bin/moodle-plugin-ci phplint plugin
+          php -l plugin/.github/scripts/prepare_behat.php
           ci/bin/moodle-plugin-ci phpcs --max-warnings=0 plugin
           ci/bin/moodle-plugin-ci phpmd plugin
           ci/bin/moodle-plugin-ci phpdoc --max-warnings=0 --moodle=moodle plugin > phpdoc.log
           cat phpdoc.log
-          python3 -c "from pathlib import Path; output=Path('phpdoc.log').read_text(); assert all(str(p.resolve()) in output for p in Path('plugin').rglob('*.php')) and '!!!' not in output"
+          python3 -c "from pathlib import Path; output=Path('phpdoc.log').read_text(); assert all(str(p.resolve()) in output for p in Path('plugin').rglob('*.php') if '.github' not in p.parts) and '!!!' not in output"
           ci/bin/moodle-plugin-ci validate --moodle=moodle plugin
           ci/bin/moodle-plugin-ci savepoints plugin
       - name: Run plugin PHPUnit suite
         run: >-
           ci/bin/moodle-plugin-ci phpunit --moodle=moodle --fail-on-warning
           --fail-on-risky --fail-on-incomplete --fail-on-skipped plugin
+      - name: Run non-JavaScript acceptance scenarios on current IOMAD
+        if: matrix.iomad == '4.5.15' && matrix.php == '8.3' && matrix.database == 'pgsql'
+        shell: bash
+        run: |
+          php -S 127.0.0.1:8000 -t moodle > behat-server.log 2>&1 &
+          icr_http_pid=$!
+          trap 'kill "$icr_http_pid" 2>/dev/null || true' EXIT
+          php moodle/admin/tool/behat/cli/util_single_run.php --install
+          php plugin/.github/scripts/prepare_behat.php "$GITHUB_WORKSPACE/moodle" > behat-setup.json
+          cat behat-setup.json
+          icr_behat_config=$(php -r '$data=json_decode(file_get_contents("behat-setup.json"),true,512,JSON_THROW_ON_ERROR); echo $data["config"];')
+          php moodle/vendor/bin/behat --config="$icr_behat_config" --suite=default --tags=@local_iomadcertregen --format=progress --strict | tee behat.log
+          python3 -c "from pathlib import Path; import re; text=Path('behat.log').read_text(); assert re.search(r'5 scenarios \(5 passed\)', text) and re.search(r'71 steps \(71 passed\)', text)"

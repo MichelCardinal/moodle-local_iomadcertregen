@@ -11,7 +11,7 @@ An authorised site administrator can prepare, review, confirm and download a sep
 ### Current compatibility
 
 - Runtime qualification is restricted to IOMAD 4.5 / 5.0 and the exact library/template fingerprints in `classes/local/qualified.json`.
-- Initial target: IOMAD 4.5.13, IOMAD Certificate `2024100745`, PHP 8.3.30 and MySQL 8.0.44. See the accompanying laboratory validation report for checks actually executed.
+- Initial target: IOMAD 4.5.13, IOMAD Certificate `2024100745`, PHP 8.3.30 and MySQL 8.0.44. See [TESTING.md](TESTING.md) for the exact executed matrix and limitations.
 - Additional tested target: IOMAD 5.0.9, PHP 8.3.30, MySQL 8.4.11 and PHPUnit 11.5.55. The same nine native source files match exactly.
 - Also tested: IOMAD 4.5.13 and current 4.5.15 (build 20261005), PHP 8.3.30 and PostgreSQL 17.11 in separate test databases. The 4.5.15 profile accepts its corrected native saved-file download handler.
 - A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility.
@@ -80,6 +80,12 @@ vendor/bin/phpunit --configuration phpunit.xml --testsuite local_iomadcertregen_
 ```
 
 The repository includes `.github/workflows/qualification.yml` with a proposed PHP/database matrix, Moodle Plugin CI 4.5.11 and pinned IOMAD commits. Matrix preparation does not establish that every runtime was tested. This workflow is prepared but has not run remotely; no CI badge or broader compatibility is claimed. Repository CI configuration is excluded from the installable ZIP.
+
+The repository also contains five non-JavaScript Behat scenarios, executed locally on IOMAD 4.5.15 / PHP 8.3.30 / PostgreSQL 17.11 with Moodle BrowserKit HTTP: 5 scenarios and 71 steps passed. They cover the real forms, required acknowledgement, permission denial, protected PDF bytes/headers, event attribution, pagination across 1,001 saved issues and a configured middle name. They do not test JavaScript, a PDF viewer or assistive technology.
+
+Use a separately configured Behat URL, database prefix and dataroot. Install that disposable acceptance site with Moodle's `admin/tool/behat/cli/util_single_run.php --install`, then run the repository-only `.github/scripts/prepare_behat.php /absolute/path/to/moodle` and use its returned configuration with `vendor/bin/behat --suite=default --tags=@local_iomadcertregen --format=progress --strict`. Start a local HTTP server serving that test URL first. The helper checks Moodle's native test-site readiness and does not modify runtime source.
+
+The qualified IOMAD distribution contains two incompatible third-party acceptance contexts: its SAML context overrides a core method with an incompatible signature, and its policy context duplicates core policy steps. The helper excludes only their exact qualified test-file hashes from configuration and reports them; both runtime components remain installed and unchanged. No plugin scenario is excluded. Changed test contexts require review rather than automatic exclusion. This is a plugin-only acceptance result, not qualification of those IOMAD SAML/policy tests. The helper is included in the source repository and excluded from the installable ZIP.
 
 No custom JavaScript, stylesheet or third-party PDF library is bundled. The source module supplies the rendering engine. The installable package contains English strings only. French and Spanish drafts are maintained separately for AMOS submission after approval; no availability through AMOS is claimed. Private laboratory local language overrides are outside the package. Check current Marketplace packaging requirements before submission.
 

@@ -1,5 +1,11 @@
 # Changes
 
+## 0.6.0-alpha — 2026102306 (unreleased)
+
+- Use Moodle's complete name-field API in the issue list, avoiding developer warnings and supporting configured name formats.
+- Add non-JavaScript Behat acceptance scenarios for preparation, acknowledgement, confirmation, HTTP download, audit attribution, permission refusal and pagination.
+- Five BrowserKit HTTP scenarios / 71 steps passed locally, including 1,001 saved originals; no remote CI execution is claimed.
+
 ## 0.5.0-alpha — 2026102305 (unreleased)
 
 - Package only English language strings for Marketplace submission; retain French and Spanish drafts separately for AMOS.
