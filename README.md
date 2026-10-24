@@ -59,9 +59,9 @@ Changing activity settings or relevant learner information during a batch can in
 
 ## Publication and native history
 
-Publication requires a confirmed copy with **no expiry**, prepared by the publishing administrator. Duration changes apply to future operations and never erase an existing deadline. If a copy expires, configure unlimited retention for future confirmed copies and prepare a new correction before publishing.
+Publication requires a confirmed copy with **no expiry**, prepared by the publishing operator with current correction permissions. Duration changes apply to future operations and never erase an existing deadline. If a copy expires, configure unlimited retention for future confirmed copies and prepare a new correction before publishing.
 
-Publication retains each previous native PDF in the plugin's protected `original` area, then replaces native file content using Moodle File API. Native file routes/names and native issue code/date are preserved. Replacement metadata is committed with the operation and its Moodle event. Only the latest publication for that learner/activity is active; previous reviewed PDFs and retained originals remain administratively available.
+Publication replaces native file content using Moodle File API. When the enforced site policy and reviewed choice retain originals, each previous native PDF is first copied into the plugin's protected `original` area; otherwise no former PDF is retained there by that publication. Native file routes/names and native issue code/date are preserved. Replacement metadata is committed with the operation and its Moodle event. Only the latest publication for that learner/activity is active; previous reviewed PDFs and retained originals remain administratively available.
 
 The native activity button serves the exact published PDF through a protected endpoint. It respects learner ownership, active enrolment, course/activity restrictions and the native minimum-course-time rule. A later enrolment period is not diverted to an obsolete issue. A subsequently changed template does not silently alter an already published correction.
 
@@ -73,7 +73,7 @@ The plugin locks its own operations. Native settings edits, native certificate r
 
 ## Email and message customisation
 
-Email requires a confirmed, unexpired copy and its preparing administrator. The current beneficiary/address is displayed and must be acknowledged. No arbitrary destination is accepted. Disabled site mail and ineligible accounts/addresses are refused before transport.
+Email requires a confirmed, unexpired copy and its preparing operator with current correction permissions. The current beneficiary/address is displayed and must be acknowledged. No arbitrary destination is accepted. Disabled site mail and ineligible accounts/addresses are refused before transport.
 
 Moodle's mail API receives the exact confirmed PDF, with the site's mail configuration and no-reply sender. The subject/body use the recipient's language and course name. Customise strings `emailsubject` and `emailbody` through **Site administration → Language → Language customisation → local_iomadcertregen.php**. Preserve `{$a}`, the course-name placeholder. These are language-wide defaults, not a per-course or per-send editor.
 

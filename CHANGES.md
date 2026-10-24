@@ -1,3 +1,8 @@
+## 0.12.4-alpha
+
+- Correct publication and email guide wording: authorised preparing operators can act; retaining previous PDFs follows the enforced site policy and reviewed choice.
+- Advance only the metadata savepoint. Product runtime, schema, capabilities, language and mail behaviour are unchanged.
+
 ## 0.12.3-alpha
 
 - Refresh HTTP acceptance assertions for the current native capability label and the completed batch page, which intentionally has no further publication form.

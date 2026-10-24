@@ -1,6 +1,6 @@
 # Validation history and current local candidate
 
-The current candidate is local 0.12.3-alpha / 2026102408; see the final sections for its scoped and pre-1.0 results. The earlier matrices below apply only to their recorded revisions. This is a private, unreleased laboratory candidate. Local results do not establish Marketplace approval, remote CI success, accessibility certification or any Moodle distinction. Previous archives and tags remain immutable.
+The current candidate is local 0.12.4-alpha / 2026102409; see the final sections for its scoped and pre-1.0 results. The earlier matrices below apply only to their recorded revisions. This is a private, unreleased laboratory candidate. Local results do not establish Marketplace approval, remote CI success, accessibility certification or any Moodle distinction. Previous archives and tags remain immutable.
 
 0.10.1 updates validation documentation and the native version savepoint only. All functional PHP, language, schema, fixture and acceptance files are byte-identical to the tested 0.10.0 tag. The complete suites below executed on that functional baseline. The editorial update is checked by native migration preservation, the six quality checks and an exact source comparison; a metadata-only revision does not justify repeating every functional suite.
 
@@ -144,3 +144,10 @@ In the ordinary 4.5 / New Learning laboratory, the multiple-role selector is che
 A separate fictitious download-mode activity publishes reviewed bytes with original retention. Issue and learning-table hashes remain unchanged and the real learner is refused the administrative archive. Its native button triggers the protected copy-download event, but the in-app browser download API times out and no downloaded test file is found. The PDF read through File API is rendered and visually checked with Poppler; this does not establish successful visual rendering or file saving in that browser. The passing native HTTP tests establish exact delivery independently. No real email is sent. The ordinary laboratory stays on the prior functionally identical revision; no general enclosing-site or third-party-theme qualification is inferred.
 
 The upstream PHP 8.4 generator deprecation, remote CI, a permanent reporting channel and external publication remain separate gates. Previous ZIPs and tags are preserved. Current commands, logs, source comparisons and archive hashes live in the private versioned qualification report, excluded from the package.
+
+
+## Documentation reconciliation (local 0.12.4)
+
+The guide now consistently describes conditional original retention and authorised preparing operators rather than site administrators alone. This is an editorial correction, with a version-only savepoint and the matching upgrade-test baseline. Product runtime, schema, capabilities and language bytes are unchanged from 0.12.3. Its complete four-branch HTTP acceptance and identical 0.12.2 functional matrices remain the recorded evidence; they are not claimed as newly executed here. Targeted savepoint tests and current quality/package comparisons are recorded in the private versioned provenance.
+
+The fixed 0.10.1-to-0.12.3 security diff review covers all 48 changed paths and reports no plausible vulnerability candidates. This scoped static review is not certification of Moodle/IOMAD or the deployment. Its private report preserves the exact reviewed revisions and limits. The 0.12.4 changes are documentation and version metadata only; prior ZIPs, tags and scan artifacts remain unchanged. PHP 8.4 native-generator diagnostics, remote CI and browser download-file verification remain open as described above.
