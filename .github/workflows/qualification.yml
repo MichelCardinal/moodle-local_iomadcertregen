@@ -190,4 +190,4 @@ jobs:
           cat behat-setup.json
           icr_behat_config=$(php -r '$data=json_decode(file_get_contents("behat-setup.json"),true,512,JSON_THROW_ON_ERROR); echo $data["config"];')
           php moodle/vendor/bin/behat --config="$icr_behat_config" --suite=default --tags=@local_iomadcertregen --format=progress --strict | tee behat.log
-          python3 -c "from pathlib import Path; import re; text=Path('behat.log').read_text(); assert re.search(r'8 scenarios \(8 passed\)', text) and re.search(r'129 steps \(129 passed\)', text)"
+          python3 -c "from pathlib import Path; import re; text=Path('behat.log').read_text(); assert re.search(r'12 scenarios \(12 passed\)', text) and re.search(r'145 steps \(145 passed\)', text)"

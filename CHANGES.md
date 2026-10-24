@@ -1,3 +1,10 @@
+## 0.12.5-alpha
+
+- Keep presentation-only row action menus out of native system-report downloads, preventing late navigation/session diagnostics from contaminating CSV data in developer mode.
+- Exercise actual system and custom-report CSV responses, quoted course names, both selected certificate templates and explicit native access refusals for authenticated non-administrators.
+- Preserve native role/certificate permissions, report audiences, retained PDFs and all correction behaviour. The metadata savepoint advances without a schema migration.
+- Retain strict CI failure propagation and update the expected acceptance totals for the additional inventory scenarios.
+
 ## 0.12.4-alpha
 
 - Correct publication and email guide wording: authorised preparing operators can act; retaining previous PDFs follows the enforced site policy and reviewed choice.

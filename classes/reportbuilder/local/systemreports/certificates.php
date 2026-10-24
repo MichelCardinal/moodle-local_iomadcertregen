@@ -61,6 +61,10 @@ final class certificates extends system_report {
         }
         $this->set_initial_sort_column('certificate:course', SORT_ASC);
         $this->set_downloadable(true);
+        // Native downloads cache this report before adding the format to its report parameters.
+        if (optional_param('download', '', PARAM_ALPHA) !== '') {
+            return;
+        }
         $this->add_action(new action(
             new moodle_url('/course/view.php', ['id' => ':courseid']),
             new pix_icon('i/course', ''),
