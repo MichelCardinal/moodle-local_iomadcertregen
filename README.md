@@ -97,7 +97,7 @@ Uninstall removes the plugin's tables/files, not the native IOMAD issue or PDFs.
 
 English is packaged in `lang/en`. French and Spanish drafts are maintained separately for local customisation/AMOS preparation; they are not claimed published in AMOS or included as packaged language directories. No customer-specific names, credentials or laboratory data belong in the distributable.
 
-Browser validation uses Boost. The independently identified New Learning 12.2.7 layout/API issue on IOMAD 5.2 remains outside this change and deferred. No core/module/theme patch is installed. iPad/NAMO and Moodle app integration are outside the agreed scope. No screen-reader or comprehensive accessibility certification is claimed.
+Native HTTP acceptance uses Boost; scoped normal-laboratory checks also cover New Learning on IOMAD 4.5. The independently identified New Learning 12.2.8 native-dashboard issue on IOMAD 5.2 remains outside this change and deferred. No core/module/theme patch is installed. iPad/NAMO and Moodle app integration are outside the agreed scope. No screen-reader or comprehensive accessibility certification is claimed.
 
 See [TESTING.md](TESTING.md), [CHANGES.md](CHANGES.md) and [SECURITY.md](SECURITY.md) for evidence, limits and reporting readiness. This independent GPL v3-or-later plugin uses the installed IOMAD renderer; it does not claim IOMAD lacks native certificate regeneration.
 

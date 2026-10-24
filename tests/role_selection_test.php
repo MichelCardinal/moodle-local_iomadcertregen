@@ -109,8 +109,8 @@ final class role_selection_test extends certificate_testcase {
         require_once($CFG->dirroot . '/local/iomadcertregen/db/upgrade.php');
         $role = $DB->get_field('role', 'id', ['shortname' => 'manager'], MUST_EXIST);
         unassign_capability(role_permissions::CAPABILITY, $role, \context_system::instance());
-        set_config('version', 2026102409, 'local_iomadcertregen');
-        $this->assertTrue(xmldb_local_iomadcertregen_upgrade(2026102409));
+        set_config('version', 2026102410, 'local_iomadcertregen');
+        $this->assertTrue(xmldb_local_iomadcertregen_upgrade(2026102410));
         $this->assertSame(CAP_INHERIT, role_permissions::permission($role));
     }
     /**

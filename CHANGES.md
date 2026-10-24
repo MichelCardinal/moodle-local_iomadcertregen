@@ -1,3 +1,9 @@
+## 0.12.6-alpha
+
+- Align contributor instructions with the actual local_iomad dependency, optional administrative archives and explicit reviewed publication.
+- Reconcile the guide's theme limitation with the tested New Learning version and distinguish native Boost acceptance from scoped New Learning laboratory checks.
+- Advance the metadata-only savepoint; production behaviour, schema, capabilities and language strings are unchanged from 0.12.5.
+
 ## 0.12.5-alpha
 
 - Keep presentation-only row action menus out of native system-report downloads, preventing late navigation/session diagnostics from contaminating CSV data in developer mode.
