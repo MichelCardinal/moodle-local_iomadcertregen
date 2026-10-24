@@ -147,7 +147,7 @@ jobs:
       - name: Register the bundled documentation checker
         run: |
           cp -R ci/vendor/moodlehq/moodle-local_moodlecheck "$ICR_WEBROOT/local/moodlecheck"
-          php moodle/admin/cli/purge_caches.php
+          # No ordinary site is installed: PHPUnit initialisation discovers this component.
       - name: Initialise PHPUnit only
         run: php "$ICR_WEBROOT/admin/tool/phpunit/cli/init.php" --disable-composer
       - name: Check syntax, style, documentation and upgrade
