@@ -1,5 +1,10 @@
 # Changes
 
+## 0.7.1-alpha — 2026102308 (unreleased)
+
+- Correct the qualified/unsupported interface messages, which still named only 4.5/5.0 after the 5.1/5.2 extension. Use version-independent wording tied to the verified source profile.
+- Update the French and Spanish translation drafts consistently. No rendering, access, file, privacy or schema behaviour changes.
+
 ## 0.7.0-alpha — 2026102307 (unreleased)
 
 - Add separately qualified IOMAD 5.1 and 5.2 native template profiles, retaining the 4.5/5.0 family.

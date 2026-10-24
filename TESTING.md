@@ -1,8 +1,14 @@
-# Validation of 0.7.0-alpha
+# Validation of 0.7.1-alpha
 
 Local qualification on 23 October 2026. This is an unreleased laboratory candidate. GitHub Actions have not run; Marketplace approval, accessibility certification and Moodle badges are not claimed.
 
-## Executed integration matrix
+## Editorial revision and normal MAMP laboratory
+
+0.7.1-alpha (2026102308) corrects two compatibility messages; the renderer, access controls and data model are unchanged from 0.7.0. The four-branch matrix below was executed at 0.7.0, and is retained as the functional baseline rather than reported as a new run of the editorial patch. All six Moodle Plugin CI checks were rerun successfully for 0.7.1.
+
+Additionally, 0.7.1 passed 52 tests / 226 assertions on IOMAD 5.2.4, PHP 8.3.30 and MySQL 8.4.11 in a normal MAMP laboratory. Browser checks under Boost and New Learning 12.2.7 prepared, reviewed and confirmed separate fictional PDFs; the native original, code and date were unchanged. A Boost browser download matched the reviewed bytes. These targeted theme checks do not qualify all pages, every theme version or assistive technology.
+
+## Executed integration matrix (0.7.0 functional baseline)
 
 PHP 8.3.30, PostgreSQL 17.11, macOS Darwin 25.6.0 arm64. Each environment has an independent database and file roots. PHPUnit 9.6.34 is used on 4.5; PHPUnit 11.5.55 on 5.0–5.2.
 

@@ -11,7 +11,7 @@ An authorised site administrator can prepare, review, confirm and download a sep
 ### Current compatibility
 
 - Qualified branches: IOMAD **4.5, 5.0, 5.1 and 5.2**, with the exact native library/template fingerprints in `classes/local/qualified.json`. Current tested updates are 4.5.15, 5.0.11, 5.1.8 and 5.2.4. See [TESTING.md](TESTING.md) for runtimes, evidence and limits.
-- Each current branch passes 52 integration tests / 226 assertions locally on PHP 8.3.30 and PostgreSQL 17.11. Earlier 4.5.13 and 5.0.9 qualification is historical evidence for 0.6, not a new 0.7 runtime claim.
+- The 0.7.0 functional baseline passes 52 integration tests / 226 assertions on each current branch locally with PHP 8.3.30 and PostgreSQL 17.11. The editorial 0.7.1 revision also passes 52 tests / 226 assertions on IOMAD 5.2.4 with MySQL 8.4.11; Boost and New Learning 12.2.7 have targeted browser workflow checks on that laboratory. Earlier 4.5.13 and 5.0.9 qualification is historical evidence for 0.6, not a new 0.7 runtime claim.
 - A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility. Future updates require qualification; this is not a promise to accept every patch automatically.
 - Plain Moodle without IOMAD is unsupported. The four branches share the IOMAD Certificate activity; their native tracking interfaces differ.
 - The six qualified standard templates are A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is disabled pending separate qualification. Company tests verify the beneficiary's seal when the administrator belongs to another company; other branding configurations are not exhaustively tested.
