@@ -129,13 +129,15 @@ jobs:
           git -C iomad-reference fetch --depth=1 https://github.com/iomad/iomad.git '${{ matrix.commit }}'
           git -C iomad-reference checkout -b codex/qualified FETCH_HEAD
           sudo locale-gen en_AU.UTF-8
-          echo "NVM_DIR=$HOME/.nvm" >> "$GITHUB_ENV"
-      - name: Install isolated test site
-        run: >-
-          ci/bin/moodle-plugin-ci install --plugin=plugin --moodle=moodle
-          --repo="$GITHUB_WORKSPACE/iomad-reference" --branch=codex/qualified
-          --db-type="$DB_TYPE" --db-host="$DB_HOST" --db-user="$DB_USER"
-          --db-pass="$DB_PASS" --db-port="$DB_PORT" --no-plugin-node --no-init
+      # This PHP-only plugin uses native CLI setup, not a core/theme asset build.
+      # Plugin CI quality commands below run unchanged; native sources stay intact.
+      - name: Prepare unmodified native source and PHP dependencies
+        run: |
+          git clone --no-hardlinks --branch codex/qualified iomad-reference moodle
+          echo "MOODLE_DIR=$GITHUB_WORKSPACE/moodle" >> "$GITHUB_ENV"
+          composer install --working-dir=moodle --no-interaction --prefer-dist
+      - name: Configure isolated native databases
+        run: php plugin/.github/scripts/configure_native.php
       - name: Locate the native web root
         shell: bash
         run: |
@@ -144,16 +146,18 @@ jobs:
           else
             echo "ICR_WEBROOT=moodle" >> "$GITHUB_ENV"
           fi
-      - name: Register the bundled documentation checker
+      - name: Install ordinary site and documentation checker
         run: |
+          cp -R plugin "$ICR_WEBROOT/local/iomadcertregen"
           cp -R ci/vendor/moodlehq/moodle-local_moodlecheck "$ICR_WEBROOT/local/moodlecheck"
-          # No ordinary site is installed: PHPUnit initialisation discovers this component.
+          php moodle/admin/cli/install_database.php --agree-license --adminpass="$(php -r 'echo "Aa1!" . bin2hex(random_bytes(20));')" --adminemail=admin@example.invalid --fullname='Certificate CI' --shortname=certificateci
       - name: Initialise PHPUnit only
         run: php "$ICR_WEBROOT/admin/tool/phpunit/cli/init.php" --disable-composer
       - name: Check syntax, style, documentation and upgrade
         run: |
           ci/bin/moodle-plugin-ci phplint plugin
           php -l plugin/.github/scripts/prepare_behat.php
+          php -l plugin/.github/scripts/configure_native.php
           ci/bin/moodle-plugin-ci phpcs --max-warnings=0 plugin
           ci/bin/moodle-plugin-ci phpmd plugin | tee phpmd.log
           python3 -c "from pathlib import Path; text=Path('phpmd.log').read_text(); assert 'VIOLATION' not in text and '!!!' not in text"
@@ -174,16 +178,7 @@ jobs:
         if: matrix.php == '8.3' && matrix.database == 'pgsql'
         shell: bash
         run: |
-          # Native 5.2 OIDC uses a schema-wide fixed index name: keep Behat in its own database.
-          PGPASSWORD="$DB_PASS" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c 'CREATE DATABASE iomadcertregen_behat'
-          python3 - <<'PYCONFIG'
-          from pathlib import Path
-          config = Path('moodle/config.php')
-          text = config.read_text()
-          marker = 'require_once('
-          assert marker in text
-          config.write_text(text.replace(marker, "$CFG->behat_dbname = 'iomadcertregen_behat';\n" + marker, 1))
-          PYCONFIG
+          # All three databases are created separately to preserve native OIDC index names.
           php -S 127.0.0.1:8000 -t "$ICR_WEBROOT" > behat-server.log 2>&1 &
           icr_http_pid=$!
           trap 'kill "$icr_http_pid" 2>/dev/null || true' EXIT
