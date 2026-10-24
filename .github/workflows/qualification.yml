@@ -122,7 +122,23 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: mysqli, pgsql, gd, intl, soap, zip, mbstring
           coverage: none
-          ini-values: max_input_vars=5000
+          ini-values: max_input_vars=5000, session.upload_progress.enabled=0
+      - name: Verify PHP security baseline and effective startup settings
+        run: |
+          php --version
+          php -r '
+          $minor = PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;
+          $fixed = ["8.2" => "8.2.35", "8.3" => "8.3.36", "8.4" => "8.4.27"];
+          if ($minor === "8.1") {
+              echo "Legacy minimum compatibility: CLI only; no patched-runtime security claim.\n";
+          } elseif (!isset($fixed[$minor]) || version_compare(PHP_VERSION, $fixed[$minor], "<")) {
+              throw new RuntimeException("PHP is below the October 21 security baseline.");
+          }
+          if (ini_get("session.upload_progress.enabled") !== "0") {
+              throw new RuntimeException("Session upload progress must be disabled before request parsing.");
+          }
+          echo "session.upload_progress.enabled=0 (startup configuration)\n";
+          '
       - name: Prepare pinned tooling and native source
         env:
           DB_PORT: ${{ matrix.database == 'pgsql' && job.services.postgres.ports['5432'] || job.services.mysql.ports['3306'] }}
