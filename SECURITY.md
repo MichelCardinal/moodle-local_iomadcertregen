@@ -1,5 +1,5 @@
 # Security reporting
 
-For this unreleased laboratory build, report suspected vulnerabilities privately to the maintainer through the private channel where you obtained the build. Do not post learner data, PDFs, credentials or exploit details in public issues.
+For this private release candidate, report suspected vulnerabilities privately to the maintainer through the private channel where you obtained the build. Do not post learner data, PDFs, credentials or exploit details in public issues.
 
-A public, private-contact route must be supplied with the Marketplace listing before publication. No dedicated address or security certification is claimed by this alpha.
+Before public release, the repository and Marketplace listing must link to a working private vulnerability-reporting channel. That public reporting route has not yet been activated for this candidate. No dedicated address or security certification is claimed.

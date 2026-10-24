@@ -1,3 +1,11 @@
+## 1.0.0-rc1 — prepared for review, not published
+
+- Prepare the first 1.0 release candidate with the existing correction, publication, inventory, role-selection, administrative-archive and individual-email features.
+- Preserve product runtime, schema, capabilities and English strings from the qualified 0.12.6 baseline. Increment only the version/savepoint and its regression-test baseline.
+- Consolidate validation documentation around completed local and Linux results, including corrected PHP releases and startup session settings.
+- Keep the strict PHP8.4 native-generator failure explicit. No native source patch, hidden diagnostic, Marketplace approval or accessibility certification is claimed.
+- Preserve earlier alpha archives and tags. Public reporting links and final release authorisation remain separate.
+
 ## 0.12.6-alpha
 
 - Align contributor instructions with the actual local_iomad dependency, optional administrative archives and explicit reviewed publication.

@@ -1,6 +1,6 @@
 # IOMAD Certificate Regenerator
 
-Independent Moodle local plugin by Michel Cardinal, component `local_iomadcertregen`. Requires IOMAD and its IOMAD Certificate activity. This is a **laboratory alpha**, not a Marketplace-approved release or a Moodle/IOMAD-certified product.
+Independent Moodle local plugin by Michel Cardinal, component `local_iomadcertregen`. Requires IOMAD and its IOMAD Certificate activity. This is a **release candidate for review**, not a Marketplace-approved release or a Moodle/IOMAD-certified product.
 
 ## Purpose
 
@@ -105,7 +105,7 @@ See [TESTING.md](TESTING.md), [CHANGES.md](CHANGES.md) and [SECURITY.md](SECURIT
 
 Dans les paramètres natifs de l'activité, choisissez d'abord le bon modèle et ses réglages. Dans **IOMAD Certificate Regenerator**, préparez les corrections, ouvrez les PDF pour les vérifier, puis confirmez-les. La **publication** est une étape distincte qui met la version corrigée à la disposition de l’élève; la conservation des anciens PDF dépend de la politique d’archive et du choix autorisé. La sélection collective traite au plus 30 élèves par demande. Le **courriel** reste une action volontaire distincte.
 
-L'inventaire est aussi disponible dans les **Rapports personnalisés**, avec la source **IOMAD Certificate inventory**. Il décrit le modèle actuellement configuré; il ne peut pas décider quel modèle devrait être utilisé ni identifier le modèle d'un ancien PDF. Les entrées d'historique sans correspondance certaine ne sont pas remplacées. Cette version reste une alpha de laboratoire.
+L'inventaire est aussi disponible dans les **Rapports personnalisés**, avec la source **IOMAD Certificate inventory**. Il décrit le modèle actuellement configuré; il ne peut pas décider quel modèle devrait être utilisé ni identifier le modèle d'un ancien PDF. Les entrées d'historique sans correspondance certaine ne sont pas remplacées. Cette version reste un candidat à valider avant diffusion stable.
 
 ## Acknowledgements
 

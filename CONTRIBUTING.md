@@ -6,12 +6,23 @@ Report ordinary defects through the repository issue tracker. Use the private ro
 
 Use an isolated IOMAD laboratory. The component directory is `local/iomadcertregen`. Install IOMAD and its bundled `mod_iomadcertificate` and `local_iomad` dependencies first, using the versions declared in `version.php`. Native history storage differs between the qualified branches; it is not an additional plugin dependency named `local_iomad_track`. The plugin ZIP does not require Composer or any build step. Composer is needed only to prepare Moodle's development tools and PHPUnit dependencies.
 
-Configure Moodle's PHPUnit prefix and dataroot separately from the ordinary site, then use the native commands:
+Configure Moodle's PHPUnit prefix and dataroot separately from the ordinary site. From the IOMAD project root, initialise the test environment with the command for that branch:
 
 ```sh
+# IOMAD 4.5 and 5.0.
 php admin/tool/phpunit/cli/init.php --disable-composer
-vendor/bin/phpunit --configuration phpunit.xml --testsuite local_iomadcertregen_testsuite
+
+# IOMAD 5.1 and 5.2.
+php public/admin/tool/phpunit/cli/init.php --disable-composer
 ```
+
+Then run the plugin suite from the same project root:
+
+```sh
+php vendor/bin/phpunit --configuration phpunit.xml --testsuite local_iomadcertregen_testsuite
+```
+
+This development command is not evidence of strict release qualification. Use the strict flags and checks documented in TESTING.md and the qualification workflow for a release.
 
 Initialisation resets test tables and test files. Never use ordinary site data for these settings. Tests create fictitious accounts and certificates through native Moodle/IOMAD fixtures.
 

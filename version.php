@@ -25,10 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_iomadcertregen';
-$plugin->version = 2026102411;
+$plugin->version = 2026102412;
 $plugin->requires = 2024100700;
-$plugin->release = '0.12.6-alpha';
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->release = '1.0.0-rc1';
+$plugin->maturity = MATURITY_RC;
 $plugin->supported = [405, 502];
 $plugin->dependencies = [
     'mod_iomadcertificate' => 2024100700,
