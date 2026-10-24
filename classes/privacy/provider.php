@@ -49,12 +49,17 @@ final class provider implements core_userlist_provider, metadata_provider, plugi
         $fields = [];
         foreach (
             ['contextid', 'cmid', 'issueid', 'userid', 'actorid', 'status', 'requestkey',
-                'sourcehash', 'pdfhash', 'timecreated', 'timemodified', 'timeexpires'] as $field
+                'sourcehash', 'pdfhash', 'timecreated', 'timemodified', 'timeexpires',
+                'mailstatus', 'mailtime', 'mailrequestkey'] as $field
         ) {
             $fields[$field] = 'privacy:metadata:operation:' . $field;
         }
         $collection->add_database_table('local_iomadcertregen_op', $fields, 'privacy:metadata:operation');
         $collection->add_subsystem_link('core_files', [], 'privacy:metadata:files');
+        $collection->add_external_location_link('email', [
+            'email' => 'privacy:metadata:email:address',
+            'pdf' => 'privacy:metadata:email:pdf',
+        ], 'privacy:metadata:email');
         return $collection;
     }
 
@@ -112,7 +117,7 @@ final class provider implements core_userlist_provider, metadata_provider, plugi
             foreach ($operations as $operation) {
                 $path = [get_string('pluginname', 'local_iomadcertregen'), (string)$operation->id];
                 $data = clone $operation;
-                unset($data->requestkey);
+                unset($data->requestkey, $data->mailrequestkey);
                 writer::with_context($context)->export_data($path, $data);
                 // A preparing administrator's request must not disclose another learner's PDF.
                 if ((int)$operation->userid === (int)$userid) {

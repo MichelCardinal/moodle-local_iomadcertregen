@@ -88,6 +88,26 @@ if ($operation->status === 'confirmed') {
         get_string('download', 'local_iomadcertregen'),
         ['class' => 'btn btn-primary']
     ));
+    echo html_writer::tag('p', get_string('mailstatus_' . $operation->mailstatus, 'local_iomadcertregen'));
+    if ($operation->mailtime) {
+        echo html_writer::tag('p', userdate($operation->mailtime));
+    }
+    if ((int)$data[0]->delivery === 2) {
+        echo $OUTPUT->notification(get_string('emailconfigured', 'local_iomadcertregen'), 'info');
+    }
+    if (
+        (int)$operation->actorid === (int)$USER->id &&
+            in_array($operation->mailstatus, ['notrequested', 'failed'], true)
+    ) {
+        echo html_writer::tag('p', html_writer::link(
+            new moodle_url(
+                '/local/iomadcertregen/email.php',
+                ['id' => $id, 'operationid' => $operationid]
+            ),
+            get_string('sendcorrectedemail', 'local_iomadcertregen'),
+            ['class' => 'btn btn-secondary']
+        ));
+    }
 } else {
     echo html_writer::tag('p', get_string('confirmnotice', 'local_iomadcertregen'));
     $form->display();

@@ -29,32 +29,25 @@
  * @return bool Success.
  */
 function xmldb_local_iomadcertregen_upgrade(int $oldversion): bool {
-    if ($oldversion < 2026102301) {
-        upgrade_plugin_savepoint(true, 2026102301, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102302) {
-        upgrade_plugin_savepoint(true, 2026102302, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102303) {
-        upgrade_plugin_savepoint(true, 2026102303, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102304) {
-        upgrade_plugin_savepoint(true, 2026102304, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102305) {
-        upgrade_plugin_savepoint(true, 2026102305, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102306) {
-        upgrade_plugin_savepoint(true, 2026102306, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102307) {
-        upgrade_plugin_savepoint(true, 2026102307, 'local', 'iomadcertregen');
-    }
-    if ($oldversion < 2026102308) {
-        upgrade_plugin_savepoint(true, 2026102308, 'local', 'iomadcertregen');
-    }
+    // Earlier alpha upgrades were metadata-only savepoints, with no schema or deadline transformations.
     if ($oldversion < 2026102309) {
         upgrade_plugin_savepoint(true, 2026102309, 'local', 'iomadcertregen');
+    }
+    if ($oldversion < 2026102310) {
+        global $DB;
+        $manager = $DB->get_manager();
+        $table = new xmldb_table('local_iomadcertregen_op');
+        $fields = [
+            new xmldb_field('mailstatus', XMLDB_TYPE_CHAR, '12', null, XMLDB_NOTNULL, null, 'notrequested'),
+            new xmldb_field('mailtime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
+            new xmldb_field('mailrequestkey', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, ''),
+        ];
+        foreach ($fields as $field) {
+            if (!$manager->field_exists($table, $field)) {
+                $manager->add_field($table, $field);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2026102310, 'local', 'iomadcertregen');
     }
     return true;
 }

@@ -6,12 +6,12 @@ Independent Moodle local plugin by Michel Cardinal. Requires IOMAD and its IOMAD
 
 ### Purpose
 
-An authorised site administrator can prepare, review, confirm and download a separate corrected PDF for an existing certificate issue. The original issue identifier, code, stored issue date and native files remain unchanged. No email, new issue, grade, completion or enrolment change is performed by the correction service. The corrected copy does **not** replace the learner's activity PDF or IOMAD history.
+An authorised site administrator can prepare, review, confirm and download a separate corrected PDF for an existing certificate issue. The original issue identifier, code, stored issue date and native files remain unchanged. No automatic email, new issue, grade, completion or enrolment change is performed by the correction service. A separate explicit action can email the exact confirmed copy to its beneficiary. The corrected copy does **not** replace the learner's activity PDF or IOMAD history.
 
 ### Current compatibility
 
 - Qualified branches: IOMAD **4.5, 5.0, 5.1 and 5.2**, with the exact native library/template fingerprints in `classes/local/qualified.json`. Current tested updates are 4.5.15, 5.0.11, 5.1.8 and 5.2.4. See [TESTING.md](TESTING.md) for runtimes, evidence and limits.
-- Version 0.8.0 passes 60 integration tests / 256 assertions per branch on PHP 8.3.30: PostgreSQL 17.11 on 4.5.15/5.0.11/5.1.8 and MySQL 8.4.11 on 5.2.4. Browser inventory acceptance uses Boost on 5.2.4; New Learning 12.2.7 has a separate native-layout API incompatibility on that branch. See TESTING.md for historical evidence and remaining limits.
+- Version 0.9.0 passes 75 integration tests / 303 assertions per branch on PHP 8.3.30: PostgreSQL 17.11 on 4.5.15/5.0.11/5.1.8 and MySQL 8.4.11 on 5.2.4. Browser inventory acceptance uses Boost on 5.2.4; New Learning 12.2.7 has a separate native-layout API incompatibility on that branch. See TESTING.md for historical evidence and remaining limits.
 - A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility. Future updates require qualification; this is not a promise to accept every patch automatically.
 - Plain Moodle without IOMAD is unsupported. The four branches share the IOMAD Certificate activity; their native tracking interfaces differ.
 - The six qualified standard templates are A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is disabled pending separate qualification. Company tests verify the beneficiary's seal when the administrator belongs to another company; other branding configurations are not exhaustively tested.
@@ -53,6 +53,16 @@ The current 5.1/5.2 native renderer omits the activity alias required by its tem
 IOMAD already supplies native stored-certificate regeneration, including in older branches. It replaces the IOMAD history file. This plugin provides a separate administrative copy with preparation, review and confirmation; it does not replace that native tool or the learner's PDF.
 
 The qualified native course/activity restore omits the saved original PDF, although the issue record is restored. The plugin restores its own confirmed copy independently. That copy remains downloadable, but a new correction of the restored issue is refused while native saved-original evidence is missing. This plugin does not reconstruct or insert a native original; use complete site backups for full recovery.
+
+### Emailing a confirmed correction
+
+After confirming the PDF, its preparing site administrator can choose **Email the corrected certificate**. The next page shows the current beneficiary name/address and requires explicit acknowledgement. The message attaches the exact confirmed PDF, in the beneficiary language when translations are available, with Moodle language fallback otherwise; it does not render a different file. A changed destination requires a fresh review. No arbitrary destination or additional recipient is accepted. Native activity email delivery prompts this action, but never causes an automatic resend.
+
+Moodle's normal email configuration is used with the site no-reply sender. There is no separate SMTP account or plugin credential. Site-wide disabled email, an unconfirmed/restricted account, nologin/suspension/deletion, invalid addresses and bounce restrictions prevent submission. A learner with an existing issue can receive the attached correction without visiting Moodle; current enrolment is not required. The learner's activity/history file is still unchanged by this release.
+
+The page records the latest attempt time and outcome. **Accepted for submission** does not prove inbox delivery or reading. A double click or repeated request does not resend; a submitted copy cannot be sent again by this action. A definite failure allows a new explicit request after reviewing configuration. An interrupted/uncertain attempt is blocked from retries to avoid duplicates; inspect the site mail logs. No automatic queue or bulk email is added. A failed attachment copy cannot send a message without its PDF.
+
+The plugin stores status, time and a hashed anti-duplicate request token on the existing operation; it does not store a historical address or message body. Privacy exports include bounded history and exclude tokens. The confirmed PDF and current profile address are disclosed to the configured email service and beneficiary only on explicit submission; delivered emails cannot be recalled by plugin deletion. Backup/restore preserves bounded mail history, resets private tokens and never sends mail. Earlier archives without history restore as not requested; interrupted states restore as uncertain. Standard activity/user removal and configured copy retention also remove owned mail metadata.
 
 ### Dates and source changes
 
@@ -111,15 +121,23 @@ Depuis **Administration du site → Plugins → Plugins locaux → IOMAD Certifi
 
 Dans les **Rapports personnalisés** natifs, choisissez la source **IOMAD Certificate inventory** (ou sa traduction locale). Les administrateurs disposent des mêmes colonnes, filtres et conditions. L’accès reste réservé aux administrateurs du site, y compris après partage d’une audience. La consultation/exportation ne modifie aucun paramètre ni certificat. Les rapports sont gérés et conservés par les API natives Moodle.
 
-Le modèle affiché est celui configuré actuellement. Il ne révèle pas le modèle utilisé dans les anciens PDF, ni tous les choix d’images/signatures/sceaux, et ne décide pas si le modèle convient au cours. Cette extension n’effectue aucune correction collective et ne remplace pas les fichiers apprenants. La version 0.8 passe 60 tests/256 assertions sur chacune des quatre branches; voir TESTING.md pour les bases/PHP réellement exécutés et les limites.
+Le modèle affiché est celui configuré actuellement. Il ne révèle pas le modèle utilisé dans les anciens PDF, ni tous les choix d’images/signatures/sceaux, et ne décide pas si le modèle convient au cours. Cette extension n’effectue aucune correction collective et ne remplace pas les fichiers apprenants. La version 0.9 passe 75 tests/303 assertions sur chacune des quatre branches; voir TESTING.md pour les bases/PHP réellement exécutés et les limites.
 
 ### Utilisation
 
-Cet outil crée une **copie administrative corrigée distincte** d'un certificat existant. Il conserve la délivrance originale, son code, sa date enregistrée et ses fichiers. Il ne remplace pas le PDF proposé à l'apprenant dans l'activité ou l'historique IOMAD. Il n'envoie aucun courriel et ne modifie ni note, ni achèvement, ni inscription.
+Cet outil crée une **copie administrative corrigée distincte** d'un certificat existant. Il conserve la délivrance originale, son code, sa date enregistrée et ses fichiers. Il ne remplace pas le PDF proposé à l'apprenant dans l'activité ou l'historique IOMAD. Il n’envoie aucun courriel automatiquement et ne modifie ni note, ni achèvement, ni inscription. Une action distincte permet l’envoi explicite de la copie confirmée au bénéficiaire.
 
 Installer le ZIP par l'installateur de plugins Moodle ou dans `local/iomadcertregen`, puis lancer la mise à jour native. L'accès est réservé aux administrateurs du site. Ouvrir l'outil depuis les réglages de l'activité ou **Administration du site → Plugins → Plugins locaux**.
 
 Choisir une délivrance, vérifier la preuve d'enregistrement de l'original et le modèle courant, préparer la copie, ouvrir sa prévisualisation, puis confirmer et télécharger. La confirmation conserve le même PDF. La liste donne également accès à la dernière copie confirmée.
+
+### Envoyer une copie confirmée par courriel
+
+L’administrateur ayant préparé la copie choisit **Envoyer le certificat corrigé par courriel** après confirmation. La page affiche le bénéficiaire et son adresse actuelle; une case d’autorisation est obligatoire. L’élève reçoit le PDF confirmé en pièce jointe, sans devoir revenir dans Moodle. Si l’adresse change avant validation, il faut revoir le destinataire. Aucun autre destinataire n’est proposé. Le réglage courriel de l’activité rappelle cette action sans déclencher d’envoi automatique.
+
+L’envoi utilise la configuration Moodle et l’expéditeur sans réponse du site. Aucun compte SMTP supplémentaire. Les comptes/adresses non admissibles et l’envoi global désactivé sont refusés. Les doublons sont évités; un échec explicite permet un nouvel essai volontaire. Un résultat incertain ou interrompu ne peut pas être réessayé automatiquement. « Accepté pour transmission » ne prouve ni réception ni lecture.
+
+L’historique conserve état/date et identifiant haché anti-doublon; pas d’adresse historique ni de corps du message. Les exports de confidentialité excluent cet identifiant, et les suppressions retirent les données propres. La sauvegarde/restauration conserve l’historique sans envoyer de message. Le plugin ne peut pas rappeler un courriel livré. **Le remplacement du PDF dans l’activité apprenant et l’historique IOMAD reste distinct et n’est pas réalisé ici.**
 
 ### Limites de cette version
 

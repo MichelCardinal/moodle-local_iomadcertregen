@@ -1,5 +1,13 @@
 # Changes
 
+## 0.9.0-alpha — 2026102310 (unreleased)
+
+- Add explicit email submission of the exact confirmed corrected PDF to its beneficiary, using Moodle mail configuration and recipient language. Native email delivery settings prompt the action without automatically sending.
+- Require the preparing administrator, session protection, explicit destination acknowledgement and an unchanged profile address. Reject ineligible recipients and disabled site mail rather than recording a false success.
+- Store bounded submission history and a hashed duplicate-protection token; use the existing issue lock. Definite failures require a new explicit request; submitted, interrupted and uncertain attempts are never automatically retried.
+- Include mail metadata in privacy exports/deletion and backup/restore; do not export request tokens or send on restoration. Declare the external email data flow. Learner activity/history PDFs remain unchanged.
+- Consolidate earlier metadata-only alpha savepoints without changing data or retention deadlines. Keep the real schema migration at this version; comply with PHP Mess Detector limits without disabling rules.
+
 ## 0.8.0-alpha — 2026102309 (unreleased)
 
 - Add a read-only, site-administrator certificate activity inventory, with current template identifiers, categories, course and activity visibility, native filters, pagination, export and navigation actions.

@@ -138,10 +138,23 @@ class restore_local_iomadcertregen_plugin extends restore_local_plugin {
             'issueid' => $issueid, 'userid' => $userid, 'actorid' => $actorid, 'status' => 'confirmed',
             'requestkey' => hash('sha256', $this->get_restoreid() . ':' . $copy->id),
             'sourcehash' => $copy->sourcehash, 'pdfhash' => $copy->pdfhash,
+            'mailstatus' => self::mail_status($copy),
+            'mailtime' => max(0, (int)($copy->mailtime ?? 0)), 'mailrequestkey' => '',
             'timecreated' => $copy->timecreated, 'timemodified' => $copy->timemodified, 'timeexpires' => $copy->timeexpires,
         ];
         $operation->id = $DB->insert_record('local_iomadcertregen_op', $operation);
         return $operation;
+    }
+
+    /**
+     * Preserve bounded mail history; an interrupted attempt must never be retried on restore.
+     *
+     * @param stdClass $copy Backup data, including older archives without mail history.
+     * @return string Safe historical state.
+     */
+    private static function mail_status(stdClass $copy): string {
+        $status = $copy->mailstatus ?? 'notrequested';
+        return in_array($status, ['notrequested', 'submitted', 'failed', 'unknown'], true) ? $status : 'unknown';
     }
 
     /**

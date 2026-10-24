@@ -117,6 +117,10 @@ final class backup_restore_test extends certificate_testcase {
         $operation = service::prepare($cm->id, $issue->id, str_repeat('c2', 16), sesskey());
         $confirmed = service::confirm($cm->id, $operation->id, sesskey());
         $bytes = service::file($confirmed)->get_content();
+        $DB->update_record('local_iomadcertregen_op', (object)[
+            'id' => $confirmed->id, 'mailstatus' => 'submitted', 'mailtime' => 1705320000,
+            'mailrequestkey' => str_repeat('7', 64),
+        ]);
         service::prepare($cm->id, $issue->id, str_repeat('d2', 16), sesskey());
         $expired = service::prepare($cm->id, $issue->id, str_repeat('e2', 16), sesskey());
         service::confirm($cm->id, $expired->id, sesskey());
@@ -127,6 +131,9 @@ final class backup_restore_test extends certificate_testcase {
         $copies = $DB->get_records('local_iomadcertregen_op', ['cmid' => $newcm->id]);
         $this->assertCount(1, $copies);
         $copy = reset($copies);
+        $this->assertSame('submitted', $copy->mailstatus);
+        $this->assertSame(1705320000, (int)$copy->mailtime);
+        $this->assertSame('', $copy->mailrequestkey);
         $this->assertNotEquals($confirmed->id, $copy->id);
         $this->assertNotEquals($issue->id, $copy->issueid);
         $this->assertEquals($learner->id, $copy->userid);

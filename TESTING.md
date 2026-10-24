@@ -1,6 +1,18 @@
-# Validation of 0.8.0-alpha
+# Validation of 0.9.0-alpha
 
 Local qualification on 23 October 2026. This is an unreleased laboratory candidate. GitHub Actions have not run; Marketplace approval, accessibility certification and Moodle badges are not claimed.
+
+## Explicit email revision
+
+0.9.0 adds explicit submission of an already confirmed PDF, with a bounded schema migration for attempt status/time and duplicate-protection token. Existing original/native and corrected-copy evidence was compared before/after the MAMP upgrade. The mail action does not replace learner files, reissue certificates or send automatically.
+
+New tests capture the real Moodle MIME message before SMTP, verify the exact base64 attachment bytes and beneficiary address, exercise duplicate submissions, definite and uncertain transport failures, disabled mail, recipient/account restrictions, changed destinations, CSRF, actor ownership, missing attachments, unconfirmed copies, an independent-connection lock and the real Moodle acknowledgement form. A failed attachment copy must never send a bare email. Backup/restore tests preserve submitted history and omit the private request token; privacy export/deletion tests cover the new fields. No real mail is sent by these tests. Successful SMTP delivery, inbox receipt and email-client presentation are not claimed.
+
+Browser verification on IOMAD 5.2/Boost confirms the action for an existing no-expiry confirmed copy and the recipient page. The laboratory retains noemailever: the page clearly reports disabled mail, offers no send form there, and no real recipient receives a message. Enabling real laboratory mail is outside this validation. Production sites use their own Moodle mail configuration.
+
+Six checks are required with no ignored violations. The maintainer's wrapper now inspects PHP Mess Detector output as well as its exit code. Older 0.7.1/0.8 exit-only quality summaries missed upgrade-savepoint complexity violations; those summaries do not establish a clean PHPMD result. Earlier metadata-only savepoints are consolidated in 0.9; old archives/tags remain immutable. Functional test results remain separate evidence.
+
+The full 0.9 suite passes **75 tests / 303 assertions per branch** on PHP 8.3.30: IOMAD 4.5.15, 5.0.11 and 5.1.8 with PostgreSQL 17.11, and IOMAD 5.2.4 with MySQL 8.4.11. The same exact native commits appear in the historical table below. Six Moodle Plugin CI checks pass with zero ignored violations. Final logs, commands and ZIP identity are retained in the release manifest/report. Earlier evidence below is explicitly historical; no new Behat, real SMTP, accessibility certification or remote CI result is inferred.
 
 ## Inventory revision
 

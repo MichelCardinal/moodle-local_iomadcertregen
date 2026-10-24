@@ -24,7 +24,7 @@
 
 $string['pluginname'] = 'IOMAD Certificate Regenerator';
 $string['iomadcertregen:regenerate'] = 'Prepare and confirm corrected certificate copies';
-$string['scope'] = 'This tool creates a separate corrected copy for the administrator. It preserves the original issue, its code and date, grades, completion and native files. It does not replace the PDF in the learner\'s activity or IOMAD history and does not send email.';
+$string['scope'] = 'This tool creates a separate corrected copy for the administrator. It preserves the original issue, its code and date, grades, completion and native files. It does not replace the PDF in the learner\'s activity or IOMAD history and never sends email automatically. A confirmed copy can be emailed through a separate explicit action.';
 $string['chooseactivity'] = 'Choose an IOMAD Certificate activity';
 $string['moduleversion'] = 'Detected IOMAD Certificate version: {$a}';
 $string['qualified'] = 'The renderer and selected native template match a qualified IOMAD source profile.';
@@ -98,3 +98,25 @@ $string['activityvisible'] = 'Activity visible';
 $string['issuedcertificates'] = 'View issued certificates';
 $string['inventoryscope'] = 'This report shows the current settings of each IOMAD Certificate activity, including hidden courses and activities. It does not identify the template used in previously issued PDFs or determine whether a template is appropriate for a course.';
 $string['inventoryhelp'] = 'Use the filters to search by course, category, activity or template. Each row represents one activity. Actions open the course, activity settings or issued certificates. No settings or certificates are changed by this report.';
+
+$string['sendcorrectedemail'] = 'Email the corrected certificate';
+$string['emailacknowledge'] = 'I authorise sending this confirmed PDF to the beneficiary shown above.';
+$string['emailnotice'] = 'The confirmed PDF will be attached to an email sent to the current beneficiary profile address. This is an explicit send; activity settings do not send it automatically. Sending does not update the learner activity PDF or IOMAD history. A sent email cannot be recalled by this plugin.';
+$string['emailconfigured'] = 'This activity uses email delivery. Corrections are not emailed automatically; use the separate email action after reviewing the confirmed copy.';
+$string['emaildisabled'] = 'Email sending is disabled on this site. No message was sent.';
+$string['emailrecipientchanged'] = 'The beneficiary email address changed. Reload this page and review the destination before sending.';
+$string['emailrecipientinvalid'] = 'This beneficiary cannot currently receive email. Check the account status, confirmed address and email restrictions. No message was sent.';
+$string['mailstatus_notrequested'] = 'This corrected copy has not been submitted by email.';
+$string['mailstatus_sending'] = 'An email attempt is in progress or was interrupted. Check mail logs before any further action; no automatic retry is performed.';
+$string['mailstatus_submitted'] = 'Moodle accepted this corrected PDF for email submission. This does not confirm receipt or reading by the learner.';
+$string['mailstatus_failed'] = 'The email service reported a failure. The PDF remains available; review the configuration before making a new explicit attempt.';
+$string['mailstatus_unknown'] = 'The email submission result is uncertain. Check mail logs; the plugin will not retry automatically or risk a duplicate.';
+$string['emailsubject'] = 'Corrected certificate — {$a}';
+$string['emailbody'] = 'Please find your corrected certificate for the course "{$a}" attached as a PDF. Keep this corrected version for your records.';
+$string['eventemailattempted'] = 'Corrected certificate email attempted';
+$string['privacy:metadata:operation:mailstatus'] = 'Result of an explicit corrected-PDF email attempt; not a receipt confirmation.';
+$string['privacy:metadata:operation:mailtime'] = 'Time of the last explicit email attempt.';
+$string['privacy:metadata:operation:mailrequestkey'] = 'Hashed request identifier used to prevent duplicate email submissions.';
+$string['privacy:metadata:email'] = 'After explicit administrator confirmation, the corrected PDF is submitted to the site email service for delivery to its beneficiary. The plugin cannot recall delivered emails.';
+$string['privacy:metadata:email:address'] = 'The beneficiary current profile email address used as the destination.';
+$string['privacy:metadata:email:pdf'] = 'The exact confirmed corrected PDF, containing the beneficiary certificate information.';
