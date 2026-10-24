@@ -46,16 +46,7 @@ $PAGE->set_heading(format_string($course->fullname));
 $custom = ['id' => $id, 'batch' => $key, 'mode' => $mode, 'requestkey' => bin2hex(random_bytes(16))];
 $total = 0;
 if ($mode === 'prepare') {
-    $total = $DB->count_records('iomadcertificate_issues', ['iomadcertificateid' => $cm->instance]);
-    $namefields = \core_user\fields::for_name()->get_sql('u')->selects;
-    $issues = $DB->get_records_sql(
-        'SELECT i.*' . $namefields . '
-          FROM {iomadcertificate_issues} i JOIN {user} u ON u.id = i.userid
-         WHERE i.iomadcertificateid = :instance ORDER BY u.lastname, u.firstname, i.id',
-        ['instance' => $cm->instance],
-        $page * batch::LIMIT,
-        batch::LIMIT
-    );
+    [$issues, $total] = \local_iomadcertregen\local\issue_list::page($id, $page);
     $custom['choices'] = [];
     foreach ($issues as $issue) {
         $custom['choices'][$issue->id] = fullname($issue) . ' — ' . $issue->code . ' — ' . userdate($issue->timecreated);
@@ -73,7 +64,14 @@ if ($submitted = $form->get_data()) {
     if ($mode === 'prepare') {
         [$key, $failed] = batch::prepare($id, $submitted->issueids, $submitted->requestkey, required_param('sesskey', PARAM_RAW));
     } else {
-        $failed = batch::apply($id, $key, $submitted->reviewhash, $mode === 'publish', required_param('sesskey', PARAM_RAW));
+        $failed = batch::apply(
+            $id,
+            $key,
+            $submitted->reviewhash,
+            $mode === 'publish',
+            required_param('sesskey', PARAM_RAW),
+            ['keep' => (bool)($submitted->keeporiginal ?? true), 'reason' => $submitted->correctionreason ?? '']
+        );
     }
     if (!$failed) {
         redirect(new moodle_url('/local/iomadcertregen/bulk.php', ['id' => $id, 'batch' => $key]));
@@ -98,6 +96,7 @@ if ($key && $DB->record_exists('local_iomadcertregen_op', ['batchkey' => $key, '
     $operations = batch::operations($id, $key);
     echo html_writer::tag('p', get_string('bulkresult', 'local_iomadcertregen'));
     $allconfirmed = true;
+    $pending = array_filter($operations, static fn($operation) => !$operation->publishedtime);
     foreach ($operations as $operation) {
         $data = records::issue($id, $operation->issueid);
         echo html_writer::tag('p', s(fullname($data[1])) . ' — ' . s($data[4]->code) . ' — ' .
@@ -124,7 +123,9 @@ if ($key && $DB->record_exists('local_iomadcertregen_op', ['batchkey' => $key, '
             }
         }
     }
-    if ($submitted && $mode === 'prepare') {
+    if (!$pending) {
+        echo $OUTPUT->notification(get_string('published', 'local_iomadcertregen'), 'success');
+    } else if ($submitted && $mode === 'prepare') {
         echo $OUTPUT->continue_button(new moodle_url('/local/iomadcertregen/bulk.php', ['id' => $id, 'batch' => $key]));
     } else {
         if ($mode === 'publish') {
@@ -132,7 +133,7 @@ if ($key && $DB->record_exists('local_iomadcertregen_op', ['batchkey' => $key, '
         }
         $form->display();
     }
-    if ($allconfirmed && $mode !== 'publish') {
+    if ($allconfirmed && $pending && $mode !== 'publish') {
         echo html_writer::tag('p', html_writer::link(new moodle_url('/local/iomadcertregen/bulk.php', [
             'id' => $id, 'batch' => $key, 'mode' => 'publish',
         ]), get_string('bulkpublish', 'local_iomadcertregen'), ['class' => 'btn btn-primary']));

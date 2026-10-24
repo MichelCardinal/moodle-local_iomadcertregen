@@ -67,7 +67,10 @@ final class publication_files {
             throw new \moodle_exception('unsupported', 'local_iomadcertregen');
         }
         foreach ($profile as $path => $hash) {
-            if (!is_readable($CFG->dirroot . '/' . $path) || hash_file('sha256', $CFG->dirroot . '/' . $path) !== $hash) {
+            if (
+                !is_readable($CFG->dirroot . '/' . $path) ||
+                    !in_array(hash_file('sha256', $CFG->dirroot . '/' . $path), (array)$hash, true)
+            ) {
                 throw new \moodle_exception('unsupported', 'local_iomadcertregen');
             }
         }

@@ -71,10 +71,76 @@ final class batch_test extends publication_testcase {
         $this->assertNull(learner::operation($data[2]->id, $seconduser->id));
         $this->assertSame([], batch::apply($data[2]->id, $key, batch::fingerprint($copies, false), false, sesskey()));
         $copies = batch::operations($data[2]->id, $key);
-        $this->assertSame([], batch::apply($data[2]->id, $key, batch::fingerprint($copies, true), true, sesskey()));
+        $failed = batch::apply(
+            $data[2]->id,
+            $key,
+            batch::fingerprint($copies, true),
+            true,
+            sesskey(),
+            ['keep' => false, 'reason' => 'Batch template correction']
+        );
+        $this->assertSame([], $failed);
+        foreach (batch::operations($data[2]->id, $key) as $operation) {
+            $this->assertSame(0, (int)$operation->keeporiginal);
+            $this->assertSame('Batch template correction', $operation->correctionreason);
+        }
         $this->assertNotNull(learner::operation($data[2]->id, $seconduser->id));
         $this->assertSame(0, $sink->count());
         $this->assertSame(2, $DB->count_records('iomadcertificate_issues', ['iomadcertificateid' => $data[0]->id]));
+    }
+
+    /**
+     * Thirty existing issues can be reviewed and published with original identity and bytes retained.
+     */
+    public function test_thirty_issues_are_prepared_confirmed_and_published(): void {
+        global $DB;
+        [$data, , $files, $original] = $this->correction();
+        $ids = [(int)$data[4]->id];
+        for ($number = 1; $number < 30; $number++) {
+            $user = $this->getDataGenerator()->create_user();
+            $issue = clone $data[4];
+            unset($issue->id);
+            $issue->userid = $user->id;
+            $issue->code = 'BATCH30-' . $number;
+            $issue->id = $DB->insert_record('iomadcertificate_issues', $issue);
+            get_file_storage()->create_file_from_storedfile(
+                ['itemid' => $issue->id, 'userid' => $user->id],
+                reset($files)
+            );
+            $ids[] = (int)$issue->id;
+        }
+        $issues = $DB->get_records('iomadcertificate_issues', ['iomadcertificateid' => $data[0]->id], 'id');
+        $sink = $this->redirectEmails();
+        [$key, $failed] = batch::prepare($data[2]->id, $ids, str_repeat('c7', 16), sesskey());
+        $this->assertSame([], $failed);
+        $operations = batch::operations($data[2]->id, $key);
+        $this->assertCount(30, $operations);
+        $this->assertSame([], batch::apply($data[2]->id, $key, batch::fingerprint($operations, false), false, sesskey()));
+        $operations = batch::operations($data[2]->id, $key);
+        $this->assertSame([], batch::apply($data[2]->id, $key, batch::fingerprint($operations, true), true, sesskey()));
+        foreach (batch::operations($data[2]->id, $key) as $operation) {
+            $this->assertGreaterThan(0, $operation->publishedtime);
+            $native = get_file_storage()->get_area_files(
+                $data[5]->id,
+                'mod_iomadcertificate',
+                'issue',
+                $operation->issueid,
+                'id',
+                false
+            );
+            $this->assertSame(service::file($operation)->get_content(), reset($native)->get_content());
+            $archive = get_file_storage()->get_area_files(
+                $data[5]->id,
+                'local_iomadcertregen',
+                'original',
+                $operation->id,
+                'id',
+                false
+            );
+            $this->assertSame($original, reset($archive)->get_content());
+        }
+        $this->assertEquals($issues, $DB->get_records('iomadcertificate_issues', ['iomadcertificateid' => $data[0]->id], 'id'));
+        $this->assertSame(0, $sink->count());
     }
 
     /**
@@ -110,7 +176,8 @@ final class batch_test extends publication_testcase {
     public function test_oversized_selection_is_refused(): void {
         [$data] = $this->correction();
         $this->expectException(\moodle_exception::class);
-        batch::prepare($data[2]->id, range(1, 21), str_repeat('f8', 16), sesskey());
+        $this->expectExceptionMessage(get_string('bulkinvalid', 'local_iomadcertregen'));
+        batch::prepare($data[2]->id, range(1, 31), str_repeat('f8', 16), sesskey());
     }
 
     /**

@@ -78,7 +78,8 @@ class restore_local_iomadcertregen_plugin extends restore_local_plugin {
                 return false;
             }
         }
-        return filter_var($copy->timeexpires, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) !== false;
+        return filter_var($copy->timeexpires, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) !== false &&
+            \local_iomadcertregen\local\archive_metadata::valid($copy);
     }
 
     /**
@@ -144,6 +145,9 @@ class restore_local_iomadcertregen_plugin extends restore_local_plugin {
             'mailtime' => max(0, (int)($copy->mailtime ?? 0)), 'mailrequestkey' => '',
             'timecreated' => $copy->timecreated, 'timemodified' => $copy->timemodified, 'timeexpires' => $copy->timeexpires,
         ];
+        foreach (\local_iomadcertregen\local\archive_metadata::values($copy) as $field => $value) {
+            $operation->$field = $value;
+        }
         $operation->id = $DB->insert_record('local_iomadcertregen_op', $operation);
         return $operation;
     }

@@ -29,13 +29,12 @@
  * @param context $context Page context.
  */
 function local_iomadcertregen_extend_settings_navigation(settings_navigation $navigation, context $context): void {
-    if ($context->contextlevel !== CONTEXT_MODULE || !is_siteadmin()) {
+    if ($context->contextlevel !== CONTEXT_MODULE) {
         return;
     }
     $cm = get_coursemodule_from_id('iomadcertificate', $context->instanceid);
     if (
-        !$cm || !has_capability('local/iomadcertregen:regenerate', $context) ||
-            !has_capability('mod/iomadcertificate:manage', $context)
+        !$cm || !\local_iomadcertregen\local\access::allowed($context)
     ) {
         return;
     }

@@ -46,6 +46,9 @@ final class records {
             'id' => $issueid, 'iomadcertificateid' => $certificate->id,
         ], '*', MUST_EXIST);
         $user = $DB->get_record('user', ['id' => $issue->userid, 'deleted' => 0, 'suspended' => 0], '*', MUST_EXIST);
+        if (!access::user_allowed($context, (int)$user->id)) {
+            throw new \required_capability_exception($context, 'local/iomadcertregen:regenerate', 'nopermissions', '');
+        }
         if (
             $DB->count_records('iomadcertificate_issues', [
                 'iomadcertificateid' => $certificate->id, 'userid' => $user->id,

@@ -29,6 +29,6 @@ $capabilities = [
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [],
+        'archetypes' => ['manager' => CAP_ALLOW],
     ],
 ];

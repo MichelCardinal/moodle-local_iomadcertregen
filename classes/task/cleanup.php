@@ -78,5 +78,6 @@ final class cleanup extends \core\task\scheduled_task {
         } finally {
             $rows->close();
         }
+        \local_iomadcertregen\local\retention::purge_archives();
     }
 }

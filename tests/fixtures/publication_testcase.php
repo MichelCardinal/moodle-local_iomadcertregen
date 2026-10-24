@@ -82,14 +82,16 @@ abstract class publication_testcase extends certificate_testcase {
      *
      * @param array $data Native records.
      * @param \stdClass $operation Confirmed operation.
+     * @param array $archivepolicy Optional administrative archive policy.
      * @return \stdClass Published operation.
      */
-    protected function publish(array $data, \stdClass $operation): \stdClass {
+    protected function publish(array $data, \stdClass $operation, array $archivepolicy = []): \stdClass {
         return publication::publish(
             $data[2]->id,
             $operation->id,
             publication_files::fingerprint(publication_files::targets($data)),
-            sesskey()
+            sesskey(),
+            $archivepolicy
         );
     }
 

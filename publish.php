@@ -48,7 +48,13 @@ if ($form->is_cancelled()) {
     redirect($back);
 }
 if ($submitted = $form->get_data()) {
-    publication::publish($id, $operationid, $submitted->reviewhash, required_param('sesskey', PARAM_RAW));
+    publication::publish(
+        $id,
+        $operationid,
+        $submitted->reviewhash,
+        required_param('sesskey', PARAM_RAW),
+        ['keep' => (bool)$submitted->keeporiginal, 'reason' => $submitted->correctionreason]
+    );
     redirect($back);
 }
 echo $OUTPUT->header();

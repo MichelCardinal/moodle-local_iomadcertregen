@@ -4,7 +4,7 @@ Independent Moodle local plugin by Michel Cardinal, component `local_iomadcertre
 
 ## Purpose
 
-Find courses using IOMAD Certificate, review their current template settings, and correct certificates that have already been issued. Preparing and confirming a correction creates an independent reviewed PDF. **Publishing** that correction is a separate explicit action: it makes the reviewed PDF available through the learner's existing activity button and replaces the identified saved native PDFs. Previous native PDFs are retained for administrators.
+Find courses using IOMAD Certificate, review their current template settings, and correct certificates that have already been issued. Preparing and confirming a correction creates an independent reviewed PDF. **Publishing** that correction is a separate explicit action: it makes the reviewed PDF available through the learner's existing activity button and replaces the identified saved native PDFs. Former native PDFs may be retained as administrative archives according to the site policy and the reviewed publication choice.
 
 The plugin preserves the native issue identifier, certificate code and recorded issue date. It does not create another issue, change grades, completion or enrolments, or impersonate a learner. Printed dates and grades still follow the native template's current printing rules. Email is a separate explicit action; neither confirmation nor publication sends it automatically.
 
@@ -17,7 +17,13 @@ The plugin preserves the native issue identifier, certificate code and recorded 
 
 Back up the complete site before installing or upgrading. Older company-bound preparations may need to be prepared again to validate their company scope; existing confirmed PDFs remain administratively available. Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and use Moodle's normal upgrade process. On IOMAD 5.1/5.2 the manual destination is `public/local/iomadcertregen` inside the installation. Moodle's ZIP installer resolves this automatically. No plugin Composer command or JavaScript build is required.
 
-Correction, publication, email and inventory administration are restricted to **site administrators**. The module capability `local/iomadcertregen:regenerate` and native certificate-management capability are also checked. Granting the plugin capability alone does not delegate corrections to teachers or company managers.
+Activity corrections, publication, administrative archives and explicit email require both `local/iomadcertregen:regenerate` and `mod/iomadcertificate:manage` in the activity context. Moodle manager archetypes are allowed the plugin capability by default; editing teachers require an explicit administrator decision. Category, course and activity role assignments and overrides apply, including separate-group restrictions. No IOMAD company/course/user association is required for this activity workflow. An IOMAD company role alone does not grant Moodle course permissions.
+
+Under **Site administration → Plugins → Local plugins → IOMAD Certificate Regenerator → Access and permissions**, site administrators select authorised roles in Moodle's native searchable multiple-selection field. Existing grants are preselected. Click a suggested role to add it; remove its selected chip to withdraw its grant. Review and acknowledge the complete selection before saving. An empty selection leaves site administrators with access. The page edits only the plugin capability in role definitions using the native Access API, which records events and invalidates role caches. Existing refusal states for unselected roles remain intact; selecting a prohibited role explicitly replaces its role-definition prohibition, with a warning. Unknown role IDs and stale selections are rejected before changes; the selection is saved in a native database transaction.
+
+This does not assign roles, enrol users, grant course access or change native certificate-management permissions. Other roles and lower-context overrides remain effective. Advanced Moodle role settings remain linked. The global inventory, custom report source, plugin settings, role editor and backup/restore of administrative copies remain site-administrator-only.
+
+Under the same plugin's **Retention settings**, choose the administrative archive policy: operator choice (default), always retain or never retain. A forced choice is displayed on individual and batch publication forms and enforced by the publication service. A contradictory stale or forged request is refused before any PDF replacement. Policy changes affect future publications only; existing archives, their deadlines and correction audit records remain unchanged.
 
 ## Find courses and templates
 
@@ -43,7 +49,7 @@ A unique existing issue and a saved original activity PDF are required. A prelim
 
 ## Correct several learners
 
-Choose **Correct several learners** from the activity's issued-certificate list. Select up to **20 existing issues per request**; selection pages are separate from the individual list. For larger groups, repeat with another selection.
+Choose **Correct several learners** from the activity's issued-certificate list. Select up to **30 existing issues per request**; selection pages are separate from the individual list. For larger groups, repeat with another selection.
 
 Prepare the selection, open each labelled PDF link, then **Confirm reviewed copies**. A further review page offers **Publish reviewed copies for learners**, listing the native targets. Publication is never combined silently with confirmation or email.
 
@@ -97,10 +103,21 @@ See [TESTING.md](TESTING.md), [CHANGES.md](CHANGES.md) and [SECURITY.md](SECURIT
 
 ## Guide rapide en français
 
-Dans les paramètres natifs de l'activité, choisissez d'abord le bon modèle et ses réglages. Dans **IOMAD Certificate Regenerator**, préparez les corrections, ouvrez les PDF pour les vérifier, puis confirmez-les. La **publication** est une étape distincte qui met la version corrigée à la disposition de l'élève et conserve les anciens PDF pour l'administrateur. La sélection collective traite au plus 20 élèves par demande. Le **courriel** reste une action volontaire distincte.
+Dans les paramètres natifs de l'activité, choisissez d'abord le bon modèle et ses réglages. Dans **IOMAD Certificate Regenerator**, préparez les corrections, ouvrez les PDF pour les vérifier, puis confirmez-les. La **publication** est une étape distincte qui met la version corrigée à la disposition de l’élève; la conservation des anciens PDF dépend de la politique d’archive et du choix autorisé. La sélection collective traite au plus 30 élèves par demande. Le **courriel** reste une action volontaire distincte.
 
 L'inventaire est aussi disponible dans les **Rapports personnalisés**, avec la source **IOMAD Certificate inventory**. Il décrit le modèle actuellement configuré; il ne peut pas décider quel modèle devrait être utilisé ni identifier le modèle d'un ancien PDF. Les entrées d'historique sans correspondance certaine ne sont pas remplacées. Cette version reste une alpha de laboratoire.
 
 ## Acknowledgements
 
 PDF generation uses the installed IOMAD Certificate module, whose native source credits Mark Nelson and IOMAD contributors. Native code and assets retain their own copyright and licence. No third-party theme code or laboratory files are bundled.
+
+Version 0.10.2 also recognises two reviewed legacy IOMAD 4.5 source variants. Native files with unknown fingerprints remain unsupported; no core or theme modification is required.
+
+
+### Previous PDFs and correction records (0.11)
+
+Before individual or collective publication, choose whether to **keep an administrative archive** (default) or **not retain the previous PDF**, and enter a correction reason. The policy applies to the exact native PDFs replaced in that publication. If no archive is selected, their former content is not retained as a plugin file after successful replacement. Earlier administrative archives and historical entries excluded from the publication are not deleted by this choice. Learners use the corrected publication; original archives require administrative tool access.
+
+The correction record retains the actor, learner/issue references, historical publication time, reason and archive choice, including when superseded. Existing privacy/lifecycle deletion rules still apply to that personal data. Replaying a publication does not rewrite its original decision. A superseded publication must be corrected through a new reviewed operation.
+
+**Administrative archive retention period** in plugin settings applies to future retained archives only. Zero means no automatic expiry. The stored deadline does not change when settings change. Expired archives are unavailable immediately, and Moodle cron removes their plugin files without removing the corrected PDF or correction record. Existing archives keep their recorded deadline (unlimited for earlier versions). The policy does not remove external downloads, emails, server backups or other components’ unrelated files. Privacy exports can include personal records and retained files as appropriate; administrative-only UI access is not a statement about exemption from data-subject rights.

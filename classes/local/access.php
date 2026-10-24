@@ -43,16 +43,59 @@ final class access {
     }
 
     /**
-     * Require an authorised site administrator in this activity.
+     * Check activity correction rights through native Moodle capabilities.
+     *
+     * @param \context_module $context Activity context.
+     * @return bool Whether corrections may be administered in this activity.
+     */
+    public static function allowed(\context_module $context): bool {
+        return isloggedin() && !isguestuser() &&
+            self::course_allowed($context);
+    }
+
+    /**
+     * Check ordinary Moodle role permissions in the activity context.
+     *
+     * @param \context_module $context Activity context.
+     * @return bool Whether both correction and native management rights are granted.
+     */
+    public static function course_allowed(\context_module $context): bool {
+        return has_capability('local/iomadcertregen:regenerate', $context) &&
+            has_capability('mod/iomadcertificate:manage', $context);
+    }
+
+    /**
+     * Require an authorised correction operator in this activity.
      *
      * @param \context_module $context Activity context.
      */
     public static function require_permission(\context_module $context): void {
-        if (!is_siteadmin()) {
+        if (!self::allowed($context)) {
             throw new \required_capability_exception($context, 'local/iomadcertregen:regenerate', 'nopermissions', '');
         }
-        require_capability('local/iomadcertregen:regenerate', $context);
-        require_capability('mod/iomadcertificate:manage', $context);
+    }
+
+    /**
+     * Check the beneficiary as well as course and separate-group boundaries.
+     *
+     * @param \context_module $context Activity context.
+     * @param int $userid Beneficiary.
+     * @return bool Whether the operator may correct this beneficiary's issue.
+     */
+    public static function user_allowed(\context_module $context, int $userid): bool {
+        if (!self::allowed($context)) {
+            return false;
+        }
+        $cm = get_coursemodule_from_id('iomadcertificate', $context->instanceid, 0, false, MUST_EXIST);
+        if ((int)groups_get_activity_groupmode($cm) !== SEPARATEGROUPS || has_capability('moodle/site:accessallgroups', $context)) {
+            return true;
+        }
+        foreach (groups_get_activity_allowed_groups($cm) as $group) {
+            if (groups_is_member($group->id, $userid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

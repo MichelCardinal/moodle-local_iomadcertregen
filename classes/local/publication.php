@@ -35,9 +35,16 @@ final class publication {
      * @param int $id Confirmed operation.
      * @param string $reviewhash Reviewed native file fingerprint.
      * @param string $sesskey Session protection.
+     * @param array $archivepolicy Archive choice and administrative reason.
      * @return \stdClass Published operation.
      */
-    public static function publish(int $cmid, int $id, string $reviewhash, string $sesskey): \stdClass {
+    public static function publish(
+        int $cmid,
+        int $id,
+        string $reviewhash,
+        string $sesskey,
+        array $archivepolicy = []
+    ): \stdClass {
         global $DB;
         if (!confirm_sesskey($sesskey)) {
             throw new \moodle_exception('invalidsesskey', 'error');
@@ -70,22 +77,17 @@ final class publication {
             if (!hash_equals(publication_files::fingerprint($files), $reviewhash)) {
                 throw new \moodle_exception('sourcechanged', 'local_iomadcertregen');
             }
+            $metadata = self::archive_policy($archivepolicy);
             $pdf = self::pdf($operation);
             $transaction = $DB->start_delegated_transaction();
             try {
-                foreach ($files as $file) {
-                    // Retain every previous native PDF before replacing its content; preserve its route and filename.
-                    get_file_storage()->create_file_from_storedfile([
-                    'contextid' => $operation->contextid, 'component' => 'local_iomadcertregen',
-                    'filearea' => 'original', 'itemid' => $operation->id, 'filepath' => '/',
-                    'filename' => 'native-' . $file->get_id() . '.pdf', 'userid' => $operation->userid,
-                    'source' => json_encode(['nativefileid' => $file->get_id(), 'sha256' => hash('sha256', $file->get_content())]),
-                    ], $file);
-                    $file->replace_file_with($pdf);
-                }
+                self::replace_files($files, $operation, $pdf, (bool)$metadata['keeporiginal']);
                 self::source($operation);
                 $DB->set_field('local_iomadcertregen_op', 'publishedtime', 0, ['cmid' => $cmid, 'userid' => $operation->userid]);
-                $operation->publishedtime = time();
+                $operation->publishedtime = $metadata['correctiontime'];
+                foreach ($metadata as $field => $value) {
+                    $operation->$field = $value;
+                }
                 $operation->issuehash = self::issue_hash($data[4]);
                 $DB->update_record('local_iomadcertregen_op', $operation);
                 \local_iomadcertregen\event\copy_published::create([
@@ -99,6 +101,56 @@ final class publication {
             return $operation;
         } finally {
             $lock->release();
+        }
+    }
+
+    /**
+     * Validate and capture archive policy once, before any native file replacement.
+     *
+     * @param array $policy Optional keep flag and bounded reason.
+     * @return array Immutable metadata stored with the correction.
+     */
+    private static function archive_policy(array $policy): array {
+        $forced = archive_policy::forced();
+        $keep = $policy['keep'] ?? $forced ?? true;
+        if (!is_bool($keep)) {
+            throw new \moodle_exception('invalidarchivepolicy', 'local_iomadcertregen');
+        }
+        if ($forced !== null && $keep !== $forced) {
+            throw new \moodle_exception('archivepolicychanged', 'local_iomadcertregen');
+        }
+        $reason = trim(clean_param($policy['reason'] ?? '', PARAM_TEXT));
+        $reason = $reason ?: get_string('reasondefault', 'local_iomadcertregen');
+        if (\core_text::strlen($reason) > 255) {
+            throw new \moodle_exception('invalidreason', 'local_iomadcertregen');
+        }
+        $time = time();
+        $duration = max(0, (int)get_config('local_iomadcertregen', 'archivelifetime'));
+        return [
+            'keeporiginal' => (int)$keep, 'correctionreason' => $reason, 'correctiontime' => $time,
+            'originalexpires' => $keep && $duration ? $time + $duration : 0,
+        ];
+    }
+
+    /**
+     * Replace reviewed native files, optionally retaining their former content in the same transaction.
+     *
+     * @param array $files Reviewed native files.
+     * @param \stdClass $operation Correction record.
+     * @param \stored_file $pdf Confirmed replacement.
+     * @param bool $keeporiginal Archive the former bytes.
+     */
+    private static function replace_files(array $files, \stdClass $operation, \stored_file $pdf, bool $keeporiginal): void {
+        foreach ($files as $file) {
+            if ($keeporiginal) {
+                get_file_storage()->create_file_from_storedfile([
+                    'contextid' => $operation->contextid, 'component' => 'local_iomadcertregen',
+                    'filearea' => 'original', 'itemid' => $operation->id, 'filepath' => '/',
+                    'filename' => 'native-' . $file->get_id() . '.pdf', 'userid' => $operation->userid,
+                    'source' => json_encode(['nativefileid' => $file->get_id(), 'sha256' => hash('sha256', $file->get_content())]),
+                ], $file);
+            }
+            $file->replace_file_with($pdf);
         }
     }
 
@@ -137,7 +189,10 @@ final class publication {
      */
     private static function require_eligible(\stdClass $operation): void {
         global $USER;
-        if ((int)$operation->actorid !== (int)$USER->id || $operation->status !== 'confirmed' || $operation->timeexpires) {
+        if (
+            (int)$operation->actorid !== (int)$USER->id || $operation->status !== 'confirmed' || $operation->timeexpires ||
+                (!empty($operation->correctiontime) && !$operation->publishedtime)
+        ) {
             throw new \moodle_exception('publicationunavailable', 'local_iomadcertregen');
         }
     }

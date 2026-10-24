@@ -1,3 +1,46 @@
+## 0.12.3-alpha
+
+- Refresh HTTP acceptance assertions for the current native capability label and the completed batch page, which intentionally has no further publication form.
+- Bind batch verification to the identity captured during preparation and check both archived originals as well as reviewed replacement bytes, native issue identity and unchanged mail status.
+- Advance only the metadata savepoint; keep manager-default migration at its original boundary. No correction, permission, archive or email behaviour changes.
+
+## 0.12.2-alpha
+
+- Replace the per-role edit workflow with Moodle’s native searchable multiple-role selector, with existing grants preselected and one explicit save.
+- Validate the complete selection, refuse unknown roles or stale definitions, and save via the native capability API in a database transaction. Preserve existing refusals for unselected roles and local overrides.
+- Keep the manager default grant migration at its original version boundary so later UI updates do not restore a grant an administrator removed.
+
+## 0.12.1-alpha
+
+- Simplify the native role-permission shortcut to a clear Yes/No choice, role-specific action labels and textual access badges.
+- Keep detailed role, company-context and prerequisite guidance in a keyboard-operable disclosure. Preserve the link to Moodle standard role settings.
+- Translate the simple choice to native permissions: Yes explicitly grants; No removes this role’s grant while preserving an existing prevent/prohibit decision. Other roles and local overrides still apply. Warn before replacing an existing role-definition prohibition.
+
+## 0.12.0-alpha
+
+- Delegate activity corrections through native Moodle role capabilities, with manager defaults and optional teacher grants, without requiring IOMAD company associations.
+- Add a site-administrator permission editor for installed and custom roles. Edit only the plugin capability, preserve local overrides and role assignments, validate CSRF and reject stale forms.
+- Respect separate-group boundaries for issue lists, correction services, administrative PDF delivery and batch selections.
+- Add an institutional archive policy: operator choice, always retain or never retain. Enforce it in individual and batch publication without changing existing archives or audit records.
+- Keep the global inventory, custom report source, settings and administrative backup/restore restricted to site administrators.
+
+## 0.11.0-alpha
+
+- Offer administrative archive retention or no retention when publishing an individual correction or a batch.
+- Record the archive choice, correction reason and historical publication time independently of the active learner publication.
+- Capture optional archive retention deadlines; restrict access immediately at expiry and clean only expired original archives, preserving the corrected PDF and correction record.
+- Preserve existing archives during upgrade and include policy metadata in privacy export and course backup/restore.
+
+## 0.10.3-alpha
+
+- Increase the reviewed batch limit from 20 to 30 existing issues, including server validation and local language drafts.
+- Exercise preparation, confirmation and publication of 30 real PDFs and rejection of 31 issues.
+
+## 0.10.2-alpha
+
+- Recognise two additional reviewed IOMAD 4.5 native file variants for publication, retaining exact file fingerprints and refusing unknown variants.
+- Verify original-file retention and access controls against these variants. No core or theme changes.
+
 # Changes
 
 ## 0.10.1-alpha — 2026102401 (unreleased)

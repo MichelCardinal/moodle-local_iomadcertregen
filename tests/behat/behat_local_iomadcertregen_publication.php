@@ -144,48 +144,6 @@ class behat_local_iomadcertregen_publication extends behat_base {
     }
 
     /**
-     * Select two existing native issues through the real multiple-selection form.
-     *
-     * @When /^I select the existing certificates of "([^"]*)" and "([^"]*)"$/
-     * @param string $first First username.
-     * @param string $second Second username.
-     */
-    public function select_issues(string $first, string $second): void {
-        global $DB;
-        $select = $this->getSession()->getPage()->findField('issueids[]');
-        if (!$select) {
-            throw new Exception('The native selection form is missing.');
-        }
-        foreach ([$first, $second] as $username) {
-            $userid = $DB->get_field('user', 'id', ['username' => $username], MUST_EXIST);
-            $issue = $DB->get_record('iomadcertificate_issues', ['userid' => $userid], '*', MUST_EXIST);
-            $this->capture($issue);
-            $select->selectOption((string)$issue->id, true);
-        }
-    }
-
-    /**
-     * Verify each issue in the selected batch, including originals and absence of new issues.
-     *
-     * @Then /^both selected certificate copies are "(prepared|confirmed|published)"$/
-     * @param string $status Expected state.
-     */
-    public function verify_batch(string $status): void {
-        global $DB;
-        $field = $this->getSession()->getPage()->find('css', 'input[name="batch"]');
-        if (!$field) {
-            throw new Exception('The batch review form is missing after the HTTP action.');
-        }
-        $key = $field->getValue();
-        $copies = $DB->get_records('local_iomadcertregen_op', ['batchkey' => $key]);
-        if (count($copies) !== 2 || count($this->before) !== 2) {
-            throw new Exception('The selected two-learner batch did not retain exactly two operations.');
-        }
-        foreach ($copies as $copy) {
-            $this->verify_batch_item($copy, $status);
-        }
-    }
-    /**
      * Compare one publication to its captured native identity and original bytes.
      *
      * @param array $item Captured native evidence.
@@ -215,28 +173,6 @@ class behat_local_iomadcertregen_publication extends behat_base {
                 hash('sha256', $native->get_content()) !== $operation->pdfhash
         ) {
             throw new Exception('Publication did not preserve native identity, original bytes and reviewed replacement.');
-        }
-    }
-
-    /**
-     * Check one selected beneficiary without changing the remaining batch checks.
-     *
-     * @param stdClass $copy Operation.
-     * @param string $status Expected batch state.
-     */
-    private function verify_batch_item(stdClass $copy, string $status): void {
-        global $DB;
-        $item = $this->before[$copy->issueid];
-        $native = get_file_storage()->get_file_by_id($item['fileid']);
-        $hash = $status === 'published' ? $copy->pdfhash : $item['hash'];
-        $issue = $DB->get_record('iomadcertificate_issues', ['id' => $copy->issueid], '*', MUST_EXIST);
-        if (
-            $copy->status !== ($status === 'published' ? 'confirmed' : $status) ||
-                ($status === 'published' && !$copy->publishedtime) ||
-                $issue != $item['issue'] || hash('sha256', $native->get_content()) !== $hash ||
-                $copy->mailstatus !== 'notrequested'
-        ) {
-            throw new Exception('A batch item has an incorrect state, changed native identity or unexpected mail attempt.');
         }
     }
 

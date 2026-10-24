@@ -61,10 +61,15 @@ final class privacy_test extends certificate_testcase {
         $users = new userlist($context, 'local_iomadcertregen');
         provider::get_users_in_context($users);
         $this->assertEqualsCanonicalizing([$actor->id, $learner->id], $users->get_userids());
+        $DB->set_field('local_iomadcertregen_op', 'correctionreason', 'Template correction audit', ['id' => $operation->id]);
+        $DB->set_field('local_iomadcertregen_op', 'keeporiginal', 0, ['id' => $operation->id]);
         $approved = new approved_contextlist($learner, 'local_iomadcertregen', [$context->id]);
         provider::export_user_data($approved);
         $this->assertTrue(writer::with_context($context)->has_any_data());
         $path = [get_string('pluginname', 'local_iomadcertregen'), (string)$operation->id];
+        $metadata = writer::with_context($context)->get_data($path);
+        $this->assertSame('Template correction audit', $metadata->correctionreason);
+        $this->assertSame(0, (int)$metadata->keeporiginal);
         $exportedfiles = writer::with_context($context)->get_files($path);
         $this->assertCount(1, $exportedfiles);
         $this->assertSame(service::file($operation)->get_content(), reset($exportedfiles)->get_content());

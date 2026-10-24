@@ -127,7 +127,7 @@ final class backup_restore_test extends publication_testcase {
         );
         $originalbytes = reset($native)->get_content();
         $data = records::issue($cm->id, $issue->id);
-        $this->publish($data, $confirmed);
+        $this->publish($data, $confirmed, ['keep' => true, 'reason' => 'Archive policy test']);
         $DB->update_record('local_iomadcertregen_op', (object)[
             'id' => $confirmed->id, 'mailstatus' => 'submitted', 'mailtime' => 1705320000,
             'mailrequestkey' => str_repeat('7', 64),
@@ -146,6 +146,8 @@ final class backup_restore_test extends publication_testcase {
         $this->assertSame(1705320000, (int)$copy->mailtime);
         $this->assertSame('', $copy->mailrequestkey);
         $this->assertSame(0, (int)$copy->publishedtime);
+        $this->assertSame(1, (int)$copy->keeporiginal);
+        $this->assertSame('Archive policy test', $copy->correctionreason);
         $this->assertSame('', $copy->issuehash);
         $this->assertSame('', $copy->batchkey);
         $archives = get_file_storage()->get_area_files(
@@ -253,6 +255,7 @@ final class backup_restore_test extends publication_testcase {
         [, , $cm, $course, $issue] = $this->fixture();
         $operation = service::prepare($cm->id, $issue->id, str_repeat('c3', 16), sesskey());
         service::confirm($cm->id, $operation->id, sesskey());
+        $DB->set_field('local_iomadcertregen_op', 'correctionreason', 'Backup reason', ['id' => $operation->id]);
         $restored = $this->round_trip($course, ['amendarchive' => function (string $directory) use ($element, $value): void {
             $files = glob($directory . '/activities/iomadcertificate_*/module.xml');
             $this->assertCount(1, $files);
@@ -349,6 +352,9 @@ final class backup_restore_test extends publication_testcase {
             'unmapped actor' => ['actorid', '999999999'],
             'mismatched PDF hash' => ['pdfhash', str_repeat('0', 64)],
             'negative expiry' => ['timeexpires', '-1'],
+            'invalid archive policy' => ['keeporiginal', '2'],
+            'nested archive expiry' => ['originalexpires', '<nested>123</nested>'],
+            'nested correction reason' => ['correctionreason', '<nested>Unexpected</nested>'],
             'missing issue date' => ['issuedate', ''],
         ];
     }

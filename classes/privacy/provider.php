@@ -50,7 +50,8 @@ final class provider implements core_userlist_provider, metadata_provider, plugi
         foreach (
             ['contextid', 'cmid', 'issueid', 'userid', 'actorid', 'status', 'requestkey',
                 'sourcehash', 'pdfhash', 'timecreated', 'timemodified', 'timeexpires',
-                'mailstatus', 'mailtime', 'mailrequestkey', 'publishedtime', 'issuehash', 'batchkey'] as $field
+                'mailstatus', 'mailtime', 'mailrequestkey', 'publishedtime', 'issuehash', 'batchkey',
+                'keeporiginal', 'originalexpires', 'correctiontime', 'correctionreason'] as $field
         ) {
             $fields[$field] = 'privacy:metadata:operation:' . $field;
         }
@@ -122,6 +123,9 @@ final class provider implements core_userlist_provider, metadata_provider, plugi
                 // A preparing administrator's request must not disclose another learner's PDF.
                 if ((int)$operation->userid === (int)$userid) {
                     foreach (['document', 'original'] as $area) {
+                        if ($area === 'original' && !\local_iomadcertregen\local\retention::archive_available($operation)) {
+                            continue;
+                        }
                         writer::with_context($context)->export_area_files(
                             $path,
                             'local_iomadcertregen',

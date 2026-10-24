@@ -98,6 +98,8 @@ if ($operation->status === 'confirmed') {
     );
     if ($operation->publishedtime) {
         echo $OUTPUT->notification(get_string('published', 'local_iomadcertregen'), 'success');
+    } else if (!empty($operation->correctiontime)) {
+        echo $OUTPUT->notification(get_string('superseded', 'local_iomadcertregen'), 'info');
     } else if ($originals) {
         echo $OUTPUT->notification(get_string('archivedpublication', 'local_iomadcertregen'), 'info');
     } else if ((int)$operation->actorid === (int)$USER->id && !$operation->timeexpires) {
@@ -108,6 +110,24 @@ if ($operation->status === 'confirmed') {
         ));
     } else if ((int)$operation->actorid === (int)$USER->id && $operation->timeexpires) {
         echo $OUTPUT->notification(get_string('publicationexpiry', 'local_iomadcertregen'), 'info');
+    }
+    if (!\local_iomadcertregen\local\retention::archive_available($operation)) {
+        $originals = [];
+    }
+    if (!empty($operation->correctiontime)) {
+        $actor = \core_user::get_user($operation->actorid);
+        echo html_writer::tag('p', get_string('correctionrecord', 'local_iomadcertregen', (object)[
+            'date' => userdate($operation->correctiontime),
+            'actor' => s($actor ? fullname($actor) : (string)$operation->actorid),
+            'reason' => s($operation->correctionreason ?: get_string('reasonlegacy', 'local_iomadcertregen')),
+        ]));
+        echo html_writer::tag('p', get_string(
+            $operation->keeporiginal ? 'archivechosen' : 'archivenotkept',
+            'local_iomadcertregen'
+        ));
+        if ($operation->originalexpires) {
+            echo html_writer::tag('p', get_string('archiveexpiry', 'local_iomadcertregen', userdate($operation->originalexpires)));
+        }
     }
     foreach ($originals as $original) {
         echo html_writer::tag('p', html_writer::link(moodle_url::make_pluginfile_url(

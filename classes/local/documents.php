@@ -37,6 +37,9 @@ final class documents {
      * @return \stored_file|false Valid file, or false.
      */
     public static function file(\stdClass $operation, string $filearea, string $filename) {
+        if ($filearea === 'original' && !retention::archive_available($operation)) {
+            return false;
+        }
         $file = $filearea === 'original' ? get_file_storage()->get_file(
             $operation->contextid,
             'local_iomadcertregen',

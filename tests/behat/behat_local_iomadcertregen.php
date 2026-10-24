@@ -144,7 +144,7 @@ class behat_local_iomadcertregen extends behat_base {
             $text = $session->getPage()->getText();
             if (
                 $session->getStatusCode() < 400 || !str_contains($text, 'Error code: nopermissions') ||
-                    !str_contains($text, 'Prepare and confirm corrected certificate copies') ||
+                    !str_contains($text, get_string('iomadcertregen:regenerate', 'local_iomadcertregen')) ||
                     $DB->record_exists('local_iomadcertregen_op', ['cmid' => $cm->id])
             ) {
                 throw new Exception('The authenticated beneficiary did not receive the expected permission denial.');

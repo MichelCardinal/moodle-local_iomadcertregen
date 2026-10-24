@@ -45,6 +45,9 @@ final class action extends \moodleform {
         $form->setType('reviewhash', PARAM_ALPHANUM);
         $form->addElement('hidden', 'requestkey', $this->_customdata['requestkey']);
         $form->setType('requestkey', PARAM_ALPHANUM);
+        if ($this->_customdata['button'] === 'publish') {
+            publication_options::add($form);
+        }
         $form->addElement('advcheckbox', 'acknowledge', get_string('acknowledge', 'local_iomadcertregen'));
         $form->addRule('acknowledge', get_string('required'), 'required', null, 'server');
         $this->add_action_buttons(true, get_string($this->_customdata['button'], 'local_iomadcertregen'));
@@ -61,6 +64,9 @@ final class action extends \moodleform {
         $errors = parent::validation($data, $files);
         if (empty($data['acknowledge'])) {
             $errors['acknowledge'] = get_string('required');
+        }
+        if ($this->_customdata['button'] === 'publish') {
+            $errors += publication_options::validation($data);
         }
         return $errors;
     }

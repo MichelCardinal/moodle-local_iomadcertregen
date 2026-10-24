@@ -56,6 +56,9 @@ final class batch extends \moodleform {
             $form->setType('issueids', PARAM_INT);
             $form->addRule('issueids', get_string('required'), 'required', null, 'server');
         }
+        if ($mode === 'publish') {
+            publication_options::add($form);
+        }
         $form->addElement('advcheckbox', 'acknowledge', get_string('acknowledge', 'local_iomadcertregen'));
         $form->addRule('acknowledge', get_string('required'), 'required', null, 'server');
         $this->add_action_buttons(true, get_string('bulk' . $mode, 'local_iomadcertregen'));
@@ -78,6 +81,9 @@ final class batch extends \moodleform {
             if (!$ids || count($ids) > \local_iomadcertregen\local\batch::LIMIT) {
                 $errors['issueids'] = get_string('bulkinvalid', 'local_iomadcertregen');
             }
+        }
+        if ($this->_customdata['mode'] === 'publish') {
+            $errors += publication_options::validation($data);
         }
         return $errors;
     }

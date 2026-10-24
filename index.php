@@ -48,10 +48,12 @@ $PAGE->set_title(get_string('pluginname', 'local_iomadcertregen'));
 $PAGE->set_heading(format_string($course->fullname));
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_iomadcertregen'));
-echo html_writer::tag('p', html_writer::link(
-    new moodle_url('/local/iomadcertregen/inventory.php'),
-    get_string('inventory', 'local_iomadcertregen')
-));
+if (is_siteadmin()) {
+    echo html_writer::tag('p', html_writer::link(
+        new moodle_url('/local/iomadcertregen/inventory.php'),
+        get_string('inventory', 'local_iomadcertregen')
+    ));
+}
 echo $OUTPUT->notification(get_string('scope', 'local_iomadcertregen'), 'info');
 echo html_writer::tag('p', html_writer::link(
     new moodle_url('/local/iomadcertregen/bulk.php', ['id' => $id]),
@@ -76,19 +78,7 @@ echo html_writer::empty_tag('input', [
 ]);
 echo html_writer::tag('button', get_string('search'), ['type' => 'submit', 'class' => 'btn btn-secondary mt-2']);
 echo html_writer::end_tag('form');
-$where = 'i.iomadcertificateid = :instance';
-$params = ['instance' => $certificate->id];
-if ($search !== '') {
-    $where .= ' AND (' . $DB->sql_like('u.firstname', ':firstname', false) . ' OR ' .
-        $DB->sql_like('u.lastname', ':lastname', false) . ')';
-    $params['firstname'] = '%' . $DB->sql_like_escape($search) . '%';
-    $params['lastname'] = $params['firstname'];
-}
-$sql = " FROM {iomadcertificate_issues} i JOIN {user} u ON u.id = i.userid WHERE " . $where;
-$total = $DB->count_records_sql('SELECT COUNT(1)' . $sql, $params);
-$namefields = \core_user\fields::for_name()->get_sql('u')->selects;
-$rows = $DB->get_records_sql('SELECT i.*' . $namefields . ', u.deleted, u.suspended' . $sql .
-    ' ORDER BY u.lastname, u.firstname, i.id', $params, $page * 30, 30);
+[$rows, $total] = \local_iomadcertregen\local\issue_list::page($id, $page, $search);
 $table = new html_table();
 $table->head = [get_string('fullname'), get_string('issuedate', 'local_iomadcertregen'),
     get_string('status'), get_string('actions')];

@@ -25,17 +25,43 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('localplugins', new admin_externalpage(
+    $ADMIN->add('localplugins', new admin_category(
+        'local_iomadcertregen_category',
+        get_string('pluginname', 'local_iomadcertregen')
+    ));
+    $ADMIN->add('local_iomadcertregen_category', new admin_externalpage(
         'local_iomadcertregen',
-        get_string('pluginname', 'local_iomadcertregen'),
+        get_string('inventory', 'local_iomadcertregen'),
         new moodle_url('/local/iomadcertregen/index.php')
+    ));
+    $ADMIN->add('local_iomadcertregen_category', new admin_externalpage(
+        'local_iomadcertregen_permissions',
+        get_string('accesspermissions', 'local_iomadcertregen'),
+        new moodle_url('/local/iomadcertregen/permissions.php')
     ));
     $settings = new admin_settingpage(
         'local_iomadcertregen_retention',
         get_string('retentionsettings', 'local_iomadcertregen')
     );
-    $ADMIN->add('localplugins', $settings);
+    $ADMIN->add('local_iomadcertregen_category', $settings);
     if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configselect(
+            'local_iomadcertregen/archivepolicy',
+            get_string('archivepolicysetting', 'local_iomadcertregen'),
+            get_string('archivepolicysetting_desc', 'local_iomadcertregen'),
+            'choice',
+            [
+                'choice' => get_string('archivepolicychoice', 'local_iomadcertregen'),
+                'keep' => get_string('archivepolicykeep', 'local_iomadcertregen'),
+                'discard' => get_string('archivepolicydiscard', 'local_iomadcertregen'),
+            ]
+        ));
+        $settings->add(new admin_setting_configduration(
+            'local_iomadcertregen/archivelifetime',
+            get_string('archivelifetime', 'local_iomadcertregen'),
+            get_string('archivelifetime_desc', 'local_iomadcertregen'),
+            0
+        ));
         $preparation = new admin_setting_configduration(
             'local_iomadcertregen/preparationlifetime',
             get_string('preparationlifetime', 'local_iomadcertregen'),

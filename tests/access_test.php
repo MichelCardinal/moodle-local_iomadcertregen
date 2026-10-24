@@ -50,7 +50,7 @@ final class access_test extends certificate_testcase {
     }
 
     /**
-     * A manager cannot acquire access through the new capability alone.
+     * The plugin capability does not replace native certificate-management permission.
      */
     public function test_nonadmin_with_capability_is_refused(): void {
         global $DB;
@@ -58,6 +58,7 @@ final class access_test extends certificate_testcase {
         $manager = $DB->get_field('role', 'id', ['shortname' => 'manager'], MUST_EXIST);
         role_assign($manager, $learner->id, $context->id);
         assign_capability('local/iomadcertregen:regenerate', CAP_ALLOW, $manager, $context->id);
+        assign_capability('mod/iomadcertificate:manage', CAP_PROHIBIT, $manager, $context->id);
         $this->setUser($learner);
         $this->expectException(\required_capability_exception::class);
         service::prepare($cm->id, $issue->id, str_repeat('d', 32), sesskey());

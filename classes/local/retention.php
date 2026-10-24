@@ -59,4 +59,53 @@ final class retention {
     public static function expired(\stdClass $operation): bool {
         return $operation->timeexpires > 0 && $operation->timeexpires <= time();
     }
+
+    /**
+     * Check the archive-specific deadline without expiring the corrected certificate or audit trail.
+     *
+     * @param \stdClass $operation Stored operation.
+     * @return bool Whether the administrative originals may be accessed.
+     */
+    public static function archive_available(\stdClass $operation): bool {
+        return (bool)($operation->keeporiginal ?? 1) &&
+            (empty($operation->originalexpires) || $operation->originalexpires > time());
+    }
+
+    /**
+     * Remove expired administrative archives only, under the normal issue lock.
+     */
+    public static function purge_archives(): void {
+        global $DB;
+        $rows = $DB->get_recordset_sql(
+            "SELECT DISTINCT o.* FROM {local_iomadcertregen_op} o
+               JOIN {files} f ON f.contextid = o.contextid AND f.itemid = o.id
+              WHERE o.originalexpires > 0 AND o.originalexpires <= :now
+                AND f.component = :component AND f.filearea = :area",
+            ['now' => time(), 'component' => 'local_iomadcertregen', 'area' => 'original']
+        );
+        try {
+            foreach ($rows as $operation) {
+                $lock = \core\lock\lock_config::get_lock_factory('local_iomadcertregen')
+                    ->get_lock('issue:' . $operation->issueid, 0);
+                if (!$lock) {
+                    continue;
+                }
+                try {
+                    $current = $DB->get_record('local_iomadcertregen_op', ['id' => $operation->id]);
+                    if ($current && !self::archive_available($current)) {
+                        get_file_storage()->delete_area_files(
+                            $current->contextid,
+                            'local_iomadcertregen',
+                            'original',
+                            $current->id
+                        );
+                    }
+                } finally {
+                    $lock->release();
+                }
+            }
+        } finally {
+            $rows->close();
+        }
+    }
 }

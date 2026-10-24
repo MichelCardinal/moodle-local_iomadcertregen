@@ -43,14 +43,16 @@ class backup_local_iomadcertregen_plugin extends backup_local_plugin {
         $plugin = $this->get_plugin_element();
         $wrapper = new backup_nested_element($this->get_recommended_name());
         $copy = new backup_nested_element('copy', ['id'], [
-            'issueid', 'userid', 'actorid', 'sourcehash', 'pdfhash',
+            'archivepolicyversion', 'issueid', 'userid', 'actorid', 'sourcehash', 'pdfhash',
             'timecreated', 'timemodified', 'timeexpires', 'issuecode', 'issuedate', 'mailstatus', 'mailtime',
+            'keeporiginal', 'originalexpires', 'correctiontime', 'correctionreason',
         ]);
         $plugin->add_child($wrapper);
         $wrapper->add_child($copy);
         $copy->set_source_sql(
             "SELECT o.id, o.issueid, o.userid, o.actorid, o.sourcehash, o.pdfhash,
                     o.timecreated, o.timemodified, o.timeexpires, o.mailstatus, o.mailtime,
+                    o.keeporiginal, o.originalexpires, o.correctiontime, o.correctionreason, 1 AS archivepolicyversion,
                     i.code AS issuecode, i.timecreated AS issuedate
                FROM {local_iomadcertregen_op} o
                JOIN {course_modules} cm ON cm.id = o.cmid

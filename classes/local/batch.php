@@ -29,7 +29,7 @@ namespace local_iomadcertregen\local;
  */
 final class batch {
     /** @var int Maximum issues processed in one explicit web request. */
-    public const LIMIT = 20;
+    public const LIMIT = 30;
 
     /**
      * Prepare selected existing issues, recording partial failures without inventing success.
@@ -126,9 +126,17 @@ final class batch {
      * @param string $reviewhash Batch review fingerprint.
      * @param bool $publish Publish instead of confirm.
      * @param string $sesskey Session protection.
+     * @param array $archivepolicy Archive choice and administrative reason.
      * @return array Failed issue IDs; successful operations remain available after an interruption.
      */
-    public static function apply(int $cmid, string $key, string $reviewhash, bool $publish, string $sesskey): array {
+    public static function apply(
+        int $cmid,
+        string $key,
+        string $reviewhash,
+        bool $publish,
+        string $sesskey,
+        array $archivepolicy = []
+    ): array {
         if (!confirm_sesskey($sesskey)) {
             throw new \moodle_exception('invalidsesskey', 'error');
         }
@@ -141,7 +149,7 @@ final class batch {
         foreach ($operations as $operation) {
             try {
                 if ($publish) {
-                    publication::publish($cmid, $operation->id, $review[$operation->id][2], $sesskey);
+                    publication::publish($cmid, $operation->id, $review[$operation->id][2], $sesskey, $archivepolicy);
                 } else {
                     service::confirm($cmid, $operation->id, $sesskey);
                 }
@@ -170,6 +178,15 @@ final class batch {
                 ])
             ) {
                 throw new \moodle_exception('bulkinvalid', 'local_iomadcertregen');
+            }
+            $userid = $DB->get_field('iomadcertificate_issues', 'userid', ['id' => (int)$issueid], MUST_EXIST);
+            if (!access::user_allowed(\context_module::instance($cmid), (int)$userid)) {
+                throw new \required_capability_exception(
+                    \context_module::instance($cmid),
+                    'local/iomadcertregen:regenerate',
+                    'nopermissions',
+                    ''
+                );
             }
         }
     }

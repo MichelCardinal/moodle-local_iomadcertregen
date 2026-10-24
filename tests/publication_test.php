@@ -41,6 +41,42 @@ require_once(__DIR__ . '/fixtures/publication_testcase.php');
 #[\PHPUnit\Framework\Attributes\CoversClass(publication_files::class)]
 final class publication_test extends publication_testcase {
     /**
+     * Only reviewed native file variants are accepted; unknown or missing files fail closed.
+     */
+    public function test_unknown_or_missing_native_file_is_refused(): void {
+        global $CFG;
+        publication_files::require_compatible();
+        $originalroot = $CFG->dirroot;
+        $temporaryroot = make_request_directory();
+        $profiles = json_decode(file_get_contents(__DIR__ . '/../classes/local/publication_profiles.json'), true);
+        foreach (array_keys($profiles[(string)$CFG->branch]) as $path) {
+            check_dir_exists(dirname($temporaryroot . '/' . $path), true, true);
+            copy($originalroot . '/' . $path, $temporaryroot . '/' . $path);
+        }
+        $target = $temporaryroot . '/mod/iomadcertificate/view.php';
+        try {
+            $CFG->dirroot = $temporaryroot;
+            publication_files::require_compatible();
+            file_put_contents($target, "\n// Unreviewed change.\n", FILE_APPEND);
+            try {
+                publication_files::require_compatible();
+                $this->fail('Unknown native bytes must be refused.');
+            } catch (\moodle_exception $error) {
+                $this->assertSame('unsupported', $error->errorcode);
+            }
+            unlink($target);
+            try {
+                publication_files::require_compatible();
+                $this->fail('Missing native file must be refused.');
+            } catch (\moodle_exception $error) {
+                $this->assertSame('unsupported', $error->errorcode);
+            }
+        } finally {
+            $CFG->dirroot = $originalroot;
+        }
+    }
+
+    /**
      * Activity and exact history files contain reviewed bytes; originals and native identity survive.
      */
     public function test_native_publication_retains_originals_and_is_idempotent(): void {
