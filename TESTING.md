@@ -1,12 +1,12 @@
 # Validation and reproducibility
 
-This staged 1.0.0-rc1 candidate is not published or stable-approved. Product runtime, schema, capabilities, renderer profiles and language bytes are unchanged from 0.12.6-alpha. The new version/savepoint and its migration-test baseline passed focused local verification: six tests / sixteen assertions on an isolated IOMAD5.2/MySQL clone. All six quality commands passed, including PHPDoc coverage of all84 PHP files. These candidate-specific checks used PHP8.3.30 for CLI compatibility only; they do not qualify a patched web runtime. Previous full-suite results below belong to their executed commits, not a newly claimed run of this staged candidate.
+This 1.0.0-rc1 is a release candidate, not a stable or Marketplace-approved release. Product runtime, schema, capabilities, renderer profiles and language bytes are unchanged from 0.12.6-alpha. The new version/savepoint and its migration-test baseline passed focused local verification: six tests / sixteen assertions on an isolated IOMAD5.2/MySQL clone. All six quality commands passed, including PHPDoc coverage of all84 PHP files. These candidate-specific checks used PHP8.3.30 for CLI compatibility only; they do not qualify a patched web runtime. The full-suite results below belong to the exact RC1 commit. Later documentation-only updates do not claim another full matrix or change the tested runtime.
 
-## Completed Linux qualification baseline
+## Completed Linux qualification of RC1
 
-The [GitHub Actions run](https://github.com/MichelCardinal/moodle-local_iomadcertregen/actions/runs/40113929250) executed commit `01ccdc758b1ff5a21fdada75cc2119b9b1becf97` using Ubuntu24.04 and Moodle Plugin CI4.5.11. The repository is currently private; no public accessibility of these links is claimed. Exact native commits are pinned in `.github/workflows/qualification.yml`.
+The [GitHub Actions run](https://github.com/MichelCardinal/moodle-local_iomadcertregen/actions/runs/40116840450) executed commit `ea44c7088897d8bf7a272f7dc5178afd36db3c5a` using Ubuntu24.04 and Moodle Plugin CI4.5.11. Source, issue tracking and CI evidence are available in the repository. Use the private vulnerability-reporting route in SECURITY.md for suspected security issues. Exact native commits are pinned in `.github/workflows/qualification.yml`.
 
-All fourteen profiles complete 158 tests / 624 assertions and the six quality commands. Eleven jobs succeed. Three PHP8.4 jobs fail strictly on the native IOMAD Certificate test generator; they are not relabelled successful. All four PHP8.3/PostgreSQL HTTP profiles pass twelve scenarios / 145 steps.
+All fourteen profiles complete 158 tests / 624 assertions and the six quality commands. Eleven jobs succeed. Three PHP 8.4 jobs fail strictly on the native IOMAD Certificate test generator; they are not relabelled successful. All four PHP8.3/PostgreSQL HTTP profiles pass twelve scenarios / 145 steps.
 
 | IOMAD | PHP | Selected database | Strict PHPUnit | HTTP acceptance |
 | --- | --- | --- | --- | --- |
@@ -27,9 +27,9 @@ All fourteen profiles complete 158 tests / 624 assertions and the six quality co
 
 The startup probe verifies `session.upload_progress.enabled=0`. Modern profiles meet the official21October2026 security-release floors (PHP8.2.35,8.3.36,8.4.27); the session setting follows the23October advisory. The PHP8.1 profile is a legacy CLI-only compatibility check, not proof of a patched runtime or a hosting recommendation. No PHP8.1 web acceptance server runs. Regression tests and version checks do not certify the enclosing server or prove resistance to every vulnerability.
 
-## Known PHP8.4 dependency boundary
+## Known PHP 8.4 dependency boundary
 
-The unmodified native generator declares `array $options = null` in `mod/iomadcertificate/tests/generator/lib.php:41` (under public/ on5.1/5.2). PHP8.4 deprecates that implicit nullability. Each strict profile finishes158/624 with one deprecation and exits nonzero. No native source is patched and no diagnostic is suppressed. Native authentication libraries also emit separate diagnostics during initialisation. A clean strict PHP8.4 qualification is not established. PHP8.3 at a corrected patch level is the recommended verified baseline.
+The unmodified native generator declares `array $options = null` in `mod/iomadcertificate/tests/generator/lib.php:41` (under public/ on5.1/5.2). PHP 8.4 deprecates that implicit nullability. Each strict profile finishes158/624 with one deprecation and exits nonzero. No native source is patched and no diagnostic is suppressed. Native authentication libraries also emit separate diagnostics during initialisation. A clean strict PHP 8.4 qualification is not established. The native generator diagnostic is reported in [IOMAD issue 2822](https://github.com/iomad/iomad/issues/2822); no upstream correction is implied by that report. PHP8.3 at a corrected patch level is the recommended verified baseline.
 
 ## Commands
 
@@ -58,4 +58,4 @@ English is packaged. French/Spanish drafts remain outside distribution with166 m
 
 ## Publication status
 
-Before stable publication, complete the candidate-specific checks and final archive/source comparison, establish effective public documentation/tracker and a permanent private reporting route, then obtain publication/submission authorisation. The Marketplace decides acceptance. No Moodle distinction or certification is guaranteed or claimed. Earlier ZIPs/tags stay immutable.
+Candidate-specific checks and the final archive/source comparison are complete for v1.0.0-rc1. Review the native PHP 8.4 boundary and the final stable metadata/archive before a stable release. Public repository publication does not itself submit the plugin to Marketplace; obtain separate submission authorisation and review the current terms. The Marketplace decides acceptance. No Moodle distinction or certification is guaranteed or claimed. Earlier ZIPs/tags stay immutable.

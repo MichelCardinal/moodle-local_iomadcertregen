@@ -1,5 +1,9 @@
-# Security reporting
+# Security policy
 
-For this private release candidate, report suspected vulnerabilities privately to the maintainer through the private channel where you obtained the build. Do not post learner data, PDFs, credentials or exploit details in public issues.
+Report suspected vulnerabilities privately using GitHub's **Report a vulnerability** option:
 
-Before public release, the repository and Marketplace listing must link to a working private vulnerability-reporting channel. That public reporting route has not yet been activated for this candidate. No dedicated address or security certification is claimed.
+https://github.com/MichelCardinal/moodle-local_iomadcertregen/security/advisories/new
+
+Include the affected plugin, IOMAD and PHP versions and a minimal reproduction with fictitious data. Do not post learner details, certificates, credentials, database exports, private logs or exploit details in public issues. If private reporting is unavailable, do not disclose those details publicly; request a private contact route without including the sensitive report.
+
+The current release candidate and its tested compatibility limits are described in README.md and TESTING.md. A native IOMAD test-generator deprecation under PHP 8.4 remains explicitly documented. This policy does not claim Moodle certification, a security audit of the enclosing site or a guaranteed response time.
