@@ -90,3 +90,11 @@ $string['restorecopyomitted'] = 'A corrected copy was omitted because its origin
 
 $string['originalunavailable'] = 'The original PDF is stored, but IOMAD\'s native saved-file download is broken in this version. The corrected copy is created separately and preserves the original.';
 $string['noissues'] = 'No certificate issues match this selection.';
+
+$string['inventory'] = 'IOMAD Certificate inventory';
+$string['templateidentifier'] = 'Current template identifier';
+$string['coursevisible'] = 'Course visible';
+$string['activityvisible'] = 'Activity visible';
+$string['issuedcertificates'] = 'View issued certificates';
+$string['inventoryscope'] = 'This report shows the current settings of each IOMAD Certificate activity, including hidden courses and activities. It does not identify the template used in previously issued PDFs or determine whether a template is appropriate for a course.';
+$string['inventoryhelp'] = 'Use the filters to search by course, category, activity or template. Each row represents one activity. Actions open the course, activity settings or issued certificates. No settings or certificates are changed by this report.';

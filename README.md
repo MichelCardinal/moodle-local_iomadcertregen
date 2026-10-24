@@ -11,7 +11,7 @@ An authorised site administrator can prepare, review, confirm and download a sep
 ### Current compatibility
 
 - Qualified branches: IOMAD **4.5, 5.0, 5.1 and 5.2**, with the exact native library/template fingerprints in `classes/local/qualified.json`. Current tested updates are 4.5.15, 5.0.11, 5.1.8 and 5.2.4. See [TESTING.md](TESTING.md) for runtimes, evidence and limits.
-- The 0.7.0 functional baseline passes 52 integration tests / 226 assertions on each current branch locally with PHP 8.3.30 and PostgreSQL 17.11. The editorial 0.7.1 revision also passes 52 tests / 226 assertions on IOMAD 5.2.4 with MySQL 8.4.11; Boost and New Learning 12.2.7 have targeted browser workflow checks on that laboratory. Earlier 4.5.13 and 5.0.9 qualification is historical evidence for 0.6, not a new 0.7 runtime claim.
+- Version 0.8.0 passes 60 integration tests / 256 assertions per branch on PHP 8.3.30: PostgreSQL 17.11 on 4.5.15/5.0.11/5.1.8 and MySQL 8.4.11 on 5.2.4. Browser inventory acceptance uses Boost on 5.2.4; New Learning 12.2.7 has a separate native-layout API incompatibility on that branch. See TESTING.md for historical evidence and remaining limits.
 - A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility. Future updates require qualification; this is not a promise to accept every patch automatically.
 - Plain Moodle without IOMAD is unsupported. The four branches share the IOMAD Certificate activity; their native tracking interfaces differ.
 - The six qualified standard templates are A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is disabled pending separate qualification. Company tests verify the beneficiary's seal when the administrator belongs to another company; other branding configurations are not exhaustively tested.
@@ -23,6 +23,16 @@ Install the ZIP through **Site administration → Plugins → Install plugins**,
 This alpha is restricted to site administrators. Its module-context capability, `local/iomadcertregen:regenerate`, has no default role grants. Granting that capability to a manager or teacher does not enable delegated access in this release.
 
 Open the tool from the activity settings menu or from **Site administration → Plugins → Local plugins → IOMAD Certificate Regenerator** and select the activity.
+
+### Certificate inventory
+
+Open **Site administration → Plugins → Local plugins → IOMAD Certificate Regenerator**. The inventory contains one row per IOMAD Certificate activity, including hidden courses/activities and activities without issued certificates or an IOMAD company association. It excludes activities pending deletion. Columns show category, course name/short name, activity name, current template identifier and course/activity visibility.
+
+Use Moodle's native filters to search by course, category, activity or template, then download the filtered table in the formats provided by Moodle. Row actions open the course, the activity's normal settings or its issued certificates. The report never changes activity settings or PDFs. Identifiers are shown as stored, including customised or missing templates, so administrators can locate them. A template identifier alone does not describe all background images, seals or signatures.
+
+The inventory describes **current configuration**, not the template used to create an old saved PDF. It cannot decide whether a model is correct for a particular course, and it does not regenerate certificates in bulk or replace learner files.
+
+For native **Custom reports**, create a report using source **IOMAD Certificate inventory**. The same columns, filters and conditions are available. Both the ready-made inventory and custom report source are restricted to site administrators, including data access when a report is shared with another audience. A shared audience does not grant access. Reports/exports created by administrators remain subject to Moodle's normal report storage and sharing controls; the plugin adds no external connection, learner data or new inventory table.
 
 ### Workflow
 
@@ -94,6 +104,14 @@ The helper reports narrowly scoped native test-context adjustments by exact file
 No custom JavaScript, stylesheet or third-party PDF library is bundled. The source module supplies the rendering engine. The installable package contains English strings only. French and Spanish drafts are maintained separately for AMOS submission after approval; no availability through AMOS is claimed. Private laboratory local language overrides are outside the package. Check current Marketplace packaging requirements before submission.
 
 ## Français
+
+### Inventaire des activités certificat
+
+Depuis **Administration du site → Plugins → Plugins locaux → IOMAD Certificate Regenerator**, retrouvez une ligne par activité avec catégorie, cours, nom abrégé, activité, identifiant du modèle courant et visibilité. Les cours masqués, activités sans délivrance et cours sans entreprise IOMAD sont inclus. Les suppressions en cours sont exclues. Utilisez les filtres natifs, puis le téléchargement du tableau; les actions ouvrent le cours, les paramètres ou les certificats délivrés.
+
+Dans les **Rapports personnalisés** natifs, choisissez la source **IOMAD Certificate inventory** (ou sa traduction locale). Les administrateurs disposent des mêmes colonnes, filtres et conditions. L’accès reste réservé aux administrateurs du site, y compris après partage d’une audience. La consultation/exportation ne modifie aucun paramètre ni certificat. Les rapports sont gérés et conservés par les API natives Moodle.
+
+Le modèle affiché est celui configuré actuellement. Il ne révèle pas le modèle utilisé dans les anciens PDF, ni tous les choix d’images/signatures/sceaux, et ne décide pas si le modèle convient au cours. Cette extension n’effectue aucune correction collective et ne remplace pas les fichiers apprenants. La version 0.8 passe 60 tests/256 assertions sur chacune des quatre branches; voir TESTING.md pour les bases/PHP réellement exécutés et les limites.
 
 ### Utilisation
 

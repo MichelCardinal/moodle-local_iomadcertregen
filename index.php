@@ -34,31 +34,7 @@ $url = new moodle_url('/local/iomadcertregen/index.php', ['id' => $id]);
 if (!$id) {
     require_login();
     access::require_permission_for_site();
-    $PAGE->set_url($url);
-    $PAGE->set_context(context_system::instance());
-    $PAGE->set_title(get_string('pluginname', 'local_iomadcertregen'));
-    $PAGE->set_heading(get_string('pluginname', 'local_iomadcertregen'));
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('chooseactivity', 'local_iomadcertregen'));
-    $sql = "SELECT cm.id, c.fullname, ic.name FROM {course_modules} cm
-              JOIN {modules} m ON m.id = cm.module
-              JOIN {iomadcertificate} ic ON ic.id = cm.instance
-              JOIN {course} c ON c.id = cm.course WHERE m.name = :module AND cm.deletioninprogress = 0
-              ORDER BY c.fullname, ic.name, cm.id";
-    $count = $DB->count_records_sql(
-        "SELECT COUNT(1) FROM {course_modules} cm JOIN {modules} m ON m.id = cm.module
-          WHERE m.name = :module AND cm.deletioninprogress = 0",
-        ['module' => 'iomadcertificate']
-    );
-    foreach ($DB->get_records_sql($sql, ['module' => 'iomadcertificate'], $page * 30, 30) as $activity) {
-        echo html_writer::div(html_writer::link(
-            new moodle_url($url, ['id' => $activity->id]),
-            format_string($activity->fullname) . ' — ' . format_string($activity->name)
-        ));
-    }
-    echo $OUTPUT->paging_bar($count, $page, 30, $url);
-    echo $OUTPUT->footer();
-    exit;
+    redirect(new moodle_url('/local/iomadcertregen/inventory.php'));
 }
 $cm = get_coursemodule_from_id('iomadcertificate', $id, 0, false, MUST_EXIST);
 $course = get_course($cm->course);
@@ -72,6 +48,10 @@ $PAGE->set_title(get_string('pluginname', 'local_iomadcertregen'));
 $PAGE->set_heading(format_string($course->fullname));
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_iomadcertregen'));
+echo html_writer::tag('p', html_writer::link(
+    new moodle_url('/local/iomadcertregen/inventory.php'),
+    get_string('inventory', 'local_iomadcertregen')
+));
 echo $OUTPUT->notification(get_string('scope', 'local_iomadcertregen'), 'info');
 $version = core_plugin_manager::instance()->get_plugin_info('mod_iomadcertificate')->versiondisk;
 echo html_writer::tag('p', get_string('moduleversion', 'local_iomadcertregen', s($version)));

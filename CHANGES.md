@@ -1,5 +1,11 @@
 # Changes
 
+## 0.8.0-alpha — 2026102309 (unreleased)
+
+- Add a read-only, site-administrator certificate activity inventory, with current template identifiers, categories, course and activity visibility, native filters, pagination, export and navigation actions.
+- Provide the same configuration entity as a native Moodle custom report source. Restrict both source discovery and data access to site administrators.
+- Include activities without issues or IOMAD company links; omit activities being deleted. Previously issued PDF templates are not inferred. No correction or delivery behaviour changes.
+
 ## 0.7.1-alpha — 2026102308 (unreleased)
 
 - Correct the qualified/unsupported interface messages, which still named only 4.5/5.0 after the 5.1/5.2 extension. Use version-independent wording tied to the verified source profile.

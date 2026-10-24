@@ -1,6 +1,16 @@
-# Validation of 0.7.1-alpha
+# Validation of 0.8.0-alpha
 
 Local qualification on 23 October 2026. This is an unreleased laboratory candidate. GitHub Actions have not run; Marketplace approval, accessibility certification and Moodle badges are not claimed.
+
+## Inventory revision
+
+0.8.0 (2026102309) adds a current-configuration inventory and a native Moodle custom report source. On 23 October 2026 the full plugin suite passed **60 tests / 256 assertions on each branch** with PHP 8.3.30: IOMAD 4.5.15, 5.0.11 and 5.1.8 on PostgreSQL 17.11, and IOMAD 5.2.4 on MySQL 8.4.11. Exact native commits are the same as the baseline table below. Strict warning/risky/skipped checks apply; PHPUnit 11 also fails on notices. Six Moodle Plugin CI checks pass with no disabled rule. Only the PHP/database combinations named here were executed for 0.8.
+
+Eight inventory tests cover multiple and identically configured activities, hidden configuration, no issues/company links, current/unknown template identifiers, deletion, filters, independently selectable columns, pagination and administrator-only access to reports/exports, even when an audience is shared. The earlier rendering, privacy, lifecycle and backup/restore tests run in the same full suite. The inventory does not infer templates from saved PDF content.
+
+Browser acceptance under Boost on IOMAD 5.2 includes a live template filter, a real CSV download with independently verified headers and data, the native activity-settings link opened without saving, and creation/preview of a fictional native custom report using this source. Existing fictional original/code/date and both confirmed-copy hashes remain unchanged. Other offered export formats are supplied by Moodle and were not individually downloaded in this check. There is no plugin JavaScript build.
+
+The five-scenario Behat HTTP results below are historical 0.7 evidence; that suite was not rerun for 0.8. New Learning 12.2.7 has a known unrelated IOMAD 5.2 API error on native layouts. Inventory browser acceptance uses Boost; a full New Learning 5.2 qualification remains deferred. No full accessibility/screen-reader audit or concurrent-load guarantee is claimed. iPad/NAMO remain outside scope.
 
 ## Editorial revision and normal MAMP laboratory
 
