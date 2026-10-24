@@ -1,5 +1,11 @@
 # Changes
 
+## 0.10.1-alpha — 2026102401 (unreleased)
+
+- Record complete minimum-runtime qualification: PHP 8.1 on IOMAD 4.5 and PHP 8.2 on IOMAD 5.0/5.1, each with 122 tests / 399 assertions and strict diagnostics.
+- Verify all six local quality checks in both native 4.5 and 5.2 contexts. Keep the native PHP 8.4 test-generator deprecation and unexecuted remote CI explicit.
+- Update validation documentation and the native version savepoint only. No functional, schema, language, file or retention behaviour changes. Preserve the previous alpha archive and tag.
+
 ## 0.10.0-alpha — 2026102400 (unreleased)
 
 - Add explicit publication of a confirmed, non-expiring correction to the learner's existing activity button. Preserve native issue identity/code/date and serve the exact reviewed PDF through a protected endpoint.

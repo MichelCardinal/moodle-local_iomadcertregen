@@ -65,5 +65,9 @@ function xmldb_local_iomadcertregen_upgrade(int $oldversion): bool {
         }
         upgrade_plugin_savepoint(true, 2026102400, 'local', 'iomadcertregen');
     }
+    // Validation documentation only; no schema, file or retention changes.
+    if ($oldversion < 2026102401) {
+        upgrade_plugin_savepoint(true, 2026102401, 'local', 'iomadcertregen');
+    }
     return true;
 }

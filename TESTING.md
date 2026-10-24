@@ -1,6 +1,8 @@
-# Validation of 0.10.0-alpha / 2026102400
+# Validation of 0.10.1-alpha / 2026102401
 
 This is a private, unreleased laboratory candidate. Local results do not establish Marketplace approval, remote CI success, accessibility certification or any Moodle distinction. Previous archives and tags remain immutable.
+
+0.10.1 updates validation documentation and the native version savepoint only. All functional PHP, language, schema, fixture and acceptance files are byte-identical to the tested 0.10.0 tag. The complete suites below executed on that functional baseline. The editorial update is checked by native migration preservation, the six quality checks and an exact source comparison; a metadata-only revision does not justify repeating every functional suite.
 
 ## Executed PHP 8.3 matrix
 
@@ -41,13 +43,25 @@ The repository-only setup helper checks native test-site readiness and exact thi
 
 BrowserKit does not execute JavaScript or test assistive technology. Ordinary native history HTTP downloads are tested end to end. Token/webservice entry points use the same normalised-path guard and have been source-traced; actual token-authenticated HTTP and Moodle-app integration are not claimed tested.
 
+## Executed minimum PHP runtimes
+
+The full functional baseline also passes strict qualification on the minimum supported runtime for each older branch:
+
+| IOMAD | PHP CLI | Database | Result |
+| --- | --- | --- | --- |
+| 4.5.15 | 8.1.34 | PostgreSQL 17.11 | 122 tests / 399 assertions, no diagnostics |
+| 5.0.11 | 8.2.35 | PostgreSQL 17.11 | 122 tests / 399 assertions, no diagnostics |
+| 5.1.8 | 8.2.35 | PostgreSQL 17.11 | 122 tests / 399 assertions, no diagnostics |
+
+These are official Homebrew bottles extracted into a separate command-line test directory, with archive hashes and commands retained outside the distribution. No MAMP runtime, site setting or global Homebrew installation is replaced. Isolated library lookup and explicit CLI settings provide memory_limit=1024M, max_input_vars=5000, zend.assertions=1 and date.timezone=UTC. All strict PHPUnit flags above apply; the minimum runs also fail on incomplete tests. IOMAD 5.2's minimum PHP 8.3 is covered by the main matrix. This does not establish the unexecuted Linux/GitHub Actions matrix.
+
 ## PHP 8.4 boundary
 
-The complete suite is additionally executed with PHP 8.4.17 on the three modern branches. Functional assertions pass, but strict qualification reports a deprecation in the native `mod_iomadcertificate` test generator: `create_instance()` implicitly marks `$options` nullable. The plugin does not patch that component or suppress the diagnostic. Retained logs identify the exact file and line. This is not a clean PHP 8.4 qualification and must be resolved or reassessed against an official native revision before a stable compatibility claim. PHP 8.1/8.2 and the remote CI matrix remain unexecuted locally; those runtimes are not added to MAMP for this candidate.
+The complete suite is additionally executed with PHP 8.4.17 on the three modern branches. Functional assertions pass, but strict qualification reports a deprecation in the native `mod_iomadcertificate` test generator: `create_instance()` implicitly marks `$options` nullable. The plugin does not patch that component or suppress the diagnostic. Retained logs identify the exact file and line. This is not a clean PHP 8.4 qualification and must be resolved or reassessed against an official native revision before a stable compatibility claim. The remote CI matrix remains unexecuted. The minimum-runtime results above are local macOS CLI evidence and are not presented as GitHub Actions results.
 
 ## Quality and migration
 
-Moodle Plugin CI 4.5.11 runs savepoints, PHP syntax, Moodle coding style, PHP Mess Detector, XMLDB/plugin validation and PHPDoc. All six must pass with no disabled rule. The wrapper inspects PHPMD output as well as its exit status. Historical 0.7.1/0.8 exit-only summaries missed complexity violations; they do not prove a clean PHPMD run. The underlying code was corrected in 0.9 and earlier release archives are unchanged.
+Moodle Plugin CI 4.5.11 runs savepoints, PHP syntax, Moodle coding style, PHP Mess Detector, XMLDB/plugin validation and PHPDoc. All six pass in both the native IOMAD 4.5 and 5.2 contexts with no disabled rule. The wrapper inspects PHPMD output as well as its exit status. Historical 0.7.1/0.8 exit-only summaries missed complexity violations; they do not prove a clean PHPMD run. The underlying code was corrected in 0.9 and earlier release archives are unchanged.
 
 0.10 adds publication timestamp, issue identity hash and batch identifier through a native XMLDB migration. Fresh isolated PHPUnit installations and the normal laboratory's 0.9-to-0.10 upgrade are verified. Before/after evidence confirms existing native original/code/date and earlier confirmed PDFs survive migration. Publication is a separate explicit action: it intentionally replaces identified native file content only after archiving the previous bytes. Retained originals and correction PDFs are covered by privacy and backup/restore tests. Restored operations have no active publication or batch identifier, and never email or republish automatically. Native restore omits its own saved original, so a fresh preparation requires restoring that evidence separately.
 
@@ -55,6 +69,6 @@ Normal MAMP 5.2/Boost browser acceptance publishes two fictitious learners toget
 
 ## Limits before public release
 
-A permanent private vulnerability-reporting route, public tracker/links and actual remote matrix results remain publication work. New Learning 12.2.7 has a deferred native-dashboard problem on IOMAD 5.2; final acceptance uses Boost. Full screen-reader/accessibility review, concurrent-load guarantees, iPad/NAMO and native Moodle-app support are not claimed. No certification of Moodle, IOMAD or the enclosing server follows from these checks.
+A permanent private vulnerability-reporting route, public tracker/links and actual remote matrix results remain publication work. The 0.10.1 native version-only upgrade preserves the complete operation rows, certificate files and relevant native learning records in the normal MAMP laboratory. New Learning 12.2.7 has a deferred native-dashboard problem on IOMAD 5.2; final acceptance uses Boost. Full screen-reader/accessibility review, concurrent-load guarantees, iPad/NAMO and native Moodle-app support are not claimed. No certification of Moodle, IOMAD or the enclosing server follows from these checks.
 
 Release provenance outside the distributable records the final commit/tag, ZIP SHA-256, commands, logs, file manifests and limits. Every ZIP byte is compared with the tagged source and qualified copies. The ZIP contains English only; French/Spanish are separate local translation drafts awaiting AMOS publication. No private reports, screenshots, credentials or laboratory data are included.
