@@ -88,6 +88,38 @@ if ($operation->status === 'confirmed') {
         get_string('download', 'local_iomadcertregen'),
         ['class' => 'btn btn-primary']
     ));
+    $originals = get_file_storage()->get_area_files(
+        $operation->contextid,
+        'local_iomadcertregen',
+        'original',
+        $operation->id,
+        'id',
+        false
+    );
+    if ($operation->publishedtime) {
+        echo $OUTPUT->notification(get_string('published', 'local_iomadcertregen'), 'success');
+    } else if ($originals) {
+        echo $OUTPUT->notification(get_string('archivedpublication', 'local_iomadcertregen'), 'info');
+    } else if ((int)$operation->actorid === (int)$USER->id && !$operation->timeexpires) {
+        echo html_writer::tag('p', html_writer::link(
+            new moodle_url('/local/iomadcertregen/publish.php', ['id' => $id, 'operationid' => $operationid]),
+            get_string('publish', 'local_iomadcertregen'),
+            ['class' => 'btn btn-primary']
+        ));
+    } else if ((int)$operation->actorid === (int)$USER->id && $operation->timeexpires) {
+        echo $OUTPUT->notification(get_string('publicationexpiry', 'local_iomadcertregen'), 'info');
+    }
+    foreach ($originals as $original) {
+        echo html_writer::tag('p', html_writer::link(moodle_url::make_pluginfile_url(
+            $operation->contextid,
+            'local_iomadcertregen',
+            'original',
+            $operation->id,
+            '/',
+            $original->get_filename(),
+            true
+        ), get_string('retainedoriginal', 'local_iomadcertregen', $original->get_filename())));
+    }
     echo html_writer::tag('p', get_string('mailstatus_' . $operation->mailstatus, 'local_iomadcertregen'));
     if ($operation->mailtime) {
         echo html_writer::tag('p', userdate($operation->mailtime));

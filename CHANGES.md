@@ -1,5 +1,15 @@
 # Changes
 
+## 0.10.0-alpha — 2026102400 (unreleased)
+
+- Add explicit publication of a confirmed, non-expiring correction to the learner's existing activity button. Preserve native issue identity/code/date and serve the exact reviewed PDF through a protected endpoint.
+- Retain previous native PDFs before replacing identified activity/history file content through Moodle File API. Match history conservatively by beneficiary, course, date and unique filename; refuse ambiguous names and mixed certificate engines. Preserve older/unmatched histories.
+- Add bounded selection of up to 20 issues, separate PDF review/confirmation/publication, idempotent preparation and per-item failures. Do not send collective or automatic email.
+- Protect native history file delivery with owner, recorded-company, department and child-company checks, including validation of the selected company's actual visibility. Use forced private downloads for recognised ordinary/token entry points.
+- Bind new rendering inputs to active beneficiary company memberships. Refuse stale delegated access and exclude other-company historical records rather than sharing a snapshot across tenant boundaries. Older company-bound preparations require a fresh review.
+- Handle later enrolment periods and superseded publications without attaching an old issue to a new course period. Refuse stale sources/targets and malformed archive provenance.
+- Extend privacy export/deletion and native backup/restore to retained originals. Restoration does not republish, send mail or restore batch/request identifiers. Keep native IOMAD data under its owner's lifecycle after plugin cleanup/removal.
+
 ## 0.9.0-alpha — 2026102310 (unreleased)
 
 - Add explicit email submission of the exact confirmed corrected PDF to its beneficiary, using Moodle mail configuration and recipient language. Native email delivery settings prompt the action without automatically sending.

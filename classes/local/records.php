@@ -77,11 +77,30 @@ final class records {
               WHERE i.courseid = :courseid AND g.userid = :userid ORDER BY g.id",
             ['courseid' => $course->id, 'userid' => $user->id]
         );
-        return hash('sha256', json_encode([
+        $values = [
             $certificate, $issue, $identity, $course->fullname, $grades,
             $DB->get_records('course_completions', ['course' => $course->id, 'userid' => $user->id], 'id'),
             $DB->get_records('config_plugins', ['plugin' => 'iomadcertificate'], 'name'),
-        ], JSON_THROW_ON_ERROR));
+        ];
+        $companies = self::company_ids((int)$user->id);
+        if ($companies) {
+            $values[] = ['companies' => $companies];
+        }
+        return hash('sha256', json_encode($values, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Read distinct active native company memberships without choosing one on the learner's behalf.
+     *
+     * @param int $userid Beneficiary.
+     * @return int[] Native company IDs in stable order.
+     */
+    public static function company_ids(int $userid): array {
+        global $CFG, $DB;
+        $table = (int)$CFG->branch >= 501 ? 'local_iomad_company_users' : 'company_users';
+        $rows = $DB->get_records_sql("SELECT DISTINCT companyid FROM {{$table}}
+            WHERE userid = :userid AND suspended = 0 ORDER BY companyid", ['userid' => $userid]);
+        return array_map('intval', array_keys($rows));
     }
 
     /**
@@ -116,7 +135,9 @@ final class records {
      */
     public static function delete(\stdClass $operation): void {
         global $DB;
-        get_file_storage()->delete_area_files($operation->contextid, 'local_iomadcertregen', 'document', $operation->id);
+        foreach (['document', 'original'] as $area) {
+            get_file_storage()->delete_area_files($operation->contextid, 'local_iomadcertregen', $area, $operation->id);
+        }
         $DB->delete_records('local_iomadcertregen_op', ['id' => $operation->id]);
     }
 }

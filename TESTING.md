@@ -1,74 +1,60 @@
-# Validation of 0.9.0-alpha
+# Validation of 0.10.0-alpha / 2026102400
 
-Local qualification on 23 October 2026. This is an unreleased laboratory candidate. GitHub Actions have not run; Marketplace approval, accessibility certification and Moodle badges are not claimed.
+This is a private, unreleased laboratory candidate. Local results do not establish Marketplace approval, remote CI success, accessibility certification or any Moodle distinction. Previous archives and tags remain immutable.
 
-## Explicit email revision
+## Executed PHP 8.3 matrix
 
-0.9.0 adds explicit submission of an already confirmed PDF, with a bounded schema migration for attempt status/time and duplicate-protection token. Existing original/native and corrected-copy evidence was compared before/after the MAMP upgrade. The mail action does not replace learner files, reissue certificates or send automatically.
+Qualification uses PHP 8.3.30, macOS Darwin 25.6.0 arm64, independent test databases and file roots. PHPUnit 9.6.34 is used on 4.5 and PHPUnit 11.5.55 on 5.0–5.2.
 
-New tests capture the real Moodle MIME message before SMTP, verify the exact base64 attachment bytes and beneficiary address, exercise duplicate submissions, definite and uncertain transport failures, disabled mail, recipient/account restrictions, changed destinations, CSRF, actor ownership, missing attachments, unconfirmed copies, an independent-connection lock and the real Moodle acknowledgement form. A failed attachment copy must never send a bare email. Backup/restore tests preserve submitted history and omit the private request token; privacy export/deletion tests cover the new fields. No real mail is sent by these tests. Successful SMTP delivery, inbox receipt and email-client presentation are not claimed.
+| IOMAD | Exact official commit | PHPUnit database | Result |
+| --- | --- | --- | --- |
+| 4.5.15 | `3e7d23c1b60018f8f540c1fbf929e1baa6755b7f` | PostgreSQL 17.11 | 122 tests / 399 assertions |
+| 5.0.11 | `addcdf8f4647b853fd85b6817571d5529caf6cfd` | PostgreSQL 17.11 | 122 tests / 399 assertions |
+| 5.1.8 | `7738c4391469132ec54b9ea7505fd29922c2b015` | PostgreSQL 17.11 | 122 tests / 399 assertions |
+| 5.2.4 | `ef8e8a1e6093518091783b37666d9cb1f4bd8a7d` | MySQL 8.4.11 | 122 tests / 399 assertions |
 
-Browser verification on IOMAD 5.2/Boost confirms the action for an existing no-expiry confirmed copy and the recipient page. The laboratory retains noemailever: the page clearly reports disabled mail, offers no send form there, and no real recipient receives a message. Enabling real laboratory mail is outside this validation. Production sites use their own Moodle mail configuration.
+The four official stable branch heads were checked on 24 October 2026. This qualifies those source profiles, not every historical or future patch. Native rendering and publication interfaces are checked by SHA-256 at runtime. Plain Moodle and unknown/custom native revisions are refused.
 
-Six checks are required with no ignored violations. The maintainer's wrapper now inspects PHP Mess Detector output as well as its exit code. Older 0.7.1/0.8 exit-only quality summaries missed upgrade-savepoint complexity violations; those summaries do not establish a clean PHPMD result. Earlier metadata-only savepoints are consolidated in 0.9; old archives/tags remain immutable. Functional test results remain separate evidence.
+Commands run from each native project root:
 
-The full 0.9 suite passes **75 tests / 303 assertions per branch** on PHP 8.3.30: IOMAD 4.5.15, 5.0.11 and 5.1.8 with PostgreSQL 17.11, and IOMAD 5.2.4 with MySQL 8.4.11. The same exact native commits appear in the historical table below. Six Moodle Plugin CI checks pass with zero ignored violations. Final logs, commands and ZIP identity are retained in the release manifest/report. Earlier evidence below is explicitly historical; no new Behat, real SMTP, accessibility certification or remote CI result is inferred.
+```sh
+/path/to/php8.3.30 vendor/bin/phpunit --testsuite local_iomadcertregen_testsuite --fail-on-warning --fail-on-risky --fail-on-skipped
+```
 
-## Inventory revision
+On 5.1/5.2, the executed command also uses `--fail-on-notice --fail-on-deprecation --fail-on-phpunit-deprecation`. On 5.0 the PHP 8.3 log contains no diagnostics; its PHP 8.4 command and the prepared remote workflow include all those strict flags. No ignored rules or suppressed diagnostics are counted as a clean result.
 
-0.8.0 (2026102309) adds a current-configuration inventory and a native Moodle custom report source. On 23 October 2026 the full plugin suite passed **60 tests / 256 assertions on each branch** with PHP 8.3.30: IOMAD 4.5.15, 5.0.11 and 5.1.8 on PostgreSQL 17.11, and IOMAD 5.2.4 on MySQL 8.4.11. Exact native commits are the same as the baseline table below. Strict warning/risky/skipped checks apply; PHPUnit 11 also fails on notices. Six Moodle Plugin CI checks pass with no disabled rule. Only the PHP/database combinations named here were executed for 0.8.
+Tests cover six native PDF templates; beneficiary/company branding; permissions and CSRF; independent-connection issue locks; reviewed byte integrity; source changes; expiry; duplicate requests; enrolment periods; publication supersession; retained originals; exact native issue/code/date preservation; bounded and partial batches; hidden/suspended learner access; actual company, department and child-company policy; stale selected companies; transfers and multiple memberships; privacy export/deletion; lifecycle cleanup; and real native backup/restore archives.
 
-Eight inventory tests cover multiple and identically configured activities, hidden configuration, no issues/company links, current/unknown template identifiers, deletion, filters, independently selectable columns, pagination and administrator-only access to reports/exports, even when an audience is shared. The earlier rendering, privacy, lifecycle and backup/restore tests run in the same full suite. The inventory does not infer templates from saved PDF content.
-
-Browser acceptance under Boost on IOMAD 5.2 includes a live template filter, a real CSV download with independently verified headers and data, the native activity-settings link opened without saving, and creation/preview of a fictional native custom report using this source. Existing fictional original/code/date and both confirmed-copy hashes remain unchanged. Other offered export formats are supplied by Moodle and were not individually downloaded in this check. There is no plugin JavaScript build.
-
-The five-scenario Behat HTTP results below are historical 0.7 evidence; that suite was not rerun for 0.8. New Learning 12.2.7 has a known unrelated IOMAD 5.2 API error on native layouts. Inventory browser acceptance uses Boost; a full New Learning 5.2 qualification remains deferred. No full accessibility/screen-reader audit or concurrent-load guarantee is claimed. iPad/NAMO remain outside scope.
-
-## Editorial revision and normal MAMP laboratory
-
-0.7.1-alpha (2026102308) corrects two compatibility messages; the renderer, access controls and data model are unchanged from 0.7.0. The four-branch matrix below was executed at 0.7.0, and is retained as the functional baseline rather than reported as a new run of the editorial patch. All six Moodle Plugin CI checks were rerun successfully for 0.7.1.
-
-Additionally, 0.7.1 passed 52 tests / 226 assertions on IOMAD 5.2.4, PHP 8.3.30 and MySQL 8.4.11 in a normal MAMP laboratory. Browser checks under Boost and New Learning 12.2.7 prepared, reviewed and confirmed separate fictional PDFs; the native original, code and date were unchanged. A Boost browser download matched the reviewed bytes. These targeted theme checks do not qualify all pages, every theme version or assistive technology.
-
-## Executed integration matrix (0.7.0 functional baseline)
-
-PHP 8.3.30, PostgreSQL 17.11, macOS Darwin 25.6.0 arm64. Each environment has an independent database and file roots. PHPUnit 9.6.34 is used on 4.5; PHPUnit 11.5.55 on 5.0–5.2.
-
-| IOMAD update | Official commit | PHPUnit |
-| --- | --- | --- |
-| 4.5.15 | `3e7d23c1b60018f8f540c1fbf929e1baa6755b7f` | 52 tests, 226 assertions |
-| 5.0.11 | `addcdf8f4647b853fd85b6817571d5529caf6cfd` | 52 tests, 226 assertions |
-| 5.1.8 | `7738c4391469132ec54b9ea7505fd29922c2b015` | 52 tests, 226 assertions |
-| 5.2.4 | `ef8e8a1e6093518091783b37666d9cb1f4bd8a7d` | 52 tests, 226 assertions |
-
-The retained runs have no warning, notice, skipped or risky result. Modern PHPUnit commands explicitly fail on these diagnostics. Earlier attempts exposing missing native template variables, deprecated URL generation and a deprecated lifecycle test call are retained separately, not counted as passing runs.
-
-Tests exercise all six qualified native PDF templates, exact native issue/file preservation, beneficiary/company branding with an administrator from another company, permissions, CSRF, cross-activity identifiers, ownership, duplicate submissions, source/PDF changes, expiry, privacy exports/deletions, lifecycle cleanup and real backup/restore archives. They use fictitious data. Plain Moodle is unsupported. Unknown native library/template revisions are refused; future patch releases need qualification.
-
-Only PHP 8.3.30 has been executed for this candidate. Earlier 0.6 MySQL 8.0/8.4 results on IOMAD 4.5.13/5.0.9 are historical evidence, not a new 0.7 runtime proof. The proposed remote matrix covers the current branches with MySQL/PostgreSQL and additional PHP versions; its result remains unknown.
-
-## Native interfaces
-
-4.5/5.0 use the qualified historical rendering function. 5.1/5.2 moved that responsibility into local_iomad; their current handler omits an activity variable required by its native templates. The adapter supplies an explicit local template scope without changing native files. It verifies the returned PDF type and beneficiary/issue aliases.
-
-On 5.1/5.2 the native reporting helper uses file_encode_url, deprecated by Moodle. The adapter uses Moodle File API and core\url for the same saved-original area, requiring exactly one PDF at the issue root. It does not call a native issuer, change enrolment or overwrite a native file. The declared dependency is the shared local_iomad component, with each interface family's exact files checked before rendering.
-
-Native stored-certificate regeneration already exists in IOMAD. It replaces an IOMAD history file; this independent administrative-copy workflow preserves originals and provides review before confirmation. Do not claim that IOMAD has no regeneration feature.
+The email tests capture the real Moodle MIME message before SMTP, inspect beneficiary and exact attachment bytes, and exercise duplicate submission, recipient changes, disabled mail, transport failure and interrupted/uncertain attempts. No real email is sent. SMTP delivery, inbox receipt and email-client rendering are not established.
 
 ## HTTP acceptance
 
-The five non-JavaScript Behat scenarios use actual HTTP forms and protected downloads with BrowserKit. They verify preparation/confirmation, mandatory acknowledgement, authenticated learner refusal, exact PDF bytes and response headers, standard event attribution, pagination/search on 1,001 native issues with 1,001 saved originals, and a configured middle name. All four current branches passed **5 scenarios / 71 steps each**. Measured feature durations were 2m0.01s (4.5), 2m2.48s (5.0), 2m2.89s (5.1) and 2m1.51s (5.2) on these laboratories. Exact logs and commands are retained in the maintainer's release report. A single-user workload does not establish concurrency capacity or a response-time guarantee.
+On all four commits above, PHP 8.3.30 with PostgreSQL 17.11 passes **8 scenarios / 129 steps per branch**, using BrowserKit and actual HTTP forms/downloads. Behat 5.2 uses a separate database to avoid the native OIDC installer's fixed PostgreSQL index name; PHPUnit 5.2 uses MySQL as listed above.
 
-The repository-only helper checks native test-site readiness before enabling the test URL. By exact test-file hashes it excludes duplicate policy steps on all branches, incompatible SAML on 4.5/5.0, and a misplaced custompage generator on 5.2. The fixed SAML context on 5.1/5.2 is retained under its actual class name. No plugin scenario or runtime component is removed. Changed native test files require review. These results do not qualify the excluded third-party suites.
+Scenarios verify individual review/confirmation and exact PDF response bytes/headers, mandatory acknowledgement, administrative permission refusal, real event attribution, configured middle names, pagination/filtering across 1,001 native issues/originals, two-learner batch publication, retained original downloads, the learner's native activity button including ignored-user/action query variants, the beneficiary's native history download, and refusal for an unrelated logged-in learner.
 
-IOMAD 5.2's native OIDC installer creates a fixed PostgreSQL index name. A separate behat_dbname avoids a collision between PHPUnit and Behat prefixes; no native index or source is changed. Use separate disposable databases and file roots, as documented in README.md.
+The repository-only setup helper checks native test-site readiness and exact third-party test-file hashes. It excludes duplicate policy steps on all branches, an incompatible SAML context on 4.5/5.0 and a misplaced custompage generator on 5.2. The fixed modern SAML context remains. No plugin scenario or runtime component is removed; changed test contexts require a review. These results do not qualify the excluded third-party suites.
 
-BrowserKit does not execute JavaScript, render a PDF viewer or test assistive technology. Historical targeted keyboard checks under Boost and New Learning do not constitute a complete accessibility audit. New Learning is not claimed tested on every new branch. iPad/NAMO and native Moodle-app integration are outside this administrative V1.
+```sh
+/path/to/php8.3.30 vendor/bin/behat --config=/isolated/behat.yml --tags=@local_iomadcertregen --format=progress
+```
 
-## Release boundaries
+BrowserKit does not execute JavaScript or test assistive technology. Ordinary native history HTTP downloads are tested end to end. Token/webservice entry points use the same normalised-path guard and have been source-traced; actual token-authenticated HTTP and Moodle-app integration are not claimed tested.
 
-The 0.7 upgrade adds no schema or lifecycle change and preserves existing correction deadlines. Fresh isolated PHPUnit sites were installed at 0.7. Course/activity restore still omits the native saved original PDF; this plugin restores only its own confirmed copy and refuses a fresh correction without original evidence. Full site backup remains necessary for full recovery.
+## PHP 8.4 boundary
 
-Run the six Moodle Plugin CI checks with no disabled rules. Identify the final source commit/tag and exact ZIP SHA-256 in an external manifest, compare every archive byte with that source and the qualified copies, package English strings only, and exclude private laboratory material. Never rewrite an earlier archive.
+The complete suite is additionally executed with PHP 8.4.17 on the three modern branches. Functional assertions pass, but strict qualification reports a deprecation in the native `mod_iomadcertificate` test generator: `create_instance()` implicitly marks `$options` nullable. The plugin does not patch that component or suppress the diagnostic. Retained logs identify the exact file and line. This is not a clean PHP 8.4 qualification and must be resolved or reassessed against an official native revision before a stable compatibility claim. PHP 8.1/8.2 and the remote CI matrix remain unexecuted locally; those runtimes are not added to MAMP for this candidate.
 
-A permanent private security-reporting route, the public tracker and remote runtime matrix remain publication gates. Security reviews and tests do not certify Moodle, IOMAD or the enclosing server.
+## Quality and migration
+
+Moodle Plugin CI 4.5.11 runs savepoints, PHP syntax, Moodle coding style, PHP Mess Detector, XMLDB/plugin validation and PHPDoc. All six must pass with no disabled rule. The wrapper inspects PHPMD output as well as its exit status. Historical 0.7.1/0.8 exit-only summaries missed complexity violations; they do not prove a clean PHPMD run. The underlying code was corrected in 0.9 and earlier release archives are unchanged.
+
+0.10 adds publication timestamp, issue identity hash and batch identifier through a native XMLDB migration. Fresh isolated PHPUnit installations and the normal laboratory's 0.9-to-0.10 upgrade are verified. Before/after evidence confirms existing native original/code/date and earlier confirmed PDFs survive migration. Publication is a separate explicit action: it intentionally replaces identified native file content only after archiving the previous bytes. Retained originals and correction PDFs are covered by privacy and backup/restore tests. Restored operations have no active publication or batch identifier, and never email or republish automatically. Native restore omits its own saved original, so a fresh preparation requires restoring that evidence separately.
+
+Normal MAMP 5.2/Boost browser acceptance publishes two fictitious learners together, then checks exact reviewed native bytes, original archives, unchanged issue codes/dates, unchanged earlier administrative copies and disabled mail. PDFs are parsed and visually reviewed. No core, IOMAD or third-party theme file is patched.
+
+## Limits before public release
+
+A permanent private vulnerability-reporting route, public tracker/links and actual remote matrix results remain publication work. New Learning 12.2.7 has a deferred native-dashboard problem on IOMAD 5.2; final acceptance uses Boost. Full screen-reader/accessibility review, concurrent-load guarantees, iPad/NAMO and native Moodle-app support are not claimed. No certification of Moodle, IOMAD or the enclosing server follows from these checks.
+
+Release provenance outside the distributable records the final commit/tag, ZIP SHA-256, commands, logs, file manifests and limits. Every ZIP byte is compared with the tagged source and qualified copies. The ZIP contains English only; French/Spanish are separate local translation drafts awaiting AMOS publication. No private reports, screenshots, credentials or laboratory data are included.

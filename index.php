@@ -53,6 +53,11 @@ echo html_writer::tag('p', html_writer::link(
     get_string('inventory', 'local_iomadcertregen')
 ));
 echo $OUTPUT->notification(get_string('scope', 'local_iomadcertregen'), 'info');
+echo html_writer::tag('p', html_writer::link(
+    new moodle_url('/local/iomadcertregen/bulk.php', ['id' => $id]),
+    get_string('bulk', 'local_iomadcertregen'),
+    ['class' => 'btn btn-secondary']
+));
 $version = core_plugin_manager::instance()->get_plugin_info('mod_iomadcertificate')->versiondisk;
 echo html_writer::tag('p', get_string('moduleversion', 'local_iomadcertregen', s($version)));
 try {

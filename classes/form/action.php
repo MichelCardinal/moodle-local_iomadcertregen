@@ -41,6 +41,8 @@ final class action extends \moodleform {
             $form->addElement('hidden', $name, $this->_customdata[$name] ?? 0);
             $form->setType($name, PARAM_INT);
         }
+        $form->addElement('hidden', 'reviewhash', $this->_customdata['reviewhash'] ?? '');
+        $form->setType('reviewhash', PARAM_ALPHANUM);
         $form->addElement('hidden', 'requestkey', $this->_customdata['requestkey']);
         $form->setType('requestkey', PARAM_ALPHANUM);
         $form->addElement('advcheckbox', 'acknowledge', get_string('acknowledge', 'local_iomadcertregen'));

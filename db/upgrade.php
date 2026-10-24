@@ -29,12 +29,12 @@
  * @return bool Success.
  */
 function xmldb_local_iomadcertregen_upgrade(int $oldversion): bool {
+    global $DB;
     // Earlier alpha upgrades were metadata-only savepoints, with no schema or deadline transformations.
     if ($oldversion < 2026102309) {
         upgrade_plugin_savepoint(true, 2026102309, 'local', 'iomadcertregen');
     }
     if ($oldversion < 2026102310) {
-        global $DB;
         $manager = $DB->get_manager();
         $table = new xmldb_table('local_iomadcertregen_op');
         $fields = [
@@ -48,6 +48,22 @@ function xmldb_local_iomadcertregen_upgrade(int $oldversion): bool {
             }
         }
         upgrade_plugin_savepoint(true, 2026102310, 'local', 'iomadcertregen');
+    }
+    if ($oldversion < 2026102400) {
+        $manager = $DB->get_manager();
+        $table = new xmldb_table('local_iomadcertregen_op');
+        foreach (
+            [
+            new xmldb_field('publishedtime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
+            new xmldb_field('issuehash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, ''),
+            new xmldb_field('batchkey', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, ''),
+            ] as $field
+        ) {
+            if (!$manager->field_exists($table, $field)) {
+                $manager->add_field($table, $field);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2026102400, 'local', 'iomadcertregen');
     }
     return true;
 }

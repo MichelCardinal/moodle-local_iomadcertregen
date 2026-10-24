@@ -35,13 +35,18 @@ final class service {
      * @param int $issueid Existing native issue.
      * @param string $requestkey One-time form identifier.
      * @param string $sesskey Moodle session protection.
+     * @param string $batchkey Optional bounded batch provenance.
      * @return \stdClass Prepared operation.
      */
-    public static function prepare(int $cmid, int $issueid, string $requestkey, string $sesskey): \stdClass {
+    public static function prepare(
+        int $cmid,
+        int $issueid,
+        string $requestkey,
+        string $sesskey,
+        string $batchkey = ''
+    ): \stdClass {
         global $DB, $USER;
-        if (!confirm_sesskey($sesskey) || !preg_match('/^[a-f0-9]{32}$/D', $requestkey)) {
-            throw new \moodle_exception('invalidsesskey', 'error');
-        }
+        access::require_intent($sesskey, $requestkey, $batchkey);
         $data = records::issue($cmid, $issueid);
         [$certificate, $user, $cm, $course, $issue, $context] = $data;
         $key = hash('sha256', $USER->id . ':' . $cmid . ':' . $issueid . ':' . $requestkey);
@@ -65,7 +70,7 @@ final class service {
             $now = time();
             $operation = (object)[
                 'contextid' => $context->id, 'cmid' => $cmid, 'issueid' => $issueid,
-                'userid' => $user->id, 'actorid' => $USER->id, 'status' => 'prepared',
+                'userid' => $user->id, 'actorid' => $USER->id, 'status' => 'prepared', 'batchkey' => $batchkey,
                 'requestkey' => $key, 'sourcehash' => $fingerprint,
                 'pdfhash' => hash('sha256', $pdf), 'timecreated' => $now,
                 'timemodified' => $now, 'timeexpires' => retention::expiry('prepared', $now),

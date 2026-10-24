@@ -40,6 +40,16 @@ jobs:
             php: '8.3'
             database: pgsql
             mysql: '8.4'
+          - iomad: '5.0.11'
+            commit: addcdf8f4647b853fd85b6817571d5529caf6cfd
+            php: '8.4'
+            database: pgsql
+            mysql: '8.4'
+          - iomad: '5.1.8'
+            commit: 7738c4391469132ec54b9ea7505fd29922c2b015
+            php: '8.2'
+            database: mysqli
+            mysql: '8.4'
           - iomad: '5.1.8'
             commit: 7738c4391469132ec54b9ea7505fd29922c2b015
             php: '8.3'
@@ -48,6 +58,11 @@ jobs:
           - iomad: '5.1.8'
             commit: 7738c4391469132ec54b9ea7505fd29922c2b015
             php: '8.3'
+            database: pgsql
+            mysql: '8.4'
+          - iomad: '5.1.8'
+            commit: 7738c4391469132ec54b9ea7505fd29922c2b015
+            php: '8.4'
             database: pgsql
             mysql: '8.4'
           - iomad: '5.2.4'
@@ -59,6 +74,11 @@ jobs:
             commit: ef8e8a1e6093518091783b37666d9cb1f4bd8a7d
             php: '8.3'
             database: pgsql
+            mysql: '8.4'
+          - iomad: '5.2.4'
+            commit: ef8e8a1e6093518091783b37666d9cb1f4bd8a7d
+            php: '8.4'
+            database: mysqli
             mysql: '8.4'
     services:
       mysql:
@@ -130,7 +150,8 @@ jobs:
           ci/bin/moodle-plugin-ci phplint plugin
           php -l plugin/.github/scripts/prepare_behat.php
           ci/bin/moodle-plugin-ci phpcs --max-warnings=0 plugin
-          ci/bin/moodle-plugin-ci phpmd plugin
+          ci/bin/moodle-plugin-ci phpmd plugin | tee phpmd.log
+          python3 -c "from pathlib import Path; text=Path('phpmd.log').read_text(); assert 'VIOLATION' not in text and '!!!' not in text"
           ci/bin/moodle-plugin-ci phpdoc --max-warnings=0 --moodle=moodle plugin > phpdoc.log
           cat phpdoc.log
           python3 -c "from pathlib import Path; output=Path('phpdoc.log').read_text(); assert all(str(p.resolve()) in output for p in Path('plugin').rglob('*.php') if '.github' not in p.parts) and '!!!' not in output"
@@ -141,7 +162,7 @@ jobs:
         run: |
           icr_flags=(--fail-on-warning --fail-on-risky --fail-on-incomplete --fail-on-skipped)
           if [ '${{ matrix.iomad }}' != '4.5.15' ]; then
-            icr_flags+=(--fail-on-notice)
+            icr_flags+=(--fail-on-notice --fail-on-deprecation --fail-on-phpunit-deprecation)
           fi
           php moodle/vendor/bin/phpunit --configuration moodle/phpunit.xml --testsuite local_iomadcertregen_testsuite "${icr_flags[@]}"
       - name: Run non-JavaScript acceptance scenarios on current IOMAD
@@ -166,4 +187,4 @@ jobs:
           cat behat-setup.json
           icr_behat_config=$(php -r '$data=json_decode(file_get_contents("behat-setup.json"),true,512,JSON_THROW_ON_ERROR); echo $data["config"];')
           php moodle/vendor/bin/behat --config="$icr_behat_config" --suite=default --tags=@local_iomadcertregen --format=progress --strict | tee behat.log
-          python3 -c "from pathlib import Path; import re; text=Path('behat.log').read_text(); assert re.search(r'5 scenarios \(5 passed\)', text) and re.search(r'71 steps \(71 passed\)', text)"
+          python3 -c "from pathlib import Path; import re; text=Path('behat.log').read_text(); assert re.search(r'8 scenarios \(8 passed\)', text) and re.search(r'129 steps \(129 passed\)', text)"

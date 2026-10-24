@@ -29,7 +29,7 @@ use local_iomadcertregen\local\service;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/fixtures/certificate_testcase.php');
+require_once(__DIR__ . '/fixtures/publication_testcase.php');
 
 /**
  * Exercise real Moodle archive export and restore with native issue mappings.
@@ -39,7 +39,7 @@ require_once(__DIR__ . '/fixtures/certificate_testcase.php');
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\backup_local_iomadcertregen_plugin::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\restore_local_iomadcertregen_plugin::class)]
-final class backup_restore_test extends certificate_testcase {
+final class backup_restore_test extends publication_testcase {
     /** @var string Exported file metadata, retained after Moodle cleans the temporary archive. */
     private string $filesxml = '';
 
@@ -117,6 +117,17 @@ final class backup_restore_test extends certificate_testcase {
         $operation = service::prepare($cm->id, $issue->id, str_repeat('c2', 16), sesskey());
         $confirmed = service::confirm($cm->id, $operation->id, sesskey());
         $bytes = service::file($confirmed)->get_content();
+        $native = get_file_storage()->get_area_files(
+            \context_module::instance($cm->id)->id,
+            'mod_iomadcertificate',
+            'issue',
+            $issue->id,
+            'id',
+            false
+        );
+        $originalbytes = reset($native)->get_content();
+        $data = records::issue($cm->id, $issue->id);
+        $this->publish($data, $confirmed);
         $DB->update_record('local_iomadcertregen_op', (object)[
             'id' => $confirmed->id, 'mailstatus' => 'submitted', 'mailtime' => 1705320000,
             'mailrequestkey' => str_repeat('7', 64),
@@ -134,6 +145,19 @@ final class backup_restore_test extends certificate_testcase {
         $this->assertSame('submitted', $copy->mailstatus);
         $this->assertSame(1705320000, (int)$copy->mailtime);
         $this->assertSame('', $copy->mailrequestkey);
+        $this->assertSame(0, (int)$copy->publishedtime);
+        $this->assertSame('', $copy->issuehash);
+        $this->assertSame('', $copy->batchkey);
+        $archives = get_file_storage()->get_area_files(
+            $copy->contextid,
+            'local_iomadcertregen',
+            'original',
+            $copy->id,
+            'id',
+            false
+        );
+        $this->assertCount(1, $archives);
+        $this->assertSame($originalbytes, reset($archives)->get_content());
         $this->assertNotEquals($confirmed->id, $copy->id);
         $this->assertNotEquals($issue->id, $copy->issueid);
         $this->assertEquals($learner->id, $copy->userid);

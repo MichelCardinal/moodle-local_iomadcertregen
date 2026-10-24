@@ -92,7 +92,9 @@ class restore_local_iomadcertregen_plugin extends restore_local_plugin {
                 continue;
             }
             $this->set_mapping('local_iomadcertregen_op', $copy->id, $operation->id, true);
-            $this->add_related_files('local_iomadcertregen', 'document', 'local_iomadcertregen_op', null, $copy->id);
+            foreach (['document', 'original'] as $area) {
+                $this->add_related_files('local_iomadcertregen', $area, 'local_iomadcertregen_op', null, $copy->id);
+            }
             if (!$this->valid_file($operation)) {
                 \local_iomadcertregen\local\records::delete($operation);
                 $this->warn();

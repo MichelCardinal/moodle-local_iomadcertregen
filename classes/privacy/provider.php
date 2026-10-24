@@ -50,7 +50,7 @@ final class provider implements core_userlist_provider, metadata_provider, plugi
         foreach (
             ['contextid', 'cmid', 'issueid', 'userid', 'actorid', 'status', 'requestkey',
                 'sourcehash', 'pdfhash', 'timecreated', 'timemodified', 'timeexpires',
-                'mailstatus', 'mailtime', 'mailrequestkey'] as $field
+                'mailstatus', 'mailtime', 'mailrequestkey', 'publishedtime', 'issuehash', 'batchkey'] as $field
         ) {
             $fields[$field] = 'privacy:metadata:operation:' . $field;
         }
@@ -117,16 +117,18 @@ final class provider implements core_userlist_provider, metadata_provider, plugi
             foreach ($operations as $operation) {
                 $path = [get_string('pluginname', 'local_iomadcertregen'), (string)$operation->id];
                 $data = clone $operation;
-                unset($data->requestkey, $data->mailrequestkey);
+                unset($data->requestkey, $data->mailrequestkey, $data->batchkey);
                 writer::with_context($context)->export_data($path, $data);
                 // A preparing administrator's request must not disclose another learner's PDF.
                 if ((int)$operation->userid === (int)$userid) {
-                    writer::with_context($context)->export_area_files(
-                        $path,
-                        'local_iomadcertregen',
-                        'document',
-                        $operation->id
-                    );
+                    foreach (['document', 'original'] as $area) {
+                        writer::with_context($context)->export_area_files(
+                            $path,
+                            'local_iomadcertregen',
+                            $area,
+                            $operation->id
+                        );
+                    }
                 }
             }
         }

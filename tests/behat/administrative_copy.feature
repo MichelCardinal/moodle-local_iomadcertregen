@@ -72,3 +72,58 @@ Feature: Review an independent corrected certificate copy
     When I log in as "admin"
     And I open the certificate regenerator for "Existing certificate"
     Then I should see "Example Fictional Learner"
+
+  @icr_publication
+  Scenario: Reviewed publication retains the original and serves the native learner button
+    Given the certificate "Existing certificate" uses email delivery
+    And a native history PDF exists for "learner1" in "Existing certificate"
+    When I log in as "admin"
+    And I open the certificate regenerator for "Existing certificate"
+    And I follow "Prepare corrected copy"
+    And I set the field "acknowledge" to "1"
+    And I press "Prepare corrected copy"
+    And I set the field "acknowledge" to "1"
+    And I press "Confirm corrected copy"
+    And I follow "Publish corrected certificate for the learner"
+    And the publication review for "Existing certificate" is recorded
+    And I set the field "acknowledge" to "1"
+    And I press "Publish corrected certificate for the learner"
+    Then I should see "This correction is published for the learner"
+    And the published certificate retains its original PDF and issue identity
+    When I log out
+    And I log in as "learner1"
+    Then the native certificate button for "Existing certificate" serves the published PDF
+    And I download my native course-history PDF
+
+  @icr_publication
+  Scenario: Administrator prepares confirms and publishes two selected learners
+    Given the following "users" exist:
+      | username | firstname | lastname | email               |
+      | learner2 | Another   | Example  | second@example.com  |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | learner2 | ICR    | student |
+    And an IOMAD certificate has been issued to "learner2" in "Existing certificate"
+    When I log in as "admin"
+    And I open the certificate regenerator for "Existing certificate"
+    And I follow "Correct several learners"
+    And I select the existing certificates of "learner1" and "learner2"
+    And I set the field "acknowledge" to "1"
+    And I press "Prepare selected corrections"
+    Then both selected certificate copies are "prepared"
+    When I set the field "acknowledge" to "1"
+    And I press "Confirm reviewed copies"
+    Then both selected certificate copies are "confirmed"
+    When I follow "Publish reviewed copies for learners"
+    And I set the field "acknowledge" to "1"
+    And I press "Publish reviewed copies for learners"
+    Then both selected certificate copies are "published"
+
+  @icr_publication @icr_history_security
+  Scenario: Another logged-in learner cannot download a personal native course-history PDF
+    Given the following "users" exist:
+      | username | firstname | lastname | email               |
+      | learner2 | Another   | Example  | second@example.com  |
+    And a native history PDF exists for "learner1" in "Existing certificate"
+    When I log in as "learner2"
+    Then the other learner's native history PDF is refused

@@ -76,17 +76,44 @@ function local_iomadcertregen_pluginfile($course, $cm, $context, $filearea, $arg
     if ((int)$operation->contextid !== (int)$context->id) {
         return false;
     }
-    $file = \local_iomadcertregen\local\service::file($operation);
-    if (
-        !$file || $file->get_mimetype() !== 'application/pdf' ||
-            $file->get_filesize() > \local_iomadcertregen\local\adapter::MAX_PDF_BYTES ||
-            !hash_equals($operation->pdfhash, hash('sha256', $file->get_content()))
-    ) {
+    $file = \local_iomadcertregen\local\documents::file($operation, $filearea, $args[1]);
+    if (!$file) {
         return false;
     }
     \local_iomadcertregen\event\copy_downloaded::create([
         'context' => $context, 'objectid' => $operation->id, 'relateduserid' => $operation->userid,
     ])->trigger();
     \core\session\manager::write_close();
-    send_stored_file($file, 0, 0, $forcedownload, ['cacheability' => 'private'] + $options);
+    send_stored_file($file, 0, 0, $filearea === 'original' || $forcedownload, ['cacheability' => 'private'] + $options);
+}
+
+/**
+ * Preserve published bytes when the native activity's download button is used.
+ *
+ * This supported login callback runs before the native renderer and any native PDF write.
+ * It protects native history file entry points and redirects the qualified activity download route.
+ */
+function local_iomadcertregen_after_require_login(): void {
+    \local_iomadcertregen\local\history_delivery::after_login();
+    global $CFG, $SCRIPT;
+    if (
+        $SCRIPT !== '/mod/iomadcertificate/view.php' || CLI_SCRIPT || AJAX_SCRIPT || WS_SERVER
+    ) {
+        return;
+    }
+    if (!\local_iomadcertregen\local\learner::native_download_enabled()) {
+        return;
+    }
+    $cmid = required_param('id', PARAM_INT);
+    $userid = \local_iomadcertregen\local\learner::native_userid();
+    if (!\local_iomadcertregen\local\learner::native_operation($cmid, $userid)) {
+        return;
+    }
+    if (
+        hash_file('sha256', $CFG->dirroot . '/mod/iomadcertificate/view.php') !==
+            '6f62861670f6f72704595b8f6268e6e85fe1e4b57c21c83ccb320e46a468b3c8'
+    ) {
+        throw new moodle_exception('unsupported', 'local_iomadcertregen');
+    }
+    redirect(new moodle_url('/local/iomadcertregen/learner.php', ['id' => $cmid, 'userid' => $userid]));
 }

@@ -63,6 +63,7 @@ class backup_local_iomadcertregen_plugin extends backup_local_plugin {
         $copy->annotate_ids('user', 'userid');
         $copy->annotate_ids('user', 'actorid');
         $copy->annotate_files('local_iomadcertregen', 'document', 'id');
+        $copy->annotate_files('local_iomadcertregen', 'original', 'id');
         return $plugin;
     }
 }

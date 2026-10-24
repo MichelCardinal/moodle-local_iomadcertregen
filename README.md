@@ -1,170 +1,106 @@
 # IOMAD Certificate Regenerator
 
-Independent Moodle local plugin by Michel Cardinal. Requires IOMAD and its IOMAD Certificate activity. This is a **laboratory alpha**, not a Marketplace-approved release or a Moodle/IOMAD-certified product.
+Independent Moodle local plugin by Michel Cardinal, component `local_iomadcertregen`. Requires IOMAD and its IOMAD Certificate activity. This is a **laboratory alpha**, not a Marketplace-approved release or a Moodle/IOMAD-certified product.
 
-## English
+## Purpose
 
-### Purpose
+Find courses using IOMAD Certificate, review their current template settings, and correct certificates that have already been issued. Preparing and confirming a correction creates an independent reviewed PDF. **Publishing** that correction is a separate explicit action: it makes the reviewed PDF available through the learner's existing activity button and replaces the identified saved native PDFs. Previous native PDFs are retained for administrators.
 
-An authorised site administrator can prepare, review, confirm and download a separate corrected PDF for an existing certificate issue. The original issue identifier, code, stored issue date and native files remain unchanged. No automatic email, new issue, grade, completion or enrolment change is performed by the correction service. A separate explicit action can email the exact confirmed copy to its beneficiary. The corrected copy does **not** replace the learner's activity PDF or IOMAD history.
+The plugin preserves the native issue identifier, certificate code and recorded issue date. It does not create another issue, change grades, completion or enrolments, or impersonate a learner. Printed dates and grades still follow the native template's current printing rules. Email is a separate explicit action; neither confirmation nor publication sends it automatically.
 
-### Current compatibility
+## Requirements and installation
 
-- Qualified branches: IOMAD **4.5, 5.0, 5.1 and 5.2**, with the exact native library/template fingerprints in `classes/local/qualified.json`. Current tested updates are 4.5.15, 5.0.11, 5.1.8 and 5.2.4. See [TESTING.md](TESTING.md) for runtimes, evidence and limits.
-- Version 0.9.0 passes 75 integration tests / 303 assertions per branch on PHP 8.3.30: PostgreSQL 17.11 on 4.5.15/5.0.11/5.1.8 and MySQL 8.4.11 on 5.2.4. Browser inventory acceptance uses Boost on 5.2.4; New Learning 12.2.7 has a separate native-layout API incompatibility on that branch. See TESTING.md for historical evidence and remaining limits.
-- A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility. Future updates require qualification; this is not a promise to accept every patch automatically.
-- Plain Moodle without IOMAD is unsupported. The four branches share the IOMAD Certificate activity; their native tracking interfaces differ.
-- The six qualified standard templates are A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is disabled pending separate qualification. Company tests verify the beneficiary's seal when the administrator belongs to another company; other branding configurations are not exhaustively tested.
+- Qualified IOMAD branches: **4.5, 5.0, 5.1 and 5.2**. Exact native variants are listed in `classes/local/qualified.json` and `classes/local/publication_profiles.json`. Matching a version number alone is insufficient. Unknown native libraries, policy implementations and customised/missing templates may be refused.
+- Tested source updates and runtimes are recorded in [TESTING.md](TESTING.md). Do not interpret the branch range as proof of every patch, PHP version, database or theme configuration.
+- Dependencies: `mod_iomadcertificate` and `local_iomad`, minimum version `2024100700`. Plain Moodle without IOMAD is unsupported.
+- Six standard native templates are qualified: A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is excluded pending separate qualification.
 
-### Installation and access
+Back up the complete site before installing or upgrading. Older company-bound preparations may need to be prepared again to validate their company scope; existing confirmed PDFs remain administratively available. Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and use Moodle's normal upgrade process. On IOMAD 5.1/5.2 the manual destination is `public/local/iomadcertregen` inside the installation. Moodle's ZIP installer resolves this automatically. No plugin Composer command or JavaScript build is required.
 
-Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and run Moodle's normal upgrade process. For IOMAD 5.1/5.2, the manual destination is `public/local/iomadcertregen` inside the IOMAD installation; Moodle's ZIP installer resolves it automatically. Required components are `mod_iomadcertificate` (minimum `2024100700`) and `local_iomad` (minimum `2024100700`), both supplied by the qualified IOMAD distribution and declared in `version.php`. No Composer command or server-side build is needed to install this plugin ZIP. Back up the site before installing or upgrading.
+Correction, publication, email and inventory administration are restricted to **site administrators**. The module capability `local/iomadcertregen:regenerate` and native certificate-management capability are also checked. Granting the plugin capability alone does not delegate corrections to teachers or company managers.
 
-This alpha is restricted to site administrators. Its module-context capability, `local/iomadcertregen:regenerate`, has no default role grants. Granting that capability to a manager or teacher does not enable delegated access in this release.
+## Find courses and templates
 
-Open the tool from the activity settings menu or from **Site administration → Plugins → Local plugins → IOMAD Certificate Regenerator** and select the activity.
+Open **Site administration → Plugins → Local plugins → IOMAD Certificate Regenerator**. The ready-made inventory has one row per IOMAD Certificate activity, including hidden activities/courses and activities with no issues or company association. Activities pending deletion are omitted.
 
-### Certificate inventory
+Columns describe category, course name/short name, activity name, current native template identifier and visibility. Use native filters, sorting, pagination and exports. Actions open the course, its activity settings or its issued certificates.
 
-Open **Site administration → Plugins → Local plugins → IOMAD Certificate Regenerator**. The inventory contains one row per IOMAD Certificate activity, including hidden courses/activities and activities without issued certificates or an IOMAD company association. It excludes activities pending deletion. Columns show category, course name/short name, activity name, current template identifier and course/activity visibility.
+For native **Custom reports**, create a report using source **IOMAD Certificate inventory** under **Site administration → Reports → Report builder → Custom reports**. The same entity, columns, filters and conditions are available. Both discovery and data access require site administration rights; sharing a report audience does not grant these rights.
 
-Use Moodle's native filters to search by course, category, activity or template, then download the filtered table in the formats provided by Moodle. Row actions open the course, the activity's normal settings or its issued certificates. The report never changes activity settings or PDFs. Identifiers are shown as stored, including customised or missing templates, so administrators can locate them. A template identifier alone does not describe all background images, seals or signatures.
+The inventory reports current configuration. It cannot identify the template used in an old PDF, decide whether a template is appropriate, or describe every background, seal and signature from its template identifier. Inspect the native activity settings where necessary. Reports and their exports do not modify certificates.
 
-The inventory describes **current configuration**, not the template used to create an old saved PDF. It cannot decide whether a model is correct for a particular course, and it does not regenerate certificates in bulk or replace learner files.
+## Correct one learner
 
-For native **Custom reports**, create a report using source **IOMAD Certificate inventory**. The same columns, filters and conditions are available. Both the ready-made inventory and custom report source are restricted to site administrators, including data access when a report is shared with another audience. A shared audience does not grant access. Reports/exports created by administrators remain subject to Moodle's normal report storage and sharing controls; the plugin adds no external connection, learner data or new inventory table.
+1. Save the desired template and related printing settings in the **native IOMAD Certificate activity settings**.
+2. Open **IOMAD Certificate Regenerator** from the activity menu and locate an existing issued certificate.
+3. Check the learner, original code/date and current settings, acknowledge the action and **Prepare corrected copy**.
+4. Open the protected PDF. Check its actual appearance, beneficiary, code, printed date and text.
+5. **Confirm corrected copy**. This retains exactly the reviewed bytes and does not render a different PDF.
+6. To update learner access, choose **Publish corrected certificate for the learner**. Review the precise native files listed, acknowledge and publish.
+7. If required, use the separate **Email the corrected certificate** action.
 
-### Workflow
+A unique existing issue and a saved original activity PDF are required. A preliminary issue row, or only a history file, is insufficient. If no PDF was saved by the activity, preparation is refused.
 
-1. Locate an existing issue. An unambiguous native issue and a saved PDF in that activity must be confirmed.
-2. Open the preparation page, check the beneficiary, original date/code, saved-original evidence and current template.
-3. Acknowledge that the copy is independent, then prepare it.
-4. Open the protected PDF for review. Confirming retains exactly those bytes, without recalculating the document.
-5. Download the confirmed copy. The latest confirmed copy is also linked from the issue list.
+## Correct several learners
 
-If `savecert` was disabled and no original was saved by the activity, the action is refused even if an issue row exists or an IOMAD history copy exists. A preliminary row is not treated as proof of a previously generated PDF. This alpha does not inspect IOMAD history files as an alternative.
+Choose **Correct several learners** from the activity's issued-certificate list. Select up to **20 existing issues per request**; selection pages are separate from the individual list. For larger groups, repeat with another selection.
 
-The older qualified IOMAD library has a confirmed defect in its native saved-file download handler. The corrected official library shipped with IOMAD 4.5.15 is qualified separately; its original-file link is enabled only when that exact library fingerprint is present. For the older revision, the preparation page reports this limitation instead of offering the broken original-file link. The file remains stored and unchanged; evidence checking and correction rendering do not invoke that handler. This plugin does not patch IOMAD.
+Prepare the selection, open each labelled PDF link, then **Confirm reviewed copies**. A further review page offers **Publish reviewed copies for learners**, listing the native targets. Publication is never combined silently with confirmation or email.
 
-On 4.5/5.0 the saved-original check parses the qualified native reporting function's output as data, with exact PDF MIME, local URL, component, context and issue checks. Its HTML is never rendered directly. On 5.1/5.2 that helper calls a deprecated Moodle function, so the adapter reads the same native area through Moodle File API, requires one PDF at the issue root and uses the current URL API. Unknown or ambiguous evidence is refused.
+Each beneficiary has an independent operation and result. An ineligible issue is reported by learner/code with a link to its individual page; successful preparations remain available. Repeating the same preparation form reuses its preparations. Confirmation/publication are idempotent per operation. A request interruption is not a claim that every item completed: reopen the batch or retry the same form and review the recorded results.
 
-The current 5.1/5.2 native renderer omits the activity alias required by its templates. The adapter supplies an explicit local template scope and invokes only a fingerprint-qualified native template. It preserves the actor session and verifies the beneficiary/issue aliases and PDF result. No native file is patched; this is a version-specific integration rather than a stable public IOMAD rendering API.
+Changing activity settings or relevant learner information during a batch can invalidate its preparations. Prepare a new selection after resolving those changes. This is bounded web processing, not an unbounded background queue or automatic mass mailing.
 
-IOMAD already supplies native stored-certificate regeneration, including in older branches. It replaces the IOMAD history file. This plugin provides a separate administrative copy with preparation, review and confirmation; it does not replace that native tool or the learner's PDF.
+## Publication and native history
 
-The qualified native course/activity restore omits the saved original PDF, although the issue record is restored. The plugin restores its own confirmed copy independently. That copy remains downloadable, but a new correction of the restored issue is refused while native saved-original evidence is missing. This plugin does not reconstruct or insert a native original; use complete site backups for full recovery.
+Publication requires a confirmed copy with **no expiry**, prepared by the publishing administrator. Duration changes apply to future operations and never erase an existing deadline. If a copy expires, configure unlimited retention for future confirmed copies and prepare a new correction before publishing.
 
-### Emailing a confirmed correction
+Publication retains each previous native PDF in the plugin's protected `original` area, then replaces native file content using Moodle File API. Native file routes/names and native issue code/date are preserved. Replacement metadata is committed with the operation and its Moodle event. Only the latest publication for that learner/activity is active; previous reviewed PDFs and retained originals remain administratively available.
 
-After confirming the PDF, its preparing site administrator can choose **Email the corrected certificate**. The next page shows the current beneficiary name/address and requires explicit acknowledgement. The message attaches the exact confirmed PDF, in the beneficiary language when translations are available, with Moodle language fallback otherwise; it does not render a different file. A changed destination requires a fresh review. No arbitrary destination or additional recipient is accepted. Native activity email delivery prompts this action, but never causes an automatic resend.
+The native activity button serves the exact published PDF through a protected endpoint. It respects learner ownership, active enrolment, course/activity restrictions and the native minimum-course-time rule. A later enrolment period is not diverted to an obsolete issue. A subsequently changed template does not silently alter an already published correction.
 
-Moodle's normal email configuration is used with the site no-reply sender. There is no separate SMTP account or plugin credential. Site-wide disabled email, an unconfirmed/restricted account, nologin/suspension/deletion, invalid addresses and bounce restrictions prevent submission. A learner with an existing issue can receive the attached correction without visiting Moodle; current enrolment is not required. The learner's activity/history file is still unchanged by this release.
+For **IOMAD history**, the plugin replaces only existing files with an exact beneficiary, course, issue-date and unique native activity filename match. Older or unmatched history records are excluded and are not described as corrected. Company-specific history also requires a match to an unambiguous current beneficiary company; personal history remains owner/admin scoped. The review lists the actual targets. Duplicate activity filenames and courses mixing other certificate engines are refused rather than guessed. Renamed activities or independently recorded completion dates can prevent a history match. Review those cases separately; there is no automatic historical reconstruction.
 
-The page records the latest attempt time and outcome. **Accepted for submission** does not prove inbox delivery or reading. A double click or repeated request does not resend; a submitted copy cannot be sent again by this action. A definite failure allows a new explicit request after reviewing configuration. An interrupted/uncertain attempt is blocked from retries to avoid duplicates; inspect the site mail logs. No automatic queue or bulk email is added. A failed attachment copy cannot send a message without its PDF.
+Native history file entry points additionally enforce the owner, site administrator or authorised IOMAD manager's company/department scope. Company selection alone is insufficient; native selectable-company and capability checks apply, including explicit child-company rights. Historical owner access does not depend on a current course enrolment. Delegated activity access is refused for ambiguous multi-company membership or changed publication inputs; an administrator must review a new correction. Owner and site-administrator access to the retained personal PDF is preserved. Native history downloads are forced attachments with private, zero-lifetime delivery. The same policy applies to recognised ordinary and token-based file entry points; this is not Moodle mobile-app integration.
 
-The plugin stores status, time and a hashed anti-duplicate request token on the existing operation; it does not store a historical address or message body. Privacy exports include bounded history and exclude tokens. The confirmed PDF and current profile address are disclosed to the configured email service and beneficiary only on explicit submission; delivered emails cannot be recalled by plugin deletion. Backup/restore preserves bounded mail history, resets private tokens and never sends mail. Earlier archives without history restore as not requested; interrupted states restore as uncertain. Standard activity/user removal and configured copy retention also remove owned mail metadata.
+The plugin locks its own operations. Native settings edits, native certificate regeneration and other external processes do not share that lock. Avoid running those operations concurrently with correction/publication. A later native action can replace a native file again; prepare and review a new correction when needed.
 
-### Dates and source changes
+## Email and message customisation
 
-Rendering uses current learner information and current activity settings. Printed dates and grades follow the native template's rules and may differ from a historical document. Keeping the stored issue date does not reconstruct missing historical grades or text. The separate preparation/confirmation timestamp records the correction operation.
+Email requires a confirmed, unexpired copy and its preparing administrator. The current beneficiary/address is displayed and must be acknowledged. No arbitrary destination is accepted. Disabled site mail and ineligible accounts/addresses are refused before transport.
 
-Printed language/date formatting follows the native renderer and the administrator session at preparation time. Changing the administrator locale after review does not change the reviewed PDF. A detectable change to the beneficiary language or timezone requires a fresh review. Historical certificates remain administratively accessible after unenrolment; regeneration does not reinstate enrolments.
+Moodle's mail API receives the exact confirmed PDF, with the site's mail configuration and no-reply sender. The subject/body use the recipient's language and course name. Customise strings `emailsubject` and `emailbody` through **Site administration → Language → Language customisation → local_iomadcertregen.php**. Preserve `{$a}`, the course-name placeholder. These are language-wide defaults, not a per-course or per-send editor.
 
-The plugin fingerprints native issue/activity/identity/grade/completion/settings inputs and rejects detectable changes before confirmation. It preserves the reviewed bytes. Its lock serialises its own operations; it does not lock external IOMAD edits. Changes to external image assets or other untracked rendering dependencies may require a new preparation and are not claimed to be fully detected.
+A successful API result means submission was accepted, not delivery/read confirmation. Submitted, interrupted and uncertain attempts are not automatically retried. A reported failure needs a new explicit attempt after reviewing configuration and mail logs. Mail history survives backup; request tokens and automatic sends do not.
 
-### Privacy and retention
+The native activity's email-delivery setting prompts this separate action. Opening a published certificate does not automatically send another message. Copies already delivered by email cannot be recalled by changing Moodle files.
 
-Prepared and confirmed PDFs and operation metadata are stored under this plugin, in the activity context. Both beneficiary and administrator are declared in the Privacy API. The beneficiary can export their own PDF; an administrator acting only as preparer exports action metadata without other beneficiaries' PDFs. An approved erasure involving either person removes the shared corrected copy and owned metadata, without deleting the native certificate. Moodle manages its own event logs separately.
+## Retention, privacy and recovery
 
-Open **Site administration → Plugins → Local plugins → Certificate copy retention** to set institutional lifetimes. Preparations default to 24 hours (minimum one minute); confirmed copies default to zero, which disables automatic expiry. The preparation deadline is captured when the PDF is prepared; the confirmed deadline is captured when it is confirmed. Changing settings does not change existing deadlines. The review page displays the stored expiry, or the absence of automatic expiry for a confirmed copy.
+Preparation expiry defaults to 24 hours. Confirmed copies have no automatic expiry by default; institutional settings can change future durations. Hourly cleanup removes expired/orphaned owned data. Publication is available only for non-expiring copies so its learner mapping and retained originals are not aged out automatically.
 
-Expired copies are inaccessible immediately and the hourly task removes their PDF and operation metadata. This affects only this plugin's copies, never the native certificate. Set a confirmed-copy lifetime only after choosing the institution's retention policy. A zero default preserves existing copies until another authorised lifecycle or privacy action removes them. Activity/user deletion and reset of the native issues clean the associated copies. No external service or telemetry is used.
+Privacy API metadata covers the beneficiary, preparing administrator, operation integrity, publication, batch and email history. Beneficiary export includes corrected PDFs and retained originals; an actor-only export does not include another learner's PDFs. Request/idempotency tokens are excluded. Approved deletion removes the plugin's own files and records. Native IOMAD files, including published replacements, remain under their native components' access and lifecycle rules.
 
-### Backup, reset and removal
+Copies and retained originals are personal data. Course/activity removal, reset and privacy operations can remove the plugin's archives. This is not a legal archiving or permanent-retention guarantee. There is no one-click rollback feature; retained originals can be downloaded by administrators.
 
-Full site backups must include the database and Moodle file storage. Course and activity backups can also transfer confirmed, unexpired copies when **the backup owner is a site administrator and user data is included**. Temporary preparations and expired copies are excluded. A teacher's backup does not export these administrative PDFs, even if the teacher can back up ordinary course user data.
+Administrator-owned course/activity backup with user information includes eligible confirmed copies and retained originals. Restoration validates native issue/user mappings, code/date and file integrity. It restores administrative copies only: no automatic publication or email, and no reuse of old batch/request keys. The qualified native activity restore omits its own saved original PDF; a new correction therefore remains refused until genuine native saved evidence exists. Full site backup is necessary for complete recovery.
 
-Restoring administrative copies is also restricted to a site-administrator restore owner with user data enabled. Moodle must map both the beneficiary and preparing administrator; their user records are therefore included in an authorised user-data backup through Moodle's native annotations. Treat such archives as personal data. Old numeric user identifiers are never used as a fallback.
+Uninstall removes the plugin's tables/files, not the native IOMAD issue or PDFs. It also removes this plugin's download integration and additional native-history access guard. Review native ownership, access and recovery requirements before removal.
 
-Native IOMAD restoration creates new activity/issue identifiers; this plugin remaps its own links to those restored records. The restored native issue must belong to the restored activity and mapped beneficiary, with the same code and recorded issue date. Historical preparation/confirmation timestamps and expiry remain absolute. The reviewed PDF is restored without regeneration and its hash, size, format and effective PDF MIME type are checked. A changed native award date, missing mapping or invalid file causes that copy to be omitted with a Moodle restore warning; the native course restore continues. For example, moving the course start date can shift native issue dates and exclude the historical copy. Existing historical names and text in the PDF are preserved; current user profile names may differ.
+## Languages, themes and support boundaries
 
-A course reset removing native issues also removes their corrected copies. Resetting unrelated settings leaves copies whose issues remain. Moodle's normal plugin uninstall removes its schema, configuration, tasks and owned files while preserving native certificates. Full site backup remains necessary for disaster recovery; importing a course backup is not a rollback of the original site's history.
+English is packaged in `lang/en`. French and Spanish drafts are maintained separately for local customisation/AMOS preparation; they are not claimed published in AMOS or included as packaged language directories. No customer-specific names, credentials or laboratory data belong in the distributable.
 
-### Testing
+Browser validation uses Boost. The independently identified New Learning 12.2.7 layout/API issue on IOMAD 5.2 remains outside this change and deferred. No core/module/theme patch is installed. iPad/NAMO and Moodle app integration are outside the agreed scope. No screen-reader or comprehensive accessibility certification is claimed.
 
-The package includes nine focused PHPUnit test classes for the correction service, saved-original requirement, roles, cross-activity identifiers, CSRF, idempotence, source changes, integrity, privacy, beneficiary-company branding, lifecycle cleanup and real course-backup round trips. The candidate passed 52 tests / 226 assertions on each current branch listed above. All six supported native PDF templates are exercised. Only PHP 8.3.30 has been executed locally; PHP 8.1 and 8.2 matrix jobs remain pending.
+See [TESTING.md](TESTING.md), [CHANGES.md](CHANGES.md) and [SECURITY.md](SECURITY.md) for evidence, limits and reporting readiness. This independent GPL v3-or-later plugin uses the installed IOMAD renderer; it does not claim IOMAD lacks native certificate regeneration.
 
-Use a dedicated IOMAD PHPUnit database prefix and dataroot. Moodle's PHPUnit initialisation resets that test schema and test files; never point it at the ordinary site data.
+## Guide rapide en français
 
-```sh
-php admin/tool/phpunit/cli/init.php --disable-composer
-vendor/bin/phpunit --configuration phpunit.xml --testsuite local_iomadcertregen_testsuite
-```
+Dans les paramètres natifs de l'activité, choisissez d'abord le bon modèle et ses réglages. Dans **IOMAD Certificate Regenerator**, préparez les corrections, ouvrez les PDF pour les vérifier, puis confirmez-les. La **publication** est une étape distincte qui met la version corrigée à la disposition de l'élève et conserve les anciens PDF pour l'administrateur. La sélection collective traite au plus 20 élèves par demande. Le **courriel** reste une action volontaire distincte.
 
-On IOMAD 5.1/5.2, the PHPUnit initialisation script is under `public/admin/tool/phpunit/cli/init.php`; run `vendor/bin/phpunit` from the installation root.
+L'inventaire est aussi disponible dans les **Rapports personnalisés**, avec la source **IOMAD Certificate inventory**. Il décrit le modèle actuellement configuré; il ne peut pas décider quel modèle devrait être utilisé ni identifier le modèle d'un ancien PDF. Les entrées d'historique sans correspondance certaine ne sont pas remplacées. Cette version reste une alpha de laboratoire.
 
-The repository includes `.github/workflows/qualification.yml` with a proposed PHP/database matrix, Moodle Plugin CI 4.5.11 and pinned IOMAD commits. Matrix preparation does not establish that every runtime was tested. This workflow is prepared but has not run remotely; no CI badge or broader compatibility is claimed. Repository CI configuration is excluded from the installable ZIP.
+## Acknowledgements
 
-The repository also contains five non-JavaScript Behat scenarios, executed locally on each current IOMAD branch listed above with PHP 8.3.30 / PostgreSQL 17.11 and Moodle BrowserKit HTTP: 5 scenarios and 71 steps passed on each branch. They cover the real forms, required acknowledgement, permission denial, protected PDF bytes/headers, event attribution, pagination across 1,001 saved issues and a configured middle name. They do not test JavaScript, a PDF viewer or assistive technology.
-
-Use a separately configured Behat URL, database prefix and dataroot. For IOMAD 5.2/PostgreSQL, configure a separate `behat_dbname`: the native OIDC install uses a fixed index name that collides across prefixes in one database. Install that disposable acceptance site with Moodle's `admin/tool/behat/cli/util_single_run.php --install`, then run the repository-only `.github/scripts/prepare_behat.php /absolute/path/to/moodle` (pass the `public` web directory on 5.1/5.2) and use its returned configuration with `vendor/bin/behat --suite=default --tags=@local_iomadcertregen --format=progress --strict`. Start a local HTTP server serving that test URL first. The helper checks Moodle's native test-site readiness and does not modify runtime source.
-
-The helper reports narrowly scoped native test-context adjustments by exact file hashes. Policy duplicates core steps on all branches. The older SAML context is incompatible on 4.5/5.0; its corrected 5.1/5.2 context is retained under its actual class name. On 5.2 a custompage generator is misplaced in the step-context directory and is excluded there. Runtime components remain installed and unchanged; no plugin scenario is excluded. Changed contexts require review. These plugin acceptance results do not qualify the excluded third-party suites. The helper is included in the source repository and excluded from the installable ZIP.
-
-No custom JavaScript, stylesheet or third-party PDF library is bundled. The source module supplies the rendering engine. The installable package contains English strings only. French and Spanish drafts are maintained separately for AMOS submission after approval; no availability through AMOS is claimed. Private laboratory local language overrides are outside the package. Check current Marketplace packaging requirements before submission.
-
-## Français
-
-### Inventaire des activités certificat
-
-Depuis **Administration du site → Plugins → Plugins locaux → IOMAD Certificate Regenerator**, retrouvez une ligne par activité avec catégorie, cours, nom abrégé, activité, identifiant du modèle courant et visibilité. Les cours masqués, activités sans délivrance et cours sans entreprise IOMAD sont inclus. Les suppressions en cours sont exclues. Utilisez les filtres natifs, puis le téléchargement du tableau; les actions ouvrent le cours, les paramètres ou les certificats délivrés.
-
-Dans les **Rapports personnalisés** natifs, choisissez la source **IOMAD Certificate inventory** (ou sa traduction locale). Les administrateurs disposent des mêmes colonnes, filtres et conditions. L’accès reste réservé aux administrateurs du site, y compris après partage d’une audience. La consultation/exportation ne modifie aucun paramètre ni certificat. Les rapports sont gérés et conservés par les API natives Moodle.
-
-Le modèle affiché est celui configuré actuellement. Il ne révèle pas le modèle utilisé dans les anciens PDF, ni tous les choix d’images/signatures/sceaux, et ne décide pas si le modèle convient au cours. Cette extension n’effectue aucune correction collective et ne remplace pas les fichiers apprenants. La version 0.9 passe 75 tests/303 assertions sur chacune des quatre branches; voir TESTING.md pour les bases/PHP réellement exécutés et les limites.
-
-### Utilisation
-
-Cet outil crée une **copie administrative corrigée distincte** d'un certificat existant. Il conserve la délivrance originale, son code, sa date enregistrée et ses fichiers. Il ne remplace pas le PDF proposé à l'apprenant dans l'activité ou l'historique IOMAD. Il n’envoie aucun courriel automatiquement et ne modifie ni note, ni achèvement, ni inscription. Une action distincte permet l’envoi explicite de la copie confirmée au bénéficiaire.
-
-Installer le ZIP par l'installateur de plugins Moodle ou dans `local/iomadcertregen`, puis lancer la mise à jour native. L'accès est réservé aux administrateurs du site. Ouvrir l'outil depuis les réglages de l'activité ou **Administration du site → Plugins → Plugins locaux**.
-
-Choisir une délivrance, vérifier la preuve d'enregistrement de l'original et le modèle courant, préparer la copie, ouvrir sa prévisualisation, puis confirmer et télécharger. La confirmation conserve le même PDF. La liste donne également accès à la dernière copie confirmée.
-
-### Envoyer une copie confirmée par courriel
-
-L’administrateur ayant préparé la copie choisit **Envoyer le certificat corrigé par courriel** après confirmation. La page affiche le bénéficiaire et son adresse actuelle; une case d’autorisation est obligatoire. L’élève reçoit le PDF confirmé en pièce jointe, sans devoir revenir dans Moodle. Si l’adresse change avant validation, il faut revoir le destinataire. Aucun autre destinataire n’est proposé. Le réglage courriel de l’activité rappelle cette action sans déclencher d’envoi automatique.
-
-L’envoi utilise la configuration Moodle et l’expéditeur sans réponse du site. Aucun compte SMTP supplémentaire. Les comptes/adresses non admissibles et l’envoi global désactivé sont refusés. Les doublons sont évités; un échec explicite permet un nouvel essai volontaire. Un résultat incertain ou interrompu ne peut pas être réessayé automatiquement. « Accepté pour transmission » ne prouve ni réception ni lecture.
-
-L’historique conserve état/date et identifiant haché anti-doublon; pas d’adresse historique ni de corps du message. Les exports de confidentialité excluent cet identifiant, et les suppressions retirent les données propres. La sauvegarde/restauration conserve l’historique sans envoyer de message. Le plugin ne peut pas rappeler un courriel livré. **Le remplacement du PDF dans l’activité apprenant et l’historique IOMAD reste distinct et n’est pas réalisé ici.**
-
-### Limites de cette version
-
-Version alpha de laboratoire, non approuvée par le Marketplace. Les profils activés couvrent les branches IOMAD 4.5, 5.0, 5.1 et 5.2 qualifiées dans `classes/local/qualified.json` : mises à jour testées 4.5.15, 5.0.11, 5.1.8 et 5.2.4. Les bibliothèques et modèles modifiés ou inconnus sont refusés; une mise à jour future exige une nouvelle qualification. L'impression des objectifs n'est pas prise en charge.
-
-L’ancienne bibliothèque IOMAD qualifiée présente un défaut confirmé dans son téléchargement natif des fichiers enregistrés. La bibliothèque officielle corrigée dans IOMAD 4.5.15 est qualifiée séparément; son lien vers l’original est proposé uniquement si son empreinte exacte est reconnue. La préparation des anciennes révisions l'indique et ne propose pas ce lien défectueux vers l'original. Le fichier d'origine est conservé; sa preuve d'enregistrement et le rendu corrigé ne passent pas par ce téléchargement. Le plugin ne modifie pas IOMAD.
-
-Un PDF original doit avoir été enregistré dans l'activité source. Une ligne de délivrance seule ou une copie présente uniquement dans l'historique IOMAD ne suffit pas. Les dates et notes imprimées suivent les réglages actuels du moteur; la copie n'est pas une reconstitution garantie des informations historiques.
-
-Les réglages **Administration du site → Plugins → Plugins locaux → Conservation des copies de certificats** définissent les durées institutionnelles. Par défaut, les préparations expirent après 24 heures et les copies confirmées n'ont pas d'expiration automatique (valeur zéro). Le minimum d'une préparation est d'une minute.
-
-L'échéance est enregistrée lors de la préparation, puis lors de la confirmation selon le réglage alors en vigueur. Modifier les réglages ne change pas les échéances déjà enregistrées. La page de vérification affiche l'échéance ou l'absence d'expiration automatique. À l'expiration, la copie devient inaccessible, puis la tâche horaire supprime son PDF et les métadonnées de l'opération; le certificat natif est conservé. Choisir la durée des copies confirmées selon la politique de l'établissement avant d'activer leur expiration. L’export Privacy du bénéficiaire inclut son PDF; celui d’un administrateur préparateur contient les traces de ses actions sans les PDF d’autres bénéficiaires. Les demandes de suppression Privacy pour le bénéficiaire ou l’administrateur suppriment la copie et ses données propres. Le certificat natif reste géré par IOMAD.
-
-Les sauvegardes de cours et d'activités incluent les copies confirmées non expirées si leur propriétaire est administrateur du site et si les données utilisateur sont incluses. Les préparations et copies expirées sont exclues. Une sauvegarde réalisée par un enseignant n'exporte pas ces copies administratives, même s'il peut sauvegarder les données ordinaires du cours.
-
-La restauration des copies exige également un administrateur du site et les données utilisateur. Les comptes du bénéficiaire et de l'administrateur préparateur sont annotés par les API natives pour conserver leur correspondance : protéger ces archives comme des données personnelles. Aucun ancien identifiant numérique n'est repris sans remappage.
-
-La restauration native IOMAD crée de nouveaux identifiants d'activité et de délivrance; le plugin remappe ses propres liens vers ces enregistrements. Le code et la date enregistrée de la délivrance restaurée doivent rester identiques. La restauration conserve le PDF revu, ses dates de préparation/confirmation et son échéance absolue, sans nouvelle génération ni prolongation. Elle vérifie le fichier et son type PDF effectif. Si une correspondance manque, si les dates natives sont décalées ou si le fichier est invalide, la copie concernée est omise avec avertissement; le cours continue d'être restauré. Un changement de date de début du cours peut donc exclure une copie historique. Les noms et informations historiques imprimés dans le PDF restent inchangés, même si un profil utilisateur a évolué.
-
-La restauration native qualifiée omet le PDF original enregistré, même si la délivrance est restaurée. La copie corrigée confirmée est restaurée séparément et reste téléchargeable. Une nouvelle correction est refusée tant que la preuve native de l’original manque. Le plugin ne recrée pas cet original; une sauvegarde complète du site reste nécessaire pour une reprise intégrale.
-
-La langue et le format des dates imprimées suivent le moteur natif et la session de l’administrateur lors de la préparation. Un changement de langue de l’administrateur après vérification ne régénère pas le PDF. Un changement détectable de langue ou de fuseau du bénéficiaire exige une nouvelle vérification. Une désinscription ne recrée ni délivrance ni inscription.
-
-Une réinitialisation supprimant les délivrances natives supprime aussi leurs copies corrigées. La désinstallation native retire les données propres du plugin et conserve les certificats natifs. Maintenir une sauvegarde complète du site pour la reprise après incident.
-
-Les essais New Learning et Boost sont décrits séparément dans le rapport de validation. Les essais sur appareil mobile sont hors périmètre de cette V1. Les traductions françaises et espagnoles sont préparées séparément pour AMOS; le ZIP ne contient que les chaînes anglaises. Une interface responsive ne constitue pas une intégration dans l'application Moodle ni une certification d’accessibilité.
-
-## Licence
-
-GNU GPL v3 or later. Existing third-party copyrights and licences remain with their respective components. The plugin does not bundle IOMAD, Moodle or New Learning.
+PDF generation uses the installed IOMAD Certificate module, whose native source credits Mark Nelson and IOMAD contributors. Native code and assets retain their own copyright and licence. No third-party theme code or laboratory files are bundled.
