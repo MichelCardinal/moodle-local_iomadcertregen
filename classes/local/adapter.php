@@ -38,8 +38,8 @@ final class adapter {
      */
     public static function require_compatible(\stdClass $certificate): void {
         global $CFG;
-        $profile = json_decode(file_get_contents(__DIR__ . '/qualified.json'), true, 512, JSON_THROW_ON_ERROR);
-        if (!in_array((int)$CFG->branch, $profile['branches'], true) || !empty($certificate->printoutcome)) {
+        $profile = self::profile((int)$CFG->branch);
+        if ($profile === null || !empty($certificate->printoutcome)) {
             throw new \moodle_exception('unsupported', 'local_iomadcertregen');
         }
         $type = $certificate->iomadcertificatetype;
@@ -53,7 +53,27 @@ final class adapter {
                 throw new \moodle_exception('unsupportedtemplate', 'local_iomadcertregen');
             }
         }
-        require_once($CFG->dirroot . '/local/iomad_track/db/install.php');
+        require_once($CFG->dirroot . '/mod/iomadcertificate/lib.php');
+        require_once($CFG->dirroot . '/mod/iomadcertificate/locallib.php');
+        if ($profile['renderer'] === 'legacy') {
+            require_once($CFG->dirroot . '/local/iomad_track/db/install.php');
+        }
+    }
+
+    /**
+     * Select the exact native interface family without a version fallback.
+     *
+     * @param int $branch Installed Moodle/IOMAD branch.
+     * @return array|null Qualified profile or null.
+     */
+    private static function profile(int $branch): ?array {
+        $profiles = json_decode(file_get_contents(__DIR__ . '/qualified.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($profiles['profiles'] as $candidate) {
+            if (in_array($branch, $candidate['branches'], true)) {
+                return $candidate;
+            }
+        }
+        return null;
     }
 
     /**
@@ -85,7 +105,36 @@ final class adapter {
      * @return string Confirmed native stored-PDF URL.
      */
     public static function original_url(\stdClass $certificate, \stdClass $issue, \context_module $context): string {
+        global $CFG;
         self::require_compatible($certificate);
+        if ((int)$CFG->branch >= 501) {
+            // The native reporting helper still calls file_encode_url, deprecated in Moodle 5.1.
+            $files = get_file_storage()->get_area_files(
+                $context->id,
+                'mod_iomadcertificate',
+                'issue',
+                $issue->id,
+                'id',
+                false
+            );
+            if (count($files) !== 1) {
+                throw new \moodle_exception('nooriginal', 'local_iomadcertregen');
+            }
+            $file = reset($files);
+            if ($file->get_filepath() !== '/' || $file->get_mimetype() !== 'application/pdf') {
+                throw new \moodle_exception('nooriginal', 'local_iomadcertregen');
+            }
+            $url = \core\url::make_pluginfile_url(
+                $context->id,
+                'mod_iomadcertificate',
+                'issue',
+                $issue->id,
+                '/',
+                $file->get_filename()
+            )->out(false);
+            self::validate_original_url($url, $context->id, $issue->id);
+            return $url;
+        }
         $html = iomadcertificate_print_user_files($certificate, $issue->userid, $context->id);
         $document = new \DOMDocument();
         $previous = libxml_use_internal_errors(true);
@@ -148,8 +197,23 @@ final class adapter {
      * @return string PDF contents.
      */
     public static function render($certificate, $user, $cm, $course, $issue): string {
+        global $CFG;
         self::require_compatible($certificate);
-        $content = xmldb_local_iomad_track_create_certificate($certificate, $user, $cm, $course, $issue);
+        if ((int)$CFG->branch >= 501) {
+            // The qualified 5.1/5.2 handler omits the template's $iomadcertificate alias.
+            // Supply the native template scope locally; do not modify IOMAD's handler.
+            require_once($CFG->libdir . '/pdflib.php');
+            $iomadcertificate = $certificate;
+            $certuser = $user;
+            $certrecord = $issue;
+            require($CFG->dirroot . '/mod/iomadcertificate/type/' . $certificate->iomadcertificatetype . '/certificate.php');
+            if ($iomadcertificate !== $certificate || $certuser !== $user || $certrecord !== $issue || !($pdf instanceof \pdf)) {
+                throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
+            }
+            $content = $pdf->Output('', 'S');
+        } else {
+            $content = xmldb_local_iomad_track_create_certificate($certificate, $user, $cm, $course, $issue);
+        }
         self::require_valid_pdf($content);
         return $content;
     }

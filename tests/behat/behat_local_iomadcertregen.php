@@ -175,7 +175,6 @@ class behat_local_iomadcertregen extends behat_base {
      * @Then /^I download the confirmed certificate with its audit trail$/
      */
     public function i_download_the_confirmed_certificate_with_its_audit_trail(): void {
-        global $DB;
         $session = $this->getSession();
         $link = $session->getPage()->findLink('Download confirmed PDF');
         if (!$link) {
@@ -198,6 +197,14 @@ class behat_local_iomadcertregen extends behat_base {
         } finally {
             $session->visit($previousurl);
         }
+        $this->verify_audit_trail();
+    }
+
+    /**
+     * Verify participant and activity attribution of the standard event records.
+     */
+    private function verify_audit_trail(): void {
+        global $DB;
         $operation = $DB->get_record('local_iomadcertregen_op', ['issueid' => $this->evidence['issue']->id], '*', MUST_EXIST);
         $logs = $DB->get_records('logstore_standard_log', ['component' => 'local_iomadcertregen'], 'id');
         $classes = [

@@ -1,5 +1,15 @@
 # Changes
 
+## 0.7.0-alpha — 2026102307 (unreleased)
+
+- Add separately qualified IOMAD 5.1 and 5.2 native template profiles, retaining the 4.5/5.0 family.
+- Use an explicit native template scope on 5.1/5.2, avoiding the missing activity alias in their current handler without modifying IOMAD.
+- Read saved-original evidence through Moodle File API on 5.1/5.2, avoiding deprecated native URL generation.
+- Replace the removed local_iomad_track dependency with the shared local_iomad component.
+- Adapt company fixtures to the new native schema; exercise all six supported PDF templates.
+- Use the current course-format deletion API in 5.2 lifecycle tests.
+- Extend the proposed CI matrix to the current 4.5, 5.0, 5.1 and 5.2 branches and isolate the Behat database. Remote CI is still pending.
+
 ## 0.6.0-alpha — 2026102306 (unreleased)
 
 - Use Moodle's complete name-field API in the issue list, avoiding developer warnings and supporting configured name formats.

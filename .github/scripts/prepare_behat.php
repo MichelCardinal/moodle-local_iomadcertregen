@@ -50,11 +50,18 @@ if ($status = behat_util::get_behat_status()) {
 $utility = new behat_config_util();
 $contexts = $utility->get_components_contexts();
 $incompatible = [
-    'auth/iomadsaml2/tests/behat/behat_auth_saml2.php' =>
-        '95b8b334909e1f7289e8cc4866309c684f76d95411c9a9ef323db38bc063a876',
     'admin/tool/iomadpolicy/tests/behat/behat_tool_iomadpolicy.php' =>
         '0ea3c4a8c243462a0589d3712541c38bcc7c2416bb22e6d134d9d67dbee6c955',
 ];
+if ((int)$CFG->branch < 501) {
+    $incompatible['auth/iomadsaml2/tests/behat/behat_auth_saml2.php'] =
+        '95b8b334909e1f7289e8cc4866309c684f76d95411c9a9ef323db38bc063a876';
+}
+if ((int)$CFG->branch === 502) {
+    // Native generator is misplaced in the step-context directory and is not a Behat context.
+    $incompatible['local/iomadcustompage/tests/behat/behat_local_iomadcustompage.php'] =
+        'd64a49b7178590bfb2550d4104538817c699f3409330c529095d6ce79783a40c';
+}
 $excluded = [];
 foreach ($contexts as $name => $path) {
     $relative = substr($path, strlen($CFG->dirroot) + 1);
@@ -66,6 +73,21 @@ foreach ($contexts as $name => $path) {
     }
     $excluded[] = ['context' => $name, 'path' => $relative, 'sha256' => $incompatible[$relative]];
     unset($contexts[$name]);
+}
+$remapped = [];
+if ((int)$CFG->branch >= 501 && isset($contexts['behat_auth_saml2'])) {
+    // Native file name and class name differ; retain the corrected context under its actual class.
+    $path = $contexts['behat_auth_saml2'];
+    $qualified = [
+        501 => '1ccf6a44748195fb73aa78d05d2fc5474616af72c9c580ff2a9aa0429d0a7f04',
+        502 => '2e882b49696449d3e508617092fb8a9b67b5a961b5863cda13c23d5e89b8f465',
+    ];
+    if (hash_file('sha256', $path) !== ($qualified[(int)$CFG->branch] ?? null)) {
+        throw new coding_exception('Changed SAML acceptance context; review its class name before remapping.');
+    }
+    $contexts['behat_auth_iomadsaml2'] = $path;
+    unset($contexts['behat_auth_saml2']);
+    $remapped[] = ['from' => 'behat_auth_saml2', 'to' => 'behat_auth_iomadsaml2'];
 }
 if (!isset($contexts['behat_local_iomadcertregen'])) {
     throw new coding_exception('The plugin acceptance context is missing.');
@@ -85,7 +107,7 @@ if ($enabled === false) {
     throw new coding_exception('Cannot enable the isolated acceptance site.');
 }
 echo json_encode([
-    'config' => $config, 'excluded_test_contexts' => $excluded,
+    'config' => $config, 'excluded_test_contexts' => $excluded, 'remapped_test_contexts' => $remapped,
     'runtime_source_modified' => false, 'plugin_scenarios_excluded' => false,
-    'scope' => 'Run only @local_iomadcertregen; no qualification of the excluded IOMAD SAML/policy acceptance contexts.',
+    'scope' => 'Run only @local_iomadcertregen; no qualification of excluded third-party acceptance contexts.',
 ], JSON_PRETTY_PRINT) . PHP_EOL;

@@ -130,4 +130,36 @@ final class evidence_test extends certificate_testcase {
             }
         }
     }
+
+    /**
+     * Every qualified template renders without native warnings or an extra issue.
+     *
+     * @dataProvider templates_provider
+     * @param string $template Qualified native template.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('templates_provider')]
+    public function test_each_native_template_preserves_issue(string $template): void {
+        global $DB, $USER;
+        [$module, $learner, $cm, $course, $issue] = $this->native_fixture();
+        $module->iomadcertificatetype = $template;
+        $before = $DB->get_record('iomadcertificate_issues', ['id' => $issue->id]);
+        $actor = serialize($USER);
+        $pdf = adapter::render($module, $learner, $cm, $course, $issue);
+        $this->assertStringStartsWith('%PDF-', $pdf);
+        $this->assertStringContainsString('%%EOF', substr($pdf, -1024));
+        $this->assertEquals($before, $DB->get_record('iomadcertificate_issues', ['id' => $issue->id]));
+        $this->assertSame(1, $DB->count_records('iomadcertificate_issues'));
+        $this->assertSame($actor, serialize($USER));
+    }
+
+    /**
+     * List the six supported native templates.
+     *
+     * @return array Template cases.
+     */
+    public static function templates_provider(): array {
+        return array_map(static function ($type) {
+            return [$type];
+        }, ['A4_non_embedded', 'A4_embedded', 'letter_non_embedded', 'letter_embedded', 'company', 'companykanji']);
+    }
 }

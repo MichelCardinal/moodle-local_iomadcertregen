@@ -41,7 +41,8 @@ abstract class certificate_testcase extends \advanced_testcase {
         $this->resetAfterTest();
         writer::reset();
         $this->setAdminUser();
-        require_once($CFG->dirroot . '/local/iomad_track/db/install.php');
+        require_once($CFG->dirroot . '/mod/iomadcertificate/lib.php');
+        require_once($CFG->dirroot . '/mod/iomadcertificate/locallib.php');
         set_config('fontsans', 'helvetica', 'iomadcertificate');
         set_config('fontserif', 'times', 'iomadcertificate');
         $generator = $this->getDataGenerator();

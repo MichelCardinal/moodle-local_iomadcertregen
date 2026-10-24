@@ -10,17 +10,15 @@ An authorised site administrator can prepare, review, confirm and download a sep
 
 ### Current compatibility
 
-- Runtime qualification is restricted to IOMAD 4.5 / 5.0 and the exact library/template fingerprints in `classes/local/qualified.json`.
-- Initial target: IOMAD 4.5.13, IOMAD Certificate `2024100745`, PHP 8.3.30 and MySQL 8.0.44. See [TESTING.md](TESTING.md) for the exact executed matrix and limitations.
-- Additional tested target: IOMAD 5.0.9, PHP 8.3.30, MySQL 8.4.11 and PHPUnit 11.5.55. The same nine native source files match exactly.
-- Also tested: IOMAD 4.5.13 and current 4.5.15 (build 20261005), PHP 8.3.30 and PostgreSQL 17.11 in separate test databases. The 4.5.15 profile accepts its corrected native saved-file download handler.
-- A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility.
-- IOMAD 5.1 and 5.2 are not enabled in this alpha. Plain Moodle without IOMAD is not supported.
-- The six qualified standard templates are A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is disabled pending separate qualification. Company and companykanji tests verify the beneficiary company's seal when the administrator belongs to a different company; other branding configurations are not exhaustively tested.
+- Qualified branches: IOMAD **4.5, 5.0, 5.1 and 5.2**, with the exact native library/template fingerprints in `classes/local/qualified.json`. Current tested updates are 4.5.15, 5.0.11, 5.1.8 and 5.2.4. See [TESTING.md](TESTING.md) for runtimes, evidence and limits.
+- Each current branch passes 52 integration tests / 226 assertions locally on PHP 8.3.30 and PostgreSQL 17.11. Earlier 4.5.13 and 5.0.9 qualification is historical evidence for 0.6, not a new 0.7 runtime claim.
+- A different source library or customised/missing template is refused. Matching a Moodle version number or installing successfully does not establish compatibility. Future updates require qualification; this is not a promise to accept every patch automatically.
+- Plain Moodle without IOMAD is unsupported. The four branches share the IOMAD Certificate activity; their native tracking interfaces differ.
+- The six qualified standard templates are A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is disabled pending separate qualification. Company tests verify the beneficiary's seal when the administrator belongs to another company; other branding configurations are not exhaustively tested.
 
 ### Installation and access
 
-Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and run Moodle's normal upgrade process. Required components are `mod_iomadcertificate` (minimum `2024100700`) and `local_iomad_track` (minimum `2025050345`), both supplied by the qualified IOMAD distribution and declared in `version.php`. No Composer command or server-side build is needed to install this plugin ZIP. Back up the site before installing or upgrading.
+Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and run Moodle's normal upgrade process. For IOMAD 5.1/5.2, the manual destination is `public/local/iomadcertregen` inside the IOMAD installation; Moodle's ZIP installer resolves it automatically. Required components are `mod_iomadcertificate` (minimum `2024100700`) and `local_iomad` (minimum `2024100700`), both supplied by the qualified IOMAD distribution and declared in `version.php`. No Composer command or server-side build is needed to install this plugin ZIP. Back up the site before installing or upgrading.
 
 This alpha is restricted to site administrators. Its module-context capability, `local/iomadcertregen:regenerate`, has no default role grants. Granting that capability to a manager or teacher does not enable delegated access in this release.
 
@@ -38,7 +36,11 @@ If `savecert` was disabled and no original was saved by the activity, the action
 
 The older qualified IOMAD library has a confirmed defect in its native saved-file download handler. The corrected official library shipped with IOMAD 4.5.15 is qualified separately; its original-file link is enabled only when that exact library fingerprint is present. For the older revision, the preparation page reports this limitation instead of offering the broken original-file link. The file remains stored and unchanged; evidence checking and correction rendering do not invoke that handler. This plugin does not patch IOMAD.
 
-The saved-original check uses the source module's reporting function inside the fingerprint-qualified adapter. Its HTML is parsed as data, with exact PDF MIME, local URL, component, context and issue checks; it is never inserted directly into the page. Unknown output is refused. This is an internal, version-specific interface, not a stable external IOMAD API.
+On 4.5/5.0 the saved-original check parses the qualified native reporting function's output as data, with exact PDF MIME, local URL, component, context and issue checks. Its HTML is never rendered directly. On 5.1/5.2 that helper calls a deprecated Moodle function, so the adapter reads the same native area through Moodle File API, requires one PDF at the issue root and uses the current URL API. Unknown or ambiguous evidence is refused.
+
+The current 5.1/5.2 native renderer omits the activity alias required by its templates. The adapter supplies an explicit local template scope and invokes only a fingerprint-qualified native template. It preserves the actor session and verifies the beneficiary/issue aliases and PDF result. No native file is patched; this is a version-specific integration rather than a stable public IOMAD rendering API.
+
+IOMAD already supplies native stored-certificate regeneration, including in older branches. It replaces the IOMAD history file. This plugin provides a separate administrative copy with preparation, review and confirmation; it does not replace that native tool or the learner's PDF.
 
 The qualified native course/activity restore omits the saved original PDF, although the issue record is restored. The plugin restores its own confirmed copy independently. That copy remains downloadable, but a new correction of the restored issue is refused while native saved-original evidence is missing. This plugin does not reconstruct or insert a native original; use complete site backups for full recovery.
 
@@ -70,7 +72,7 @@ A course reset removing native issues also removes their corrected copies. Reset
 
 ### Testing
 
-The package includes nine focused PHPUnit test classes for the correction service, saved-original requirement, roles, cross-activity identifiers, CSRF, idempotence, source changes, integrity, privacy, beneficiary-company branding, lifecycle cleanup and real course-backup round trips. The candidate passed 46 tests on each of the four tested IOMAD/database combinations above (197 assertions on the older handler, 196 on the corrected handler). Only PHP 8.3.30 has been executed locally; PHP 8.1 and 8.2 matrix jobs remain pending.
+The package includes nine focused PHPUnit test classes for the correction service, saved-original requirement, roles, cross-activity identifiers, CSRF, idempotence, source changes, integrity, privacy, beneficiary-company branding, lifecycle cleanup and real course-backup round trips. The candidate passed 52 tests / 226 assertions on each current branch listed above. All six supported native PDF templates are exercised. Only PHP 8.3.30 has been executed locally; PHP 8.1 and 8.2 matrix jobs remain pending.
 
 Use a dedicated IOMAD PHPUnit database prefix and dataroot. Moodle's PHPUnit initialisation resets that test schema and test files; never point it at the ordinary site data.
 
@@ -79,13 +81,15 @@ php admin/tool/phpunit/cli/init.php --disable-composer
 vendor/bin/phpunit --configuration phpunit.xml --testsuite local_iomadcertregen_testsuite
 ```
 
+On IOMAD 5.1/5.2, the PHPUnit initialisation script is under `public/admin/tool/phpunit/cli/init.php`; run `vendor/bin/phpunit` from the installation root.
+
 The repository includes `.github/workflows/qualification.yml` with a proposed PHP/database matrix, Moodle Plugin CI 4.5.11 and pinned IOMAD commits. Matrix preparation does not establish that every runtime was tested. This workflow is prepared but has not run remotely; no CI badge or broader compatibility is claimed. Repository CI configuration is excluded from the installable ZIP.
 
-The repository also contains five non-JavaScript Behat scenarios, executed locally on IOMAD 4.5.15 / PHP 8.3.30 / PostgreSQL 17.11 with Moodle BrowserKit HTTP: 5 scenarios and 71 steps passed. They cover the real forms, required acknowledgement, permission denial, protected PDF bytes/headers, event attribution, pagination across 1,001 saved issues and a configured middle name. They do not test JavaScript, a PDF viewer or assistive technology.
+The repository also contains five non-JavaScript Behat scenarios, executed locally on each current IOMAD branch listed above with PHP 8.3.30 / PostgreSQL 17.11 and Moodle BrowserKit HTTP: 5 scenarios and 71 steps passed on each branch. They cover the real forms, required acknowledgement, permission denial, protected PDF bytes/headers, event attribution, pagination across 1,001 saved issues and a configured middle name. They do not test JavaScript, a PDF viewer or assistive technology.
 
-Use a separately configured Behat URL, database prefix and dataroot. Install that disposable acceptance site with Moodle's `admin/tool/behat/cli/util_single_run.php --install`, then run the repository-only `.github/scripts/prepare_behat.php /absolute/path/to/moodle` and use its returned configuration with `vendor/bin/behat --suite=default --tags=@local_iomadcertregen --format=progress --strict`. Start a local HTTP server serving that test URL first. The helper checks Moodle's native test-site readiness and does not modify runtime source.
+Use a separately configured Behat URL, database prefix and dataroot. For IOMAD 5.2/PostgreSQL, configure a separate `behat_dbname`: the native OIDC install uses a fixed index name that collides across prefixes in one database. Install that disposable acceptance site with Moodle's `admin/tool/behat/cli/util_single_run.php --install`, then run the repository-only `.github/scripts/prepare_behat.php /absolute/path/to/moodle` (pass the `public` web directory on 5.1/5.2) and use its returned configuration with `vendor/bin/behat --suite=default --tags=@local_iomadcertregen --format=progress --strict`. Start a local HTTP server serving that test URL first. The helper checks Moodle's native test-site readiness and does not modify runtime source.
 
-The qualified IOMAD distribution contains two incompatible third-party acceptance contexts: its SAML context overrides a core method with an incompatible signature, and its policy context duplicates core policy steps. The helper excludes only their exact qualified test-file hashes from configuration and reports them; both runtime components remain installed and unchanged. No plugin scenario is excluded. Changed test contexts require review rather than automatic exclusion. This is a plugin-only acceptance result, not qualification of those IOMAD SAML/policy tests. The helper is included in the source repository and excluded from the installable ZIP.
+The helper reports narrowly scoped native test-context adjustments by exact file hashes. Policy duplicates core steps on all branches. The older SAML context is incompatible on 4.5/5.0; its corrected 5.1/5.2 context is retained under its actual class name. On 5.2 a custompage generator is misplaced in the step-context directory and is excluded there. Runtime components remain installed and unchanged; no plugin scenario is excluded. Changed contexts require review. These plugin acceptance results do not qualify the excluded third-party suites. The helper is included in the source repository and excluded from the installable ZIP.
 
 No custom JavaScript, stylesheet or third-party PDF library is bundled. The source module supplies the rendering engine. The installable package contains English strings only. French and Spanish drafts are maintained separately for AMOS submission after approval; no availability through AMOS is claimed. Private laboratory local language overrides are outside the package. Check current Marketplace packaging requirements before submission.
 
@@ -101,7 +105,7 @@ Choisir une délivrance, vérifier la preuve d'enregistrement de l'original et l
 
 ### Limites de cette version
 
-Version alpha de laboratoire, non approuvée par le Marketplace. Le profil activé est celui d'IOMAD 4.5 / 5.0 qualifié dans `classes/local/qualified.json`. Les bibliothèques et modèles modifiés ou inconnus sont refusés; les branches 5.1 et ultérieures ne sont pas activées. L'impression des objectifs n'est pas prise en charge.
+Version alpha de laboratoire, non approuvée par le Marketplace. Les profils activés couvrent les branches IOMAD 4.5, 5.0, 5.1 et 5.2 qualifiées dans `classes/local/qualified.json` : mises à jour testées 4.5.15, 5.0.11, 5.1.8 et 5.2.4. Les bibliothèques et modèles modifiés ou inconnus sont refusés; une mise à jour future exige une nouvelle qualification. L'impression des objectifs n'est pas prise en charge.
 
 L’ancienne bibliothèque IOMAD qualifiée présente un défaut confirmé dans son téléchargement natif des fichiers enregistrés. La bibliothèque officielle corrigée dans IOMAD 4.5.15 est qualifiée séparément; son lien vers l’original est proposé uniquement si son empreinte exacte est reconnue. La préparation des anciennes révisions l'indique et ne propose pas ce lien défectueux vers l'original. Le fichier d'origine est conservé; sa preuve d'enregistrement et le rendu corrigé ne passent pas par ce téléchargement. Le plugin ne modifie pas IOMAD.
 

@@ -68,7 +68,11 @@ final class lifecycle_test extends certificate_testcase {
         require_once($CFG->dirroot . '/course/lib.php');
         [, , $cm, , $issue] = $this->fixture();
         $operation = service::prepare($cm->id, $issue->id, str_repeat('a1', 16), sesskey());
-        course_delete_module($cm->id);
+        if ((int)$CFG->branch >= 502) {
+            \core_courseformat\formatactions::cm($cm->course)->delete($cm->id);
+        } else {
+            course_delete_module($cm->id);
+        }
         $this->assertFalse($DB->record_exists('local_iomadcertregen_op', ['id' => $operation->id]));
         $this->assertFalse(service::file($operation));
     }

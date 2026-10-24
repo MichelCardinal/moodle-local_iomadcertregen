@@ -66,14 +66,15 @@ final class branding_test extends certificate_testcase {
      * @return int Company identifier.
      */
     private function company(int $userid, string $name, string $png): int {
-        global $DB;
-        $companyid = $DB->insert_record('company', (object)[
+        global $CFG, $DB;
+        $modern = (int)$CFG->branch >= 501;
+        $companyid = $DB->insert_record($modern ? 'local_iomad_companies' : 'company', (object)[
             'name' => $name, 'shortname' => $name, 'city' => 'Example', 'country' => 'CA', 'theme' => '',
         ]);
-        $departmentid = $DB->insert_record('department', (object)[
+        $departmentid = $DB->insert_record($modern ? 'local_iomad_company_departments' : 'department', (object)[
             'name' => $name, 'shortname' => $name, 'company' => $companyid,
         ]);
-        $DB->insert_record('company_users', (object)[
+        $DB->insert_record($modern ? 'local_iomad_company_users' : 'company_users', (object)[
             'companyid' => $companyid, 'userid' => $userid, 'departmentid' => $departmentid, 'lastused' => time(),
         ]);
         get_file_storage()->create_file_from_string([
@@ -92,7 +93,8 @@ final class branding_test extends certificate_testcase {
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('company_templates_provider')]
     public function test_company_branding_uses_beneficiary(string $template): void {
-        global $DB, $USER, $SESSION;
+        global $CFG, $DB, $USER, $SESSION;
+        $companyusertable = (int)$CFG->branch >= 501 ? 'local_iomad_company_users' : 'company_users';
         [$module, $learner, $cm, , $issue, $context] = $this->fixture();
         $DB->set_field('iomadcertificate', 'iomadcertificatetype', $template, ['id' => $module->id]);
         $red = $this->image(3, 3, 255, 0);
@@ -109,7 +111,7 @@ final class branding_test extends certificate_testcase {
         );
         $originalhash = hash('sha256', $original->get_content());
         $issuebefore = $DB->get_record('iomadcertificate_issues', ['id' => $issue->id]);
-        $before = $DB->get_records('company_users', [], 'id');
+        $before = $DB->get_records($companyusertable, [], 'id');
         $actor = serialize($USER);
         $previous = $SESSION->currenteditingcompany ?? null;
         $SESSION->currenteditingcompany = $actorcompany;
@@ -121,7 +123,7 @@ final class branding_test extends certificate_testcase {
             $this->assertSame(0, preg_match('/\/Subtype\s*\/Image\b[^>]*\/Width\s+7\b[^>]*\/Height\s+5\b/s', $pdf));
             $this->assertSame('confirmed', service::confirm($cm->id, $operation->id, sesskey())->status);
             $this->assertSame($actor, serialize($USER));
-            $this->assertEquals($before, $DB->get_records('company_users', [], 'id'));
+            $this->assertEquals($before, $DB->get_records($companyusertable, [], 'id'));
             $original = get_file_storage()->get_file(
                 $context->id,
                 'mod_iomadcertificate',

@@ -25,18 +25,38 @@ jobs:
             php: '8.3'
             database: pgsql
             mysql: '8.0'
-          - iomad: '5.0.9'
-            commit: 0616692c833c495436eda551a4e972c2934f6257
+          - iomad: '5.0.11'
+            commit: addcdf8f4647b853fd85b6817571d5529caf6cfd
             php: '8.2'
             database: mysqli
             mysql: '8.4'
-          - iomad: '5.0.9'
-            commit: 0616692c833c495436eda551a4e972c2934f6257
+          - iomad: '5.0.11'
+            commit: addcdf8f4647b853fd85b6817571d5529caf6cfd
             php: '8.3'
             database: mysqli
             mysql: '8.4'
-          - iomad: '5.0.9'
-            commit: 0616692c833c495436eda551a4e972c2934f6257
+          - iomad: '5.0.11'
+            commit: addcdf8f4647b853fd85b6817571d5529caf6cfd
+            php: '8.3'
+            database: pgsql
+            mysql: '8.4'
+          - iomad: '5.1.8'
+            commit: 7738c4391469132ec54b9ea7505fd29922c2b015
+            php: '8.3'
+            database: mysqli
+            mysql: '8.4'
+          - iomad: '5.1.8'
+            commit: 7738c4391469132ec54b9ea7505fd29922c2b015
+            php: '8.3'
+            database: pgsql
+            mysql: '8.4'
+          - iomad: '5.2.4'
+            commit: ef8e8a1e6093518091783b37666d9cb1f4bd8a7d
+            php: '8.3'
+            database: mysqli
+            mysql: '8.4'
+          - iomad: '5.2.4'
+            commit: ef8e8a1e6093518091783b37666d9cb1f4bd8a7d
             php: '8.3'
             database: pgsql
             mysql: '8.4'
@@ -91,13 +111,20 @@ jobs:
           --repo="$GITHUB_WORKSPACE/iomad-reference" --branch=codex/qualified
           --db-type="$DB_TYPE" --db-host="$DB_HOST" --db-user="$DB_USER"
           --db-pass="$DB_PASS" --db-port="$DB_PORT" --no-plugin-node --no-init
+      - name: Locate the native web root
+        shell: bash
+        run: |
+          if [ -f moodle/public/version.php ]; then
+            echo "ICR_WEBROOT=moodle/public" >> "$GITHUB_ENV"
+          else
+            echo "ICR_WEBROOT=moodle" >> "$GITHUB_ENV"
+          fi
       - name: Register the bundled documentation checker
         run: |
-          cp -R ci/vendor/moodlehq/moodle-local_moodlecheck moodle/local/moodlecheck
-          php moodle/admin/cli/purge_caches.php
+          cp -R ci/vendor/moodlehq/moodle-local_moodlecheck "$ICR_WEBROOT/local/moodlecheck"
+          php "$ICR_WEBROOT/admin/cli/purge_caches.php"
       - name: Initialise PHPUnit only
-        working-directory: moodle
-        run: php admin/tool/phpunit/cli/init.php --disable-composer
+        run: php "$ICR_WEBROOT/admin/tool/phpunit/cli/init.php" --disable-composer
       - name: Check syntax, style, documentation and upgrade
         run: |
           ci/bin/moodle-plugin-ci phplint plugin
@@ -110,18 +137,32 @@ jobs:
           ci/bin/moodle-plugin-ci validate --moodle=moodle plugin
           ci/bin/moodle-plugin-ci savepoints plugin
       - name: Run plugin PHPUnit suite
-        run: >-
-          ci/bin/moodle-plugin-ci phpunit --moodle=moodle --fail-on-warning
-          --fail-on-risky --fail-on-incomplete --fail-on-skipped plugin
-      - name: Run non-JavaScript acceptance scenarios on current IOMAD
-        if: matrix.iomad == '4.5.15' && matrix.php == '8.3' && matrix.database == 'pgsql'
         shell: bash
         run: |
-          php -S 127.0.0.1:8000 -t moodle > behat-server.log 2>&1 &
+          icr_flags=(--fail-on-warning --fail-on-risky --fail-on-incomplete --fail-on-skipped)
+          if [ '${{ matrix.iomad }}' != '4.5.15' ]; then
+            icr_flags+=(--fail-on-notice)
+          fi
+          php moodle/vendor/bin/phpunit --configuration moodle/phpunit.xml --testsuite local_iomadcertregen_testsuite "${icr_flags[@]}"
+      - name: Run non-JavaScript acceptance scenarios on current IOMAD
+        if: matrix.php == '8.3' && matrix.database == 'pgsql'
+        shell: bash
+        run: |
+          # Native 5.2 OIDC uses a schema-wide fixed index name: keep Behat in its own database.
+          PGPASSWORD="$DB_PASS" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c 'CREATE DATABASE iomadcertregen_behat'
+          python3 - <<'PYCONFIG'
+          from pathlib import Path
+          config = Path('moodle/config.php')
+          text = config.read_text()
+          marker = 'require_once('
+          assert marker in text
+          config.write_text(text.replace(marker, "$CFG->behat_dbname = 'iomadcertregen_behat';\n" + marker, 1))
+          PYCONFIG
+          php -S 127.0.0.1:8000 -t "$ICR_WEBROOT" > behat-server.log 2>&1 &
           icr_http_pid=$!
           trap 'kill "$icr_http_pid" 2>/dev/null || true' EXIT
-          php moodle/admin/tool/behat/cli/util_single_run.php --install
-          php plugin/.github/scripts/prepare_behat.php "$GITHUB_WORKSPACE/moodle" > behat-setup.json
+          php "$ICR_WEBROOT/admin/tool/behat/cli/util_single_run.php" --install
+          php plugin/.github/scripts/prepare_behat.php "$GITHUB_WORKSPACE/$ICR_WEBROOT" > behat-setup.json
           cat behat-setup.json
           icr_behat_config=$(php -r '$data=json_decode(file_get_contents("behat-setup.json"),true,512,JSON_THROW_ON_ERROR); echo $data["config"];')
           php moodle/vendor/bin/behat --config="$icr_behat_config" --suite=default --tags=@local_iomadcertregen --format=progress --strict | tee behat.log

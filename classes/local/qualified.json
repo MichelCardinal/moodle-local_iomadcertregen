@@ -1,31 +1,61 @@
 {
-  "qualification": "IOMAD 4.5.13 / 4.5.15 and 5.0.9; qualified native source variants",
-  "libraries": {
-    "mod/iomadcertificate/locallib.php": "b2e74e4d6d25bec10270bc13216ff04f06ef85a625577192246c7c3a5c5879a4",
-    "mod/iomadcertificate/lib.php": [
-      "2be1d17989233c86fa36e295526250b3f1ce8ecf02452ba434ecb85501c68ad8",
-      "7c4f2b07966fd08ed359b1f7c10c13c77c38f3039607e20b9dffdd23ca5e883b"
-    ],
-    "local/iomad_track/db/install.php": "6c92e138056ec73731e4e20ec82c692b82e54d1c91830e7d78ace2f5ca772f9d"
-  },
-  "templates": {
-    "mod/iomadcertificate/type/A4_non_embedded/certificate.php": "a1161fac9590600569ebccc503a31de9e37f74130bad72f49c601649b8c0551c",
-    "mod/iomadcertificate/type/A4_embedded/certificate.php": "55b0d09f6a3d2be0d6df1cde8a3b92f24b6ca7199aa7fc6e887f98e99a55b4f5",
-    "mod/iomadcertificate/type/letter_non_embedded/certificate.php": "5dadbad49455180ab90a15ab290dcd96bafd187342038fb13de9ff1165c6b1a1",
-    "mod/iomadcertificate/type/letter_embedded/certificate.php": "e26aa44eaabd3fa6a864fbbcc0e30e1165e7e019a103d1314ad6701f9ec628e4",
-    "mod/iomadcertificate/type/company/certificate.php": "06210f65def471d28c3e6d932882c9dd72fb556a1cf201a08c3c5cb505cbded8",
-    "mod/iomadcertificate/type/companykanji/certificate.php": "dbe63704ed98e0d756ee5563b1e45305c1afcd7d6a4b7d18ef822730fc5bb931"
-  },
+  "qualification": "Qualified native variants: IOMAD 4.5.13 / 4.5.15, 5.0.9 / 5.0.11, 5.1.8 and 5.2.4",
+  "profiles": [
+    {
+      "branches": [
+        405,
+        500
+      ],
+      "libraries": {
+        "mod/iomadcertificate/locallib.php": "b2e74e4d6d25bec10270bc13216ff04f06ef85a625577192246c7c3a5c5879a4",
+        "mod/iomadcertificate/lib.php": [
+          "2be1d17989233c86fa36e295526250b3f1ce8ecf02452ba434ecb85501c68ad8",
+          "7c4f2b07966fd08ed359b1f7c10c13c77c38f3039607e20b9dffdd23ca5e883b"
+        ],
+        "local/iomad_track/db/install.php": "6c92e138056ec73731e4e20ec82c692b82e54d1c91830e7d78ace2f5ca772f9d"
+      },
+      "templates": {
+        "mod/iomadcertificate/type/A4_non_embedded/certificate.php": "a1161fac9590600569ebccc503a31de9e37f74130bad72f49c601649b8c0551c",
+        "mod/iomadcertificate/type/A4_embedded/certificate.php": "55b0d09f6a3d2be0d6df1cde8a3b92f24b6ca7199aa7fc6e887f98e99a55b4f5",
+        "mod/iomadcertificate/type/letter_non_embedded/certificate.php": "5dadbad49455180ab90a15ab290dcd96bafd187342038fb13de9ff1165c6b1a1",
+        "mod/iomadcertificate/type/letter_embedded/certificate.php": "e26aa44eaabd3fa6a864fbbcc0e30e1165e7e019a103d1314ad6701f9ec628e4",
+        "mod/iomadcertificate/type/company/certificate.php": "06210f65def471d28c3e6d932882c9dd72fb556a1cf201a08c3c5cb505cbded8",
+        "mod/iomadcertificate/type/companykanji/certificate.php": "dbe63704ed98e0d756ee5563b1e45305c1afcd7d6a4b7d18ef822730fc5bb931"
+      },
+      "renderer": "legacy"
+    },
+    {
+      "branches": [
+        501,
+        502
+      ],
+      "libraries": {
+        "mod/iomadcertificate/locallib.php": "b2e74e4d6d25bec10270bc13216ff04f06ef85a625577192246c7c3a5c5879a4",
+        "mod/iomadcertificate/lib.php": [
+          "2be1d17989233c86fa36e295526250b3f1ce8ecf02452ba434ecb85501c68ad8",
+          "7c4f2b07966fd08ed359b1f7c10c13c77c38f3039607e20b9dffdd23ca5e883b"
+        ],
+        "local/iomad/classes/certificates/iomad_iomadcertificate.php": "561f4985b175ad84af2629834d6494a5a9a3ae38bcc5df4706571544e9f49881"
+      },
+      "templates": {
+        "mod/iomadcertificate/type/A4_non_embedded/certificate.php": "a1161fac9590600569ebccc503a31de9e37f74130bad72f49c601649b8c0551c",
+        "mod/iomadcertificate/type/A4_embedded/certificate.php": "55b0d09f6a3d2be0d6df1cde8a3b92f24b6ca7199aa7fc6e887f98e99a55b4f5",
+        "mod/iomadcertificate/type/letter_non_embedded/certificate.php": "5dadbad49455180ab90a15ab290dcd96bafd187342038fb13de9ff1165c6b1a1",
+        "mod/iomadcertificate/type/letter_embedded/certificate.php": "e26aa44eaabd3fa6a864fbbcc0e30e1165e7e019a103d1314ad6701f9ec628e4",
+        "mod/iomadcertificate/type/company/certificate.php": "f8d0454f10cb6b74eaa4cb0ff5385d4fcd1991eb8c2eaee6540ecab4fd75f31a",
+        "mod/iomadcertificate/type/companykanji/certificate.php": "3a905f06be0ceb47d07a26e11f148a38a78edb008ee63803866410029083f95b"
+      },
+      "renderer": "scoped-template"
+    }
+  ],
   "native_saved_file_download": {
     "2be1d17989233c86fa36e295526250b3f1ce8ecf02452ba434ecb85501c68ad8": false,
     "7c4f2b07966fd08ed359b1f7c10c13c77c38f3039607e20b9dffdd23ca5e883b": true
   },
   "knownlimitations": [
     "The older qualified native saved-file handler has a boolean-assignment precedence defect; its original-file link is not advertised. The corrected native handler is a separately qualified variant.",
-    "The qualified native activity restore omits saved original PDFs; confirmed administrative copies restore independently, but a new correction requires native saved-original evidence."
-  ],
-  "branches": [
-    405,
-    500
+    "The qualified native activity restore omits saved original PDFs; confirmed administrative copies restore independently, but a new correction requires native saved-original evidence.",
+    "The qualified IOMAD 5.1/5.2 renderer omits the activity variable required by its templates. This adapter supplies an explicit local template scope without patching the native handler.",
+    "On IOMAD 5.1/5.2, saved-original evidence is read through Moodle File API to avoid the native reporting helper's deprecated file_encode_url call. Ambiguous or non-PDF files are refused."
   ]
 }
