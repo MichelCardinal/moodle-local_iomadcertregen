@@ -52,6 +52,10 @@ function xmldb_local_iomadcertregen_upgrade(int $oldversion): bool {
     if ($oldversion < 2026102412) {
         upgrade_plugin_savepoint(true, 2026102412, 'local', 'iomadcertregen');
     }
+    if ($oldversion < 2026111100) {
+        upgrade_plugin_savepoint(true, 2026111100, 'local', 'iomadcertregen');
+    }
+
     return true;
 }
 

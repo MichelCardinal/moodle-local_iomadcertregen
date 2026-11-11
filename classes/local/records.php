@@ -80,10 +80,13 @@ final class records {
               WHERE i.courseid = :courseid AND g.userid = :userid ORDER BY g.id",
             ['courseid' => $course->id, 'userid' => $user->id]
         );
+        // IOMAD Certificate stores its renderer settings under this legacy configuration name.
+        $settings = (array)get_config('iomadcertificate');
+        ksort($settings, SORT_STRING);
         $values = [
             $certificate, $issue, $identity, $course->fullname, $grades,
             $DB->get_records('course_completions', ['course' => $course->id, 'userid' => $user->id], 'id'),
-            $DB->get_records('config_plugins', ['plugin' => 'iomadcertificate'], 'name'),
+            $settings,
         ];
         $companies = self::company_ids((int)$user->id);
         if ($companies) {

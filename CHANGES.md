@@ -1,3 +1,8 @@
+## 1.0.0-rc2 — draft for Marketplace review
+
+- Read effective IOMAD Certificate settings through Moodle's configuration API, including site-forced settings, and sort the keys for a deterministic source fingerprint.
+- After upgrading, prepare a fresh copy for any pending correction. Published PDFs and archives are retained, and learners retain their own published copy. Access on behalf of another user to an older publication may require a new review.
+
 ## 1.0.0-rc1 — prepared for review, not published
 
 - Prepare the first 1.0 release candidate with the existing correction, publication, inventory, role-selection, administrative-archive and individual-email features.

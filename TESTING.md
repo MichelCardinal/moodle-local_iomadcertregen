@@ -1,6 +1,10 @@
 # Validation and reproducibility
 
-This 1.0.0-rc1 is a release candidate, not a stable or Marketplace-approved release. Product runtime, schema, capabilities, renderer profiles and language bytes are unchanged from 0.12.6-alpha. The new version/savepoint and its migration-test baseline passed focused local verification: six tests / sixteen assertions on an isolated IOMAD5.2/MySQL clone. All six quality commands passed, including PHPDoc coverage of all84 PHP files. These candidate-specific checks used PHP8.3.30 for CLI compatibility only; they do not qualify a patched web runtime. The full-suite results below belong to the exact RC1 commit. Later documentation-only updates do not claim another full matrix or change the tested runtime.
+## RC2 Marketplace review follow-up
+
+RC2 replaces the direct settings-table read with Moodle's configuration API. The regression suite exercises forced settings as well as the normal certificate correction and delivery paths. The RC1 matrix below is historical; it is not a full qualification of RC2. No change to the required IOMAD components or the PHP 8.4 support statement is inferred from this fix.
+
+The historical 1.0.0-rc1 was a release candidate, not a stable or Marketplace-approved release. Product runtime, schema, capabilities, renderer profiles and language bytes are unchanged from 0.12.6-alpha. The new version/savepoint and its migration-test baseline passed focused local verification: six tests / sixteen assertions on an isolated IOMAD5.2/MySQL clone. All six quality commands passed, including PHPDoc coverage of all84 PHP files. These candidate-specific checks used PHP8.3.30 for CLI compatibility only; they do not qualify a patched web runtime. The full-suite results below belong to the exact RC1 commit. Later documentation-only updates do not claim another full matrix or change the tested runtime.
 
 ## Completed Linux qualification of RC1
 

@@ -72,6 +72,28 @@ final class history_test extends certificate_testcase {
     }
 
     /**
+     * A change in the effective renderer configuration requires another review.
+     */
+    public function test_forced_renderer_setting_change_requires_new_review(): void {
+        global $CFG;
+        [, , $cm, , $issue] = $this->fixture();
+        set_config('fontsans', 'helvetica', 'iomadcertificate');
+        $operation = service::prepare($cm->id, $issue->id, str_repeat('19', 16), sesskey());
+        $settings = $CFG->forced_plugin_settings;
+        $CFG->forced_plugin_settings['iomadcertificate']['fontsans'] = 'dejavusans';
+        try {
+            service::confirm($cm->id, $operation->id, sesskey());
+            $this->fail('A change in effective renderer settings must require a new review.');
+        } catch (\moodle_exception $error) {
+            $this->assertSame('sourcechanged', $error->errorcode);
+        } finally {
+            $CFG->forced_plugin_settings = $settings;
+        }
+        $this->assertSame('prepared', records::operation($cm->id, $operation->id)->status);
+        $this->assertSame('confirmed', service::confirm($cm->id, $operation->id, sesskey())->status);
+    }
+
+    /**
      * Confirmation never regenerates a PDF when the administrator changes locale.
      */
     public function test_actor_locale_change_preserves_reviewed_bytes(): void {

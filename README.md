@@ -12,10 +12,12 @@ The plugin preserves the native issue identifier, certificate code and recorded 
 
 - Qualified IOMAD branches: **4.5, 5.0, 5.1 and 5.2**. Exact native variants are listed in `classes/local/qualified.json` and `classes/local/publication_profiles.json`. Matching a version number alone is insufficient. Unknown native libraries, policy implementations and customised/missing templates may be refused.
 - Tested source updates and runtimes are recorded in [TESTING.md](TESTING.md). Do not interpret the branch range as proof of every patch, PHP version, database or theme configuration.
-- Dependencies: `mod_iomadcertificate` and `local_iomad`, minimum version `2024100700`. Plain Moodle without IOMAD is unsupported.
+- Dependencies: `mod_iomadcertificate` and `local_iomad`, minimum version `2024100700`. Both dependencies are bundled in the [official IOMAD distribution](https://github.com/iomad/iomad). Plain Moodle without IOMAD is unsupported.
 - Six standard native templates are qualified: A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is excluded pending separate qualification.
 
 Back up the complete site before installing or upgrading. Older company-bound preparations may need to be prepared again to validate their company scope; existing confirmed PDFs remain administratively available. Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and use Moodle's normal upgrade process. On IOMAD 5.1/5.2 the manual destination is `public/local/iomadcertregen` inside the installation. Moodle's ZIP installer resolves this automatically. No plugin Composer command or JavaScript build is required.
+
+When updating from 1.0.0-rc1 or earlier, finish or defer pending corrections before upgrading. Prepare and review a fresh copy afterwards for any uncompleted correction. Previously published PDFs and administrative archives are retained. Learners can still access their own publication; delegated access to an older publication may require a new review.
 
 Activity corrections, publication, administrative archives and explicit email require both `local/iomadcertregen:regenerate` and `mod/iomadcertificate:manage` in the activity context. Moodle manager archetypes are allowed the plugin capability by default; editing teachers require an explicit administrator decision. Category, course and activity role assignments and overrides apply, including separate-group restrictions. No IOMAD company/course/user association is required for this activity workflow. An IOMAD company role alone does not grant Moodle course permissions.
 
