@@ -1,5 +1,15 @@
 # Validation and reproducibility
 
+## Completed GitHub qualification of RC3 — 27 November 2026
+
+[Run 46049214689](https://github.com/MichelCardinal/moodle-local_iomadcertregen/actions/runs/46049214689) tested commit `dbfc0c55397eb71c897780f96c354e56e62c0911` against the 14 pinned profiles in the workflow. Eleven profiles passed. Three strict PHP 8.4.28 profiles failed on the native IOMAD Certificate generator's implicit-nullability deprecation; the overall workflow conclusion remains **failure**, not a completely green matrix.
+
+All fourteen suites completed **163 tests / 687 assertions**. The three PHP 8.4 profiles additionally report one PHP deprecation in `mod_iomadcertificate_generator::create_instance()`. All six quality checks passed on every profile. The four PostgreSQL/PHP 8.3 HTTP runs each passed **12 scenarios / 145 steps**. No native source was patched and no strict diagnostic was suppressed.
+
+Passing runtimes were PHP **8.1.34** (legacy CLI compatibility on 4.5 only), **8.2.36** (5.0/5.1 MySQL), and **8.3.37** (4.5/5.0/5.1/5.2 with both MySQL and PostgreSQL). The native commits remain those listed in the workflow. Modern PHP 8.3 is the verified baseline; PHP 8.1 is not a secure hosting recommendation. PHP 8.4 remains unqualified for these pinned native revisions. This result does not qualify newer IOMAD history/publication implementations.
+
+Subsequent publication-evidence edits affect documentation only; PHP, tests, version and workflow bytes remain those of the tested commit. These documentation edits do not claim another matrix run. RC3 remains a prerelease, without Marketplace approval.
+
 ## RC3 detailed inventory — 27 November 2026
 
 RC3 exposes 36 selectable report columns, covering all 29 fields of the native IOMAD Certificate configuration table plus course/activity context and the derived date-enabled flag. All four installed native branches (4.5, 5.0, 5.1, 5.2) have the same certificate schema and form for these settings. Schema comparison is not a full runtime qualification of every branch.
@@ -16,7 +26,7 @@ The focused inventory suite also passes 12 tests / 90 assertions on each MySQL p
 
 The six Moodle Plugin CI commands pass; PHPDoc output covers all 86 PHP files. French and Spanish remain local drafts outside the ZIP, with 205 matching identifiers and placeholders. They are not claimed as published AMOS translations.
 
-The earlier RC1 Linux matrix below remains historical. RC3 does not establish a new full PHP/IOMAD matrix or remove the PHP 8.4 boundary for the pinned native sources. This candidate is not a stable or Marketplace-approved release. A fresh GitHub matrix is required before candidate distribution. Earlier archives are immutable.
+The earlier RC1 Linux matrix below remains historical. The completed RC3 GitHub matrix is documented above, including its PHP 8.4 failures. This candidate is not a stable or Marketplace-approved release. Earlier archives are immutable.
 
 ## RC2 Marketplace review follow-up
 
