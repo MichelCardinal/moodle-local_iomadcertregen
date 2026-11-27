@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/fixtures/publication_testcase.php');
 
 /**
- * The positive legacy route is exercised when its actual historical native variant is installed.
+ * The early route is exercised against each environment's real qualified native handler.
  *
  * @covers \local_iomadcertregen\local\legacy_download
  */
@@ -54,17 +54,6 @@ final class legacy_download_test extends publication_testcase {
         } finally {
             [$SCRIPT, $_GET, $_POST] = $previous;
         }
-    }
-
-    /**
-     * Recognise the exact native fixture rather than pretending a modern source is historical.
-     *
-     * @return bool This environment contains the supported old route.
-     */
-    private function historical(): bool {
-        global $CFG;
-        return (int)$CFG->branch === 405 &&
-            hash_file('sha256', $CFG->dirroot . '/mod/iomadcertificate/view.php') === legacy_download::VIEW_SHA256;
     }
 
     /**
@@ -96,9 +85,9 @@ final class legacy_download_test extends publication_testcase {
         [$data, $operation] = $this->correction();
         $this->publish($data, $operation);
         $parameters = ['action' => 'get', 'id' => $data[2]->id, 'userid' => $data[1]->id];
-        $expected = $this->historical() ? new \moodle_url('/local/iomadcertregen/learner.php', [
+        $expected = new \moodle_url('/local/iomadcertregen/learner.php', [
             'id' => $data[2]->id, 'userid' => $data[1]->id,
-        ]) : null;
+        ]);
         $this->assertEquals($expected, $this->destination($parameters));
         $other = $this->getDataGenerator()->create_user();
         $this->setUser($other);

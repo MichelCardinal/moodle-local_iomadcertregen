@@ -236,22 +236,25 @@ final class adapter {
      */
     private static function render_template($certificate, $user, $cm, $course, $issue): string {
         global $CFG;
-        if ((int)$CFG->branch >= 501) {
-            // The qualified 5.1/5.2 handler omits the template's $iomadcertificate alias.
-            // Supply the native template scope locally; do not modify IOMAD's handler.
-            require_once($CFG->libdir . '/pdflib.php');
-            $iomadcertificate = $certificate;
-            $certuser = $user;
-            $certrecord = $issue;
-            require(self::template_file($certificate));
-            if ($iomadcertificate !== $certificate || $certuser !== $user || $certrecord !== $issue || !($pdf instanceof \pdf)) {
-                throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
-            }
-            $content = $pdf->Output('', 'S');
-        } else {
-            $content = xmldb_local_iomad_track_create_certificate($certificate, $user, $cm, $course, $issue);
+        // Reproduce the presentation variables without changing the authenticated global user.
+        // Some site templates use the native activity's $USER rather than $certuser.
+        $USER = clone $user;
+        $SITE = clone get_site();
+        $iomadcertificate = $certificate;
+        $certuser = $user;
+        $certrecord = $issue;
+        if (
+            (int)$cm->course !== (int)$course->id || (int)$USER->id !== (int)$certrecord->userid ||
+                (int)$SITE->id !== (int)SITEID
+        ) {
+            throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
         }
-        return $content;
+        require_once($CFG->libdir . '/pdflib.php');
+        require(self::template_file($certificate));
+        if ($iomadcertificate !== $certificate || $certuser !== $user || $certrecord !== $issue || !($pdf instanceof \pdf)) {
+            throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
+        }
+        return $pdf->Output('', 'S');
     }
 
     /**

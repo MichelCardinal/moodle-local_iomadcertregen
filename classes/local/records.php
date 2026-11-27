@@ -86,7 +86,7 @@ final class records {
         $values = [
             $certificate, $issue, $identity, $course->fullname, $grades,
             $DB->get_records('course_completions', ['course' => $course->id, 'userid' => $user->id], 'id'),
-            $settings, ['templatehash' => adapter::template_hash($certificate)],
+            $settings, ['templatehash' => adapter::template_hash($certificate), 'presentation' => 'beneficiary-local-v1'],
         ];
         $companies = self::company_ids((int)$user->id);
         if ($companies) {

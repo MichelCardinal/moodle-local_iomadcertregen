@@ -200,3 +200,9 @@ Database version `2026102302` changes no schema and does not recalculate existin
 - Local English, French and Spanish strings and PHPUnit service tests.
 
 Internal database versions: `2026102300` introduced the operation table; `2026102301` registers lifecycle cleanup while preserving existing records. No Marketplace release has been published.
+
+## RC4 development refinement — 2026112703
+
+- Supply beneficiary-local USER and site presentation copies for activity-style templates, while retaining the authenticated global user for permissions and audit attribution. No session impersonation or core/template edit.
+- Divert both qualified native handlers before their company checks, including administrative downloads in courses with no IOMAD company association. The protected destination continues to enforce course access and beneficiary scope.
+- Use PHPUnit9-compatible strict flags for both4.5 profiles and assert the actual13-scenario/163-step acceptance total. Earlier failed runs are retained as evidence.

@@ -130,6 +130,35 @@ PHP
     }
 
     /**
+     * Activity-style presentation aliases identify the beneficiary without impersonating them.
+     */
+    public function test_local_user_and_site_aliases_preserve_authenticated_actor(): void {
+        global $USER;
+        [$module, $learner, $cm, $course, $issue] = $this->native_fixture();
+        $actor = serialize($USER);
+        $actorid = $USER->id;
+        [$type] = $this->install_template(<<<'PHP'
+$pdf = new \PDF('L', 'mm', 'A4', true, 'UTF-8', false);
+$pdf->setPrintHeader(false);
+$pdf->setPrintFooter(false);
+$pdf->SetCompression(false);
+$pdf->AddPage();
+$pdf->SetFont('helvetica', '', 12);
+$pdf->Text(10, 30, 'BENEFICIARY ' . $USER->id . ' ' . fullname($USER));
+$pdf->Text(10, 40, 'AUTHENTICATED ' . $GLOBALS['USER']->id);
+$pdf->Text(10, 50, 'SITE ' . $SITE->id);
+$USER->firstname = 'Presentation only';
+PHP
+        );
+        $module->iomadcertificatetype = $type;
+        $content = adapter::render($module, $learner, $cm, $course, $issue);
+        $this->assertStringContainsString('BENEFICIARY ' . $learner->id . ' ' . fullname($learner), $content);
+        $this->assertStringContainsString('AUTHENTICATED ' . $actorid, $content);
+        $this->assertStringContainsString('SITE ' . SITEID, $content);
+        $this->assertSame($actor, serialize($USER));
+    }
+
+    /**
      * Editing the PHP file after preparation requires another preview.
      */
     public function test_changed_template_bytes_invalidate_prepared_copy(): void {

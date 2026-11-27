@@ -25,11 +25,14 @@
 namespace local_iomadcertregen\local;
 
 /**
- * Divert the historical route before it can bypass its own require_login call.
+ * Divert qualified routes before native company checks or rendering.
  */
 final class legacy_download {
     /** @var string Exact historical activity handler covered by this bridge. */
     public const VIEW_SHA256 = 'beabab61999b738da75954db5df00524b04cbbb7bc8f1668eb510bedc46a0170';
+
+    /** @var string Qualified newer handler, whose company check also precedes login callbacks. */
+    public const CURRENT_VIEW_SHA256 = '6f62861670f6f72704595b8f6268e6e85fe1e4b57c21c83ccb320e46a468b3c8';
 
     /**
      * Redirect through the normal protected learner endpoint, before native rendering.
@@ -55,12 +58,14 @@ final class legacy_download {
     public static function destination(): ?\moodle_url {
         global $CFG, $SCRIPT;
         if (
-            $SCRIPT !== '/mod/iomadcertificate/view.php' || (int)($CFG->branch ?? 0) !== 405 ||
+            $SCRIPT !== '/mod/iomadcertificate/view.php' ||
+                !in_array((int)($CFG->branch ?? 0), [405, 500, 501, 502], true) ||
                 !isloggedin() || isguestuser() || !learner::native_download_enabled()
         ) {
             return null;
         }
-        if (hash_file('sha256', $CFG->dirroot . '/mod/iomadcertificate/view.php') !== self::VIEW_SHA256) {
+        $handlers = [self::VIEW_SHA256, self::CURRENT_VIEW_SHA256];
+        if (!in_array(hash_file('sha256', $CFG->dirroot . '/mod/iomadcertificate/view.php'), $handlers, true)) {
             return null;
         }
         $cmid = required_param('id', PARAM_INT);

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_iomadcertregen';
-$plugin->version = 2026112702;
+$plugin->version = 2026112703;
 $plugin->requires = 2024100700;
 $plugin->release = '1.0.0-rc4-dev';
 $plugin->maturity = MATURITY_ALPHA;
