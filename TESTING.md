@@ -10,7 +10,7 @@ Candidate-specific tests use PHP 8.3.36 with `max_input_vars=5000` and `session.
 | --- | --- |
 | IOMAD 4.5.13 (build 20260810), PHP 8.3.36, MySQL 8.0.46 | Strict full suite: 163 tests / 688 assertions pass |
 | IOMAD 5.2.4 (build 20261005), PHP 8.3.36, MySQL 8.4.11 | Strict full suite: 163 tests / 687 assertions pass |
-| IOMAD 5.2.4, PHP 8.3.36, PostgreSQL 17.11 | Focused inventory suite: 12 tests / 90 assertions pass |
+| IOMAD 5.2.4, PHP 8.3.36, PostgreSQL 17.11 | Focused inventory suite: 12 tests / 90 assertions; HTTP inventory CSV: 4 scenarios / 16 steps pass |
 
 The focused inventory suite also passes 12 tests / 90 assertions on each MySQL profile. PostgreSQL uses the unchanged native commit `ef8e8a1e6093518091783b37666d9cb1f4bd8a7d`. Strict flags are those in the Commands section; initialization logs retain separate native task diagnostics.
 
