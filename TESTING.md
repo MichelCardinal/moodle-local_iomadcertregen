@@ -1,5 +1,17 @@
 # Validation and reproducibility
 
+## Unreleased custom-template development — qualification in progress
+
+This branch is `1.0.0-rc4-dev` / `2026112701`, with alpha maturity. It has not been released, deployed to the remote demonstration site, or approved by Marketplace. RC3 results below are historical and must not be treated as qualification of these runtime changes.
+
+The latest focused custom-template cases pass **10 tests / 70 assertions** on PHP 8.3.36 with MySQL 8.0.46 and an IOMAD 4.5.13 framework containing separately copied historical certificate libraries, and with MySQL 8.4.11 / IOMAD 5.2.4. They exercise current custom layouts/date settings on an existing issue, exact publication bytes, original issue identity/date preservation, changed PHP between preparation/confirmation/publication, native preference reads, broken/noisy/identity-changing templates and unsafe paths.
+
+An earlier iteration of this change passed the full suite **172 tests / 753 assertions** in both environments. That iteration predates the added preference-read case and final refinement of the actor-state guard; it is not final full-suite qualification of the current source. Full current-source runs and checks on 5.0/5.1 are still pending. No PHP 8.4 requalification, browser acceptance or inbox-delivery result is claimed here.
+
+The historical certificate-library fixture is a scoped compatibility test, not a complete IOMAD 4.5.5 installation. Native history/publication policy fingerprints on the remote demonstration site still require separate verification before a live end-to-end result can be claimed. Tests use isolated source copies, PHPUnit prefixes and dataroots with fictitious data; native installed laboratory sources and ordinary course tables are not changed for these runtime tests.
+
+English strings are packaged; French and Spanish remain matching local draft translations outside the ZIP. Updating to RC4 changes the source fingerprint format to include the template entry file: pending earlier preparations need fresh review. Existing published personal snapshots and administrative archives are retained. Arbitrary PHP scripts and their external effects cannot be qualified by these tests; use the native template contract and review site-maintained code.
+
 ## Completed GitHub qualification of RC3 — 27 November 2026
 
 [Run 46049214689](https://github.com/MichelCardinal/moodle-local_iomadcertregen/actions/runs/46049214689) tested commit `dbfc0c55397eb71c897780f96c354e56e62c0911` against the 14 pinned profiles in the workflow. Eleven profiles passed. Three strict PHP 8.4.28 profiles failed on the native IOMAD Certificate generator's implicit-nullability deprecation; the overall workflow conclusion remains **failure**, not a completely green matrix.

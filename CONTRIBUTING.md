@@ -28,7 +28,9 @@ Initialisation resets test tables and test files. Never use ordinary site data f
 
 Use Moodle coding, security, accessibility and Privacy APIs. Keep English strings in `lang/en/`; community translations belong in AMOS after approval. Tests support the PHPUnit versions supplied by the supported Moodle branches; do not suppress warnings to pass CI. Preserve native issue identifiers, issue dates, codes, grades, completion and enrolments. Replace only explicitly reviewed PDF targets through the publication service, enforcing the institutional archive policy and recorded operator decision. Do not modify Moodle, IOMAD Certificate or a theme to make this plugin work.
 
-The qualified renderer deliberately rejects unrecognised source fingerprints or templates. A compatibility change requires source review and meaningful generation, integrity and access tests. A version number alone does not qualify an interface.
+Native libraries and history/access implementations still require reviewed compatibility profiles; a version number alone does not qualify an interface. Installed custom templates follow the native rendering contract described in README.md and do not need hash-by-hash registration. Their entry-file digest binds the prepared copy to the reviewed layout. Treat them as trusted site-maintained PHP, not as sandboxed learner content. Do not weaken path checks or history/permission boundaries to support a layout. A compatibility change requires source review and meaningful generation, integrity and access tests.
+
+Custom-template tests create disposable directories in the native module's template folder and remove them after each test. Run these tests in an isolated source copy as well as isolated PHPUnit tables and dataroot; do not point them at a shared production code tree.
 
 ## Changes and releases
 

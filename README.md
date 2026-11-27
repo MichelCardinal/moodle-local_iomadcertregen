@@ -1,6 +1,6 @@
 # IOMAD Certificate Regenerator
 
-Independent Moodle local plugin by Michel Cardinal, component `local_iomadcertregen`. Requires IOMAD and its IOMAD Certificate activity. This is a **release candidate for review**, not a Marketplace-approved release or a Moodle/IOMAD-certified product.
+Independent Moodle local plugin by Michel Cardinal, component `local_iomadcertregen`. Requires IOMAD and its IOMAD Certificate activity. This branch contains **unreleased 1.0.0-rc4 development work**, not a stable, Marketplace-approved or Moodle/IOMAD-certified release. See [TESTING.md](TESTING.md) for the distinction between completed checks and outstanding qualification.
 
 ## Purpose
 
@@ -8,16 +8,26 @@ Find courses using IOMAD Certificate, review their current template settings, an
 
 The plugin preserves the native issue identifier, certificate code and recorded issue date. It does not create another issue, change grades, completion or enrolments, or impersonate a learner. Printed dates and grades still follow the native template's current printing rules. Email is a separate explicit action; neither confirmation nor publication sends it automatically.
 
+## Installed custom certificate templates
+
+After correcting the template choice or printing settings in an existing course activity, prepare a new correction. It uses that activity's **current** template and settings with the **existing** native issue. For example, enabling issue-date printing uses the recorded issue date, rather than the day of correction. A template must actually implement the selected printing settings; the plugin cannot make a hard-coded layout follow settings it ignores.
+
+Site-maintained `certificate.php` files installed in `mod/iomadcertificate/type/<type>/` no longer need an individual source-hash approval. Directory names must resolve to a readable file inside that exact installed directory; traversal, stream paths and escaping symbolic links are refused. There is no template-upload facility or new role grant. The code hash is instead captured as part of a preparation's reviewed inputs: changing the entry file after preview or confirmation requires a fresh preparation before publication.
+
+Custom templates are **trusted PHP server code**, as in the native activity, and must be installed and reviewed by the site maintainer. This feature is not a PHP sandbox and cannot guarantee the behaviour of arbitrary scripts, external services, dependent assets or hard-coded learner details. Templates should follow the native rendering contract: use `$iomadcertificate` for the current activity, `$certuser` for the explicit beneficiary, `$certrecord` for the existing issue, and create `$pdf` without delivering it or performing unrelated writes or email. `$USER` remains the administrator/manager performing the correction. The renderer receives copies of source objects, rejects accidental output and unusable PDFs, and restores the acting user's state if presentation code changes it. Exceptions prevent creation of a correction; the plugin does not publish a partial result. Preview each new layout with fictitious data before using it in production.
+
+Native IOMAD library, history and access-policy compatibility checks remain separate. Accepting a custom template does not automatically qualify an unknown native history implementation or remove the requirement for an existing native saved PDF. A library compatibility error is reported separately from a missing or invalid template.
+
 ## Requirements and installation
 
-- Qualified IOMAD branches: **4.5, 5.0, 5.1 and 5.2**. Exact native variants are listed in `classes/local/qualified.json` and `classes/local/publication_profiles.json`. Matching a version number alone is insufficient. Unknown native libraries, policy implementations and customised/missing templates may be refused.
+- IOMAD branch range: **4.5, 5.0, 5.1 and 5.2**. Verified native interfaces are bounded by `classes/local/qualified.json` and `classes/local/publication_profiles.json`. Matching a version number alone is insufficient. Unknown native libraries or policy implementations, and missing/invalid template paths, may be refused. The unreleased custom-template changes are still undergoing qualification.
 - Tested source updates and runtimes are recorded in [TESTING.md](TESTING.md). Do not interpret the branch range as proof of every patch, PHP version, database or theme configuration.
 - Dependencies: `mod_iomadcertificate` and `local_iomad`, minimum version `2024100700`. Both dependencies are bundled in the [official IOMAD distribution](https://github.com/iomad/iomad). Plain Moodle without IOMAD is unsupported.
-- Six standard native templates are qualified: A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji. Outcome printing is excluded pending separate qualification.
+- The standard A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji templates remain regression cases; custom templates are not restricted to that list. Outcome printing is excluded pending separate qualification.
 
 Back up the complete site before installing or upgrading. Older company-bound preparations may need to be prepared again to validate their company scope; existing confirmed PDFs remain administratively available. Install the ZIP through **Site administration → Plugins → Install plugins**, or place its contents in `local/iomadcertregen` and use Moodle's normal upgrade process. On IOMAD 5.1/5.2 the manual destination is `public/local/iomadcertregen` inside the installation. Moodle's ZIP installer resolves this automatically. No plugin Composer command or JavaScript build is required.
 
-When updating from 1.0.0-rc1 or earlier, finish or defer pending corrections before upgrading. Prepare and review a fresh copy afterwards for any uncompleted correction. Previously published PDFs and administrative archives are retained. Learners can still access their own publication; delegated access to an older publication may require a new review.
+When updating from RC3 or earlier to this development version, finish or defer pending corrections before upgrading. Prepare and review a fresh copy afterwards for any uncompleted correction, because reviewed inputs now include the template file's contents. Previously published PDFs and administrative archives are retained. Learners can still access their own publication; delegated access to an older publication may require a new review.
 
 Activity corrections, publication, administrative archives and explicit email require both `local/iomadcertregen:regenerate` and `mod/iomadcertificate:manage` in the activity context. Moodle manager archetypes are allowed the plugin capability by default; editing teachers require an explicit administrator decision. Category, course and activity role assignments and overrides apply, including separate-group restrictions. No IOMAD company/course/user association is required for this activity workflow. An IOMAD company role alone does not grant Moodle course permissions.
 

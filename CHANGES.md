@@ -1,3 +1,12 @@
+## Unreleased 1.0.0-rc4 development — installed custom templates
+
+- Correct an existing course issue with the activity's newly selected installed template and current printing settings, without registering every custom certificate.php hash.
+- Resolve template paths canonically inside the native template directory. Keep native library and history/access compatibility checks separate, with distinct errors.
+- Include the selected entry file's digest in reviewed source inputs, preventing confirmation or publication after its contents change.
+- Render with copies of the native source objects. Reject stray output, syntax/runtime errors, unusable PDFs and acting-identity changes; preserve the original issue and saved certificate when preparation fails.
+- Add integration cases for custom layouts, newly enabled/formatted issue dates, preview/publication integrity, native preference reads, broken templates and escaping paths. Historical native-library variants are under qualification, not a claim of universal IOMAD patch support.
+- No schema, role, archive-policy or automatic-mail change. Pending pre-RC4 corrections require a fresh preparation after upgrade; retained published PDFs and archives are not rewritten by the upgrade.
+
 ## 1.0.0-rc3 — detailed certificate configuration inventory
 
 - Make all native IOMAD Certificate activity settings available as selectable columns in Moodle custom reports, including date source and format, grade source and format, delivery, notifications, required course time, layout images and stored text.
