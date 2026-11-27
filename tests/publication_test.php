@@ -41,18 +41,30 @@ require_once(__DIR__ . '/fixtures/publication_testcase.php');
 #[\PHPUnit\Framework\Attributes\CoversClass(publication_files::class)]
 final class publication_test extends publication_testcase {
     /**
+     * Copy interface files into a disposable root without changing native installed source files.
+     *
+     * @return string Temporary root containing the current interface bundle and framework identity.
+     */
+    private function native_files_copy(): string {
+        global $CFG;
+        $temporaryroot = make_request_directory();
+        $profiles = json_decode(file_get_contents(__DIR__ . '/../classes/local/publication_profiles.json'), true);
+        $paths = array_unique(array_merge(['version.php'], array_keys($profiles[(string)$CFG->branch])));
+        foreach ($paths as $path) {
+            check_dir_exists(dirname($temporaryroot . '/' . $path), true, true);
+            copy($CFG->dirroot . '/' . $path, $temporaryroot . '/' . $path);
+        }
+        return $temporaryroot;
+    }
+
+    /**
      * Only reviewed native file variants are accepted; unknown or missing files fail closed.
      */
     public function test_unknown_or_missing_native_file_is_refused(): void {
         global $CFG;
         publication_files::require_compatible();
         $originalroot = $CFG->dirroot;
-        $temporaryroot = make_request_directory();
-        $profiles = json_decode(file_get_contents(__DIR__ . '/../classes/local/publication_profiles.json'), true);
-        foreach (array_keys($profiles[(string)$CFG->branch]) as $path) {
-            check_dir_exists(dirname($temporaryroot . '/' . $path), true, true);
-            copy($originalroot . '/' . $path, $temporaryroot . '/' . $path);
-        }
+        $temporaryroot = $this->native_files_copy();
         $target = $temporaryroot . '/mod/iomadcertificate/view.php';
         try {
             $CFG->dirroot = $temporaryroot;
@@ -73,6 +85,40 @@ final class publication_test extends publication_testcase {
             }
         } finally {
             $CFG->dirroot = $originalroot;
+        }
+    }
+
+    /**
+     * Historical interfaces cannot be combined with another framework's version identity.
+     */
+    public function test_framework_and_native_interfaces_must_form_one_bundle(): void {
+        global $CFG;
+        publication_files::require_compatible();
+        $originalroot = $CFG->dirroot;
+        $originalbranch = $CFG->branch;
+        $temporaryroot = $this->native_files_copy();
+        $historical = file_get_contents(__DIR__ . '/fixtures/historical_core_version.txt');
+        $profiles = json_decode(file_get_contents(__DIR__ . '/../classes/local/publication_profiles.json'), true);
+        $this->assertSame($profiles['405historical']['version.php'], hash('sha256', $historical));
+        try {
+            $CFG->dirroot = $temporaryroot;
+            publication_files::require_compatible();
+            if ((int)$originalbranch === 405) {
+                $versionfile = $temporaryroot . '/version.php';
+                $replacement = file_get_contents($versionfile) === $historical ? $historical . "\n" : $historical;
+                file_put_contents($versionfile, $replacement);
+            } else {
+                $CFG->branch = '405';
+            }
+            try {
+                publication_files::require_compatible();
+                $this->fail('A mixed framework/interface identity must be refused.');
+            } catch (\moodle_exception $error) {
+                $this->assertSame('unsupported', $error->errorcode);
+            }
+        } finally {
+            $CFG->dirroot = $originalroot;
+            $CFG->branch = $originalbranch;
         }
     }
 

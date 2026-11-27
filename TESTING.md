@@ -1,16 +1,28 @@
 # Validation and reproducibility
 
-## Unreleased custom-template development — qualification in progress
+## Unreleased custom-template development — local qualification
 
-This branch is `1.0.0-rc4-dev` / `2026112701`, with alpha maturity. It has not been released, deployed to the remote demonstration site, or approved by Marketplace. RC3 results below are historical and must not be treated as qualification of these runtime changes.
+This branch is `1.0.0-rc4-dev` / `2026112701`, with alpha maturity. It is not a stable or Marketplace-approved release. It has not been deployed to the remote demonstration site. RC3 results below remain historical and do not qualify this runtime change.
 
-The latest focused custom-template cases pass **10 tests / 70 assertions** on PHP 8.3.36 with MySQL 8.0.46 and an IOMAD 4.5.13 framework containing separately copied historical certificate libraries, and with MySQL 8.4.11 / IOMAD 5.2.4. They exercise current custom layouts/date settings on an existing issue, exact publication bytes, original issue identity/date preservation, changed PHP between preparation/confirmation/publication, native preference reads, broken/noisy/identity-changing templates and unsafe paths.
+The current strict full suite passes **178 tests** in each isolated environment below. PHP **8.3.36** is used throughout, with `max_input_vars=5000` and `session.upload_progress.enabled=0`. No ordinary laboratory course tables or native runtime source are changed.
 
-An earlier iteration of this change passed the full suite **172 tests / 753 assertions** in both environments. That iteration predates the added preference-read case and final refinement of the actor-state guard; it is not final full-suite qualification of the current source. Full current-source runs and checks on 5.0/5.1 are still pending. No PHP 8.4 requalification, browser acceptance or inbox-delivery result is claimed here.
+| Native framework | Database | PHPUnit | Result |
+| --- | --- | --- | --- |
+| IOMAD 4.5.5, build 20250609 | MySQL 8.0.46 | 9.6.18 | 178 tests / 767 assertions pass |
+| IOMAD 4.5.13, build 20260810 | MySQL 8.0.46 | 9.6.34 | 178 tests / 767 assertions pass |
+| IOMAD 5.0.9, build 20260810 | MySQL 8.4.11 | 11.5.55 | 178 tests / 768 assertions pass |
+| IOMAD 5.1.6, build 20260810 | MySQL 8.4.11 | 11.5.55 | 178 tests / 768 assertions pass |
+| IOMAD 5.2.4, build 20261005 | MySQL 8.4.11 | 11.5.55 | 178 tests / 767 assertions pass |
 
-The historical certificate-library fixture is a scoped compatibility test, not a complete IOMAD 4.5.5 installation. Native history/publication policy fingerprints on the remote demonstration site still require separate verification before a live end-to-end result can be claimed. Tests use isolated source copies, PHPUnit prefixes and dataroots with fictitious data; native installed laboratory sources and ordinary course tables are not changed for these runtime tests.
+The historical environment uses the complete official distribution at `ab4393b55c705df9962fd4c23018036039229f5c`. Its framework and history interfaces form a separate coherent fingerprint bundle. Combining older native interfaces with a newer framework failed during qualification and is not an accepted historical bundle. The 4.5.13 environment separately exercises historical certificate libraries without replacing its modern history/framework interfaces.
 
-English strings are packaged; French and Spanish remain matching local draft translations outside the ZIP. Updating to RC4 changes the source fingerprint format to include the template entry file: pending earlier preparations need fresh review. Existing published personal snapshots and administrative archives are retained. Arbitrary PHP scripts and their external effects cannot be qualified by these tests; use the native template contract and review site-maintained code.
+Ten custom-template cases (70 assertions) cover current custom layouts/date settings on an existing issue, exact publication bytes, original issue identity/date preservation, changed PHP between preparation/confirmation/publication, native preference reads, broken/noisy/identity-changing templates and unsafe paths. Four legacy-route cases and a mixed-framework regression exercise the bounded historical download bridge. Syntax, Moodle CodeSniffer, PHPMD, savepoints, structure validation and PHPDoc pass. The temporary PHPDoc checker is removed after use; no diagnostic or quality rule is suppressed.
+
+Historical HTTP acceptance completes **12 scenarios: 11 pass, one fails**. The passing scenarios cover privileged native downloads, the real learner button, protected original/history files, bounded publication, custom-report CSV and authenticated export refusals. The failing compact system-inventory export contains an additional native closed-session mutation diagnostic (`$SESSION->flextable`) in its CSV. This is an unresolved historical-profile export limitation; the complete acceptance suite is not green. The fixture opens the Moodle site home after login, avoiding the historical company dashboard error for company-less fictitious users. No plugin scenario or diagnostic is suppressed and no native runtime is patched.
+
+The workflow now proposes 16 pinned profiles, including historical 4.5.5 on PHP 8.2 and 8.3. That new matrix has not yet run on GitHub. There is no new PHP 8.4, PostgreSQL, SMTP inbox or remote-site qualification of this branch. No managed security scan completed for this change because the available scan service could not open this worktree; source inspection and regression tests are not presented as an independent audit.
+
+English strings are packaged; French and Spanish remain matching local drafts outside the ZIP, without an AMOS-publication claim. Updating to RC4 includes the template entry file in reviewed input fingerprints: pending earlier preparations need fresh review. Existing published personal snapshots and administrative archives are retained. A saved native original PDF is still required. Templates must follow the native rendering contract; hard-coded dates or other ignored settings are not automatically repaired, and arbitrary PHP or its external effects are not guaranteed.
 
 ## Completed GitHub qualification of RC3 — 27 November 2026
 

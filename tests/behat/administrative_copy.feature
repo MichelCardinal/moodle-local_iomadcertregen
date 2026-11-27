@@ -10,6 +10,8 @@ Feature: Review an independent corrected certificate copy
       | learner1 | Example   | Fictional  | Learner  | learner@example.com |
     And the following config values are set as admin:
       | enabled_stores | logstore_standard | tool_log |
+    And the following config values are set as admin:
+      | defaulthomepage | 0 |
     And the following "courses" exist:
       | fullname                | shortname | category |
       | Certificate test course | ICR       | 0        |
@@ -90,6 +92,7 @@ Feature: Review an independent corrected certificate copy
     And I press "Publish corrected certificate for the learner"
     Then I should see "This correction is published for the learner"
     And the published certificate retains its original PDF and issue identity
+    And the native certificate download for "learner1" in "Existing certificate" serves the published PDF
     When I log out
     And I log in as "learner1"
     Then the native certificate button for "Existing certificate" serves the published PDF

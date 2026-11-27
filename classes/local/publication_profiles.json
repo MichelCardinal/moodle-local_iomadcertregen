@@ -14,6 +14,16 @@
     "local/iomad/lib/iomad.php": "eceed1def44fb03fbcdc99a26656ae9d2b6ebfdabe2d5cc21fa92f13f54a928c",
     "lib/classes/context/company.php": "7da92a0f21fdb581bca823fafc7c7a6f5ca58eef14b747c7de22773495b4562d"
   },
+  "405historical": {
+    "version.php": "a2969f6290536a07734a57e3a6fedef421cb8f50dd78eaedc1b2a9aa1c0b7d37",
+    "mod/iomadcertificate/view.php": "beabab61999b738da75954db5df00524b04cbbb7bc8f1668eb510bedc46a0170",
+    "local/iomad_track/db/install.xml": "fe18a6d4c8bfc2a618ebf84a3384f8c5b803ce482bb1146c9fb37e7aa7457df5",
+    "local/iomad_track/db/install.php": "6c92e138056ec73731e4e20ec82c692b82e54d1c91830e7d78ace2f5ca772f9d",
+    "local/iomad_track/lib.php": "1ed66f6934ba6aa544c52af82a7b7bbcae92db7e6fff4a2df5f5ac259050c613",
+    "local/iomad/lib/company.php": "d91b4f2f033b6ce325d440848c7e6c0c6e4e20c7f3dea1eb656b8ad2c9ac1aa9",
+    "local/iomad/lib/iomad.php": "d4635d1a09e9acbb6cd3c217ae3343ebc269bb5edc47b23516461f87185c58ac",
+    "lib/classes/context/company.php": "9c576f3c0fe5ebfe650a1f3d96d6e2f0a0fb9ad74231843de038db147deb49ee"
+  },
   "500": {
     "mod/iomadcertificate/view.php": "6f62861670f6f72704595b8f6268e6e85fe1e4b57c21c83ccb320e46a468b3c8",
     "local/iomad_track/db/install.xml": "fe18a6d4c8bfc2a618ebf84a3384f8c5b803ce482bb1146c9fb37e7aa7457df5",

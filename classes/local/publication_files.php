@@ -62,7 +62,7 @@ final class publication_files {
     public static function require_compatible(): void {
         global $CFG;
         $profiles = json_decode(file_get_contents(__DIR__ . '/publication_profiles.json'), true, 512, JSON_THROW_ON_ERROR);
-        $profile = $profiles[(string)$CFG->branch] ?? [];
+        $profile = self::profile($profiles);
         if (!$profile) {
             throw new \moodle_exception('unsupported', 'local_iomadcertregen');
         }
@@ -74,6 +74,26 @@ final class publication_files {
                 throw new \moodle_exception('unsupported', 'local_iomadcertregen');
             }
         }
+    }
+
+    /**
+     * Keep the historical framework and its native interfaces in one coherent bundle.
+     *
+     * @param array $profiles Verified source bundles.
+     * @return array Matching native interface profile, or an empty unsupported profile.
+     */
+    private static function profile(array $profiles): array {
+        global $CFG;
+        $branch = (string)($CFG->branch ?? '');
+        $historical = $profiles['405historical'] ?? [];
+        $versionfile = $CFG->dirroot . '/version.php';
+        if (
+            $branch === '405' && isset($historical['version.php']) && is_readable($versionfile) &&
+                hash_file('sha256', $versionfile) === $historical['version.php']
+        ) {
+            return $historical;
+        }
+        return $profiles[$branch] ?? [];
     }
 
     /**
