@@ -25,7 +25,8 @@
 namespace local_iomadcertregen\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
-use core_reportbuilder\local\filters\{select, text};
+use core_reportbuilder\local\filters\{date, number, select, text};
+use local_iomadcertregen\local\inventory_settings;
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
 
@@ -39,7 +40,7 @@ final class certificate extends base {
      * @return string[] Tables used by this entity.
      */
     protected function get_default_tables(): array {
-        return ['iomadcertificate', 'course_modules', 'course', 'course_categories'];
+        return ['iomadcertificate', 'course_modules', 'course', 'course_categories', 'grade_categories', 'grade_items'];
     }
 
     /**
@@ -66,6 +67,12 @@ final class certificate extends base {
             AND {$cm}.module = (SELECT id FROM {modules} WHERE name = 'iomadcertificate')");
         $this->add_join("JOIN {course} {$course} ON {$course}.id = {$cm}.course");
         $this->add_join("JOIN {course_categories} {$category} ON {$category}.id = {$course}.category");
+        $gradecategory = $this->get_table_alias('grade_categories');
+        $outcome = $this->get_table_alias('grade_items');
+        $this->add_join("LEFT JOIN {grade_categories} {$gradecategory}
+            ON {$gradecategory}.id = -{$ic}.printgrade AND {$gradecategory}.courseid = {$course}.id");
+        $this->add_join("LEFT JOIN {grade_items} {$outcome}
+            ON {$outcome}.id = {$ic}.printoutcome AND {$outcome}.courseid = {$course}.id AND {$outcome}.outcomeid IS NOT NULL");
         foreach ($this->get_available_columns() as $column) {
             $this->add_column($column);
         }
@@ -86,15 +93,24 @@ final class certificate extends base {
         $cm = $this->get_table_alias('course_modules');
         $course = $this->get_table_alias('course');
         $category = $this->get_table_alias('course_categories');
-        return [
-            'category' => ["{$category}.name", new lang_string('category')],
-            'course' => ["{$course}.fullname", new lang_string('course')],
-            'shortname' => ["{$course}.shortname", new lang_string('shortnamecourse')],
-            'activity' => ["{$ic}.name", new lang_string('activity')],
-            'template' => ["{$ic}.iomadcertificatetype", new lang_string('templateidentifier', 'local_iomadcertregen')],
-            'coursevisible' => ["{$course}.visible", new lang_string('coursevisible', 'local_iomadcertregen')],
-            'activityvisible' => ["{$cm}.visible", new lang_string('activityvisible', 'local_iomadcertregen')],
+        $fields = [
+            'category' => ["{$category}.name", new lang_string('category'), 'text'],
+            'course' => ["{$course}.fullname", new lang_string('course'), 'text'],
+            'shortname' => ["{$course}.shortname", new lang_string('shortnamecourse'), 'text'],
+            'activity' => ["{$ic}.name", new lang_string('activity'), 'text'],
+            'template' => ["{$ic}.iomadcertificatetype", new lang_string('templateidentifier', 'local_iomadcertregen'), 'text'],
+            'coursevisible' => ["{$course}.visible", new lang_string('coursevisible', 'local_iomadcertregen'), 'boolean'],
+            'activityvisible' => ["{$cm}.visible", new lang_string('activityvisible', 'local_iomadcertregen'), 'boolean'],
         ];
+        foreach (inventory_settings::fields() as $name => [$title, $kind]) {
+            $fields[$name] = ["{$ic}.{$name}", new lang_string($title, 'local_iomadcertregen'), $kind];
+        }
+        foreach (['courseid' => "{$course}.id", 'activityid' => "{$cm}.id", 'certificateid' => "{$ic}.id"] as $name => $sql) {
+            $fields[$name] = [$sql, new lang_string('inventory' . $name, 'local_iomadcertregen'), 'integer'];
+        }
+        $fields['dateenabled'] = ["CASE WHEN {$ic}.printdate > 0 THEN 1 ELSE 0 END",
+            new lang_string('inventorydateenabled', 'local_iomadcertregen'), 'boolean'];
+        return $fields;
     }
 
     /**
@@ -104,16 +120,27 @@ final class certificate extends base {
      */
     protected function get_available_columns(): array {
         $columns = [];
-        foreach ($this->fields() as $name => [$field, $title]) {
-            $visible = in_array($name, ['coursevisible', 'activityvisible'], true);
-            $columns[] = (new column($name, $title, $this->get_entity_name()))
+        foreach ($this->fields() as $name => [$field, $title, $kind]) {
+            $column = (new column($name, $title, $this->get_entity_name()))
                 ->add_joins($this->get_joins())
-                ->set_type($visible ? column::TYPE_BOOLEAN : column::TYPE_TEXT)
-                ->add_field($field)
-                ->set_is_sortable(true)
-                ->add_callback(static function ($value) use ($visible): string {
-                    return $visible ? get_string($value ? 'yes' : 'no') : s((string)$value);
-                });
+                ->set_type(inventory_settings::column_type($kind))
+                ->add_field($field, $name)
+                ->set_is_sortable($kind !== 'longtext');
+            if (in_array($kind, ['datesource', 'gradesource', 'outcome'], true)) {
+                $ic = $this->get_table_alias('iomadcertificate');
+                $column->add_field("{$ic}.course", 'settingscourseid');
+            }
+            if ($kind === 'gradesource') {
+                $category = $this->get_table_alias('grade_categories');
+                $column->add_field("{$category}.fullname", 'settingscategoryname');
+            } else if ($kind === 'outcome') {
+                $item = $this->get_table_alias('grade_items');
+                $column->add_field("{$item}.itemname", 'settingsoutcomename');
+            }
+            $column->add_callback(static function ($value, \stdClass $row) use ($name, $kind): string {
+                return inventory_settings::format($name, $kind, $value, $row);
+            });
+            $columns[] = $column;
         }
         return $columns;
     }
@@ -125,17 +152,18 @@ final class certificate extends base {
      */
     protected function get_available_filters(): array {
         $filters = [];
-        foreach ($this->fields() as $name => [$field, $title]) {
-            $visible = in_array($name, ['coursevisible', 'activityvisible'], true);
-            $filter = (new filter(
-                $visible ? select::class : text::class,
-                $name,
-                $title,
-                $this->get_entity_name(),
-                $field
-            ))->add_joins($this->get_joins());
-            if ($visible) {
-                $filter->set_options([0 => get_string('no'), 1 => get_string('yes')]);
+        foreach ($this->fields() as $name => [$field, $title, $kind]) {
+            $options = inventory_settings::options($name, $kind);
+            $class = $options ? select::class : text::class;
+            if (in_array($kind, ['integer', 'datesource', 'gradesource', 'outcome'], true)) {
+                $class = number::class;
+            } else if ($kind === 'timestamp') {
+                $class = date::class;
+            }
+            $filter = (new filter($class, $name, $title, $this->get_entity_name(), $field))
+                ->add_joins($this->get_joins());
+            if ($options) {
+                $filter->set_options($options);
             }
             $filters[] = $filter;
         }

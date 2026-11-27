@@ -1,5 +1,23 @@
 # Validation and reproducibility
 
+## RC3 detailed inventory — 27 November 2026
+
+RC3 exposes 36 selectable report columns, covering all 29 fields of the native IOMAD Certificate configuration table plus course/activity context and the derived date-enabled flag. All four installed native branches (4.5, 5.0, 5.1, 5.2) have the same certificate schema and form for these settings. Schema comparison is not a full runtime qualification of every branch.
+
+Candidate-specific tests use PHP 8.3.36 with `max_input_vars=5000` and `session.upload_progress.enabled=0`, isolated database prefixes and fictitious data. No native source or third-party theme is changed. New cases cover all settings selected together, existing report preservation, date/delivery/time filters, default and unknown format values, safe text display, course-local grade/outcome references and explicit missing references. Existing administrator-only report/export checks remain in place.
+
+| Candidate-specific environment | Result |
+| --- | --- |
+| IOMAD 4.5.13 (build 20260810), PHP 8.3.36, MySQL 8.0.46 | Strict full suite: 163 tests / 688 assertions pass |
+| IOMAD 5.2.4 (build 20261005), PHP 8.3.36, MySQL 8.4.11 | Strict full suite: 163 tests / 687 assertions pass |
+| IOMAD 5.2.4, PHP 8.3.36, PostgreSQL 17.11 | Focused inventory suite: 12 tests / 90 assertions pass |
+
+The focused inventory suite also passes 12 tests / 90 assertions on each MySQL profile. PostgreSQL uses the unchanged native commit `ef8e8a1e6093518091783b37666d9cb1f4bd8a7d`. Strict flags are those in the Commands section; initialization logs retain separate native task diagnostics.
+
+The six Moodle Plugin CI commands pass; PHPDoc output covers all 86 PHP files. French and Spanish remain local drafts outside the ZIP, with 205 matching identifiers and placeholders. They are not claimed as published AMOS translations.
+
+The earlier RC1 Linux matrix below remains historical. RC3 does not establish a new full PHP/IOMAD matrix or remove the PHP 8.4 boundary for the pinned native sources. This candidate remains local and is not a stable or Marketplace-approved release. Earlier archives are immutable.
+
 ## RC2 Marketplace review follow-up
 
 RC2 replaces the direct settings-table read with Moodle's configuration API. The regression suite exercises forced settings as well as the normal certificate correction and delivery paths. The RC1 matrix below is historical; it is not a full qualification of RC2. No change to the required IOMAD components or the PHP 8.4 support statement is inferred from this fix.
@@ -58,7 +76,7 @@ Earlier local strict full suites cover the same0.12.5/0.12.6 product baseline, a
 
 The sealed security review covers the fixed0.10.1→0.12.3 diff; a bounded later review covers the CSV integration. Neither is claimed as a new security scan of this candidate. Accessibility evidence covers keyboard role selection and two Boost pages (fourteen named controls,29 sampled text contrasts); there is no screen-reader or exhaustive accessibility certification. iPad/NAMO and native Moodle-app integration are outside scope.
 
-English is packaged. French/Spanish drafts remain outside distribution with166 matching identifiers/placeholders; no AMOS publication is claimed. Private logs, lab data, screenshots, runtime archives and translations are excluded from the ZIP and source repository. GPL licence and legitimate third-party attributions are retained.
+For RC1, English was packaged and French/Spanish drafts remained outside distribution with166 matching identifiers/placeholders; no AMOS publication is claimed. Private logs, lab data, screenshots, runtime archives and translations are excluded from the ZIP and source repository. GPL licence and legitimate third-party attributions are retained.
 
 ## Publication status
 

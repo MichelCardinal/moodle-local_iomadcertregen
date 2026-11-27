@@ -51,7 +51,10 @@ final class certificates extends system_report {
         $entity = new certificate();
         $this->set_main_table('iomadcertificate', $entity->get_table_alias('iomadcertificate'));
         $this->add_entity($entity);
-        $this->add_columns_from_entity('certificate');
+        $this->add_columns_from_entity('certificate', [
+            'category', 'course', 'shortname', 'activity', 'template', 'coursevisible', 'activityvisible',
+            'printdate', 'datefmt', 'delivery', 'savecert',
+        ]);
         $this->add_filters_from_entity('certificate');
         $cm = $entity->get_table_alias('course_modules');
         $course = $entity->get_table_alias('course');

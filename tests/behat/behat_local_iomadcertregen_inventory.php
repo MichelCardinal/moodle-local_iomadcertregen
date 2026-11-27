@@ -50,6 +50,8 @@ class behat_local_iomadcertregen_inventory extends behat_base {
             foreach (['A4_non_embedded', 'letter_non_embedded'] as $template) {
                 $generator->create_module('iomadcertificate', [
                     'course' => $course->id, 'name' => 'Fictional ' . $template, 'iomadcertificatetype' => $template,
+                    'printdate' => 1, 'datefmt' => 3, 'delivery' => 2, 'requiredtime' => 45,
+                    'customtext' => 'Fictional CSV text, "quoted"',
                 ]);
             }
             $reports = $generator->get_plugin_generator('core_reportbuilder');
@@ -57,6 +59,9 @@ class behat_local_iomadcertregen_inventory extends behat_base {
                 'name' => 'Fictional CSV inventory',
                 'source' => \local_iomadcertregen\reportbuilder\datasource\certificates::class, 'default' => 1,
             ]);
+            foreach (['printdate', 'datefmt', 'delivery', 'requiredtime', 'customtext'] as $name) {
+                \core_reportbuilder\local\helpers\report::add_report_column($custom->get('id'), 'certificate:' . $name);
+            }
             $reports->create_audience([
                 'reportid' => $custom->get('id'),
                 'classname' => \core_reportbuilder\reportbuilder\audience\allusers::class, 'configdata' => [],
@@ -125,7 +130,7 @@ class behat_local_iomadcertregen_inventory extends behat_base {
             ) {
                 throw new Exception('The native inventory endpoint did not return an attached CSV.');
             }
-            $this->verify_csv($body);
+            $this->verify_csv($body, $source);
         } finally {
             $session->visit($previous);
         }
@@ -169,8 +174,9 @@ class behat_local_iomadcertregen_inventory extends behat_base {
      * Parse real CSV syntax rather than accepting matching text inside an HTML response.
      *
      * @param string $body Native download bytes.
+     * @param string $source System or custom report.
      */
-    private function verify_csv(string $body): void {
+    private function verify_csv(string $body, string $source): void {
         $stream = fopen('php://temp', 'r+');
         try {
             fwrite($stream, $body);
@@ -184,7 +190,14 @@ class behat_local_iomadcertregen_inventory extends behat_base {
             }
             foreach (['A4_non_embedded', 'letter_non_embedded'] as $offset => $template) {
                 $row = $rows[$offset + 1];
-                foreach (['Fictional CSV category', 'Fictional course, "CSV"', 'Fictional ' . $template, $template] as $value) {
+                $expected = ['Fictional CSV category', 'Fictional course, "CSV"', 'Fictional ' . $template, $template,
+                    get_string('issueddate', 'iomadcertificate'),
+                    get_string('inventorydateformat3', 'local_iomadcertregen'),
+                    get_string('emailiomadcertificate', 'iomadcertificate')];
+                if ($source === 'custom') {
+                    $expected = array_merge($expected, ['45', 'Fictional CSV text, "quoted"']);
+                }
+                foreach ($expected as $value) {
                     if (!in_array($value, $row, true)) {
                         throw new Exception('The CSV changed a quoted course name or certificate template.');
                     }

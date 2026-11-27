@@ -1,3 +1,11 @@
+## 1.0.0-rc3 — detailed certificate configuration inventory
+
+- Make all native IOMAD Certificate activity settings available as selectable columns in Moodle custom reports, including date source and format, grade source and format, delivery, notifications, required course time, layout images and stored text.
+- Keep existing custom reports and their column identifiers intact. The compact system inventory adds date source, date format, delivery and saved-certificate settings.
+- Resolve references inside the owning course; show deleted or invalid references explicitly. Use localised native choices and retain image identifiers. Escape stored content rather than rendering HTML or running certificate templates.
+- Keep the source, exports and shared report execution restricted to site administrators. The inventory describes current configuration, not the contents of previously issued PDFs.
+- No correction, publication, archive, email or database schema behaviour changes. Advance the native version savepoint; retain the RC2 configuration API fix.
+
 ## 1.0.0-rc2 — draft for Marketplace review
 
 - Read effective IOMAD Certificate settings through Moodle's configuration API, including site-forced settings, and sort the keys for a deterministic source fingerprint.
