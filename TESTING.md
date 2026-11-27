@@ -16,7 +16,7 @@ The focused inventory suite also passes 12 tests / 90 assertions on each MySQL p
 
 The six Moodle Plugin CI commands pass; PHPDoc output covers all 86 PHP files. French and Spanish remain local drafts outside the ZIP, with 205 matching identifiers and placeholders. They are not claimed as published AMOS translations.
 
-The earlier RC1 Linux matrix below remains historical. RC3 does not establish a new full PHP/IOMAD matrix or remove the PHP 8.4 boundary for the pinned native sources. This candidate remains local and is not a stable or Marketplace-approved release. Earlier archives are immutable.
+The earlier RC1 Linux matrix below remains historical. RC3 does not establish a new full PHP/IOMAD matrix or remove the PHP 8.4 boundary for the pinned native sources. This candidate is not a stable or Marketplace-approved release. A fresh GitHub matrix is required before candidate distribution. Earlier archives are immutable.
 
 ## RC2 Marketplace review follow-up
 
@@ -51,7 +51,7 @@ The startup probe verifies `session.upload_progress.enabled=0`. Modern profiles 
 
 ## Known PHP 8.4 dependency boundary
 
-The unmodified native generator declares `array $options = null` in `mod/iomadcertificate/tests/generator/lib.php:41` (under public/ on5.1/5.2). PHP 8.4 deprecates that implicit nullability. Each strict profile finishes158/624 with one deprecation and exits nonzero. No native source is patched and no diagnostic is suppressed. Native authentication libraries also emit separate diagnostics during initialisation. A clean strict PHP 8.4 qualification is not established. The native generator diagnostic is reported in [IOMAD issue 2822](https://github.com/iomad/iomad/issues/2822); no upstream correction is implied by that report. PHP8.3 at a corrected patch level is the recommended verified baseline.
+The unmodified native generator declares `array $options = null` in `mod/iomadcertificate/tests/generator/lib.php:41` (under public/ on5.1/5.2). PHP 8.4 deprecates that implicit nullability. Each strict profile finishes158/624 with one deprecation and exits nonzero. No native source is patched and no diagnostic is suppressed. Native authentication libraries also emit separate diagnostics during initialisation. A clean strict PHP 8.4 qualification is not established. The native generator diagnostic was reported in [IOMAD issue 2822](https://github.com/iomad/iomad/issues/2822), now closed as completed. Official [IOMAD change d581d6a](https://github.com/iomad/iomad/commit/d581d6a4d0287ded7682cae083d57fc3cc041068) corrects the declaration in newer native revisions. The pinned commits in this historical matrix predate that fix. Newer native runtime revisions have separate history/publication changes and require their own qualification; this candidate does not approve them solely because the generator was fixed. PHP8.3 at a corrected patch level is the recommended verified baseline.
 
 ## Commands
 

@@ -39,6 +39,8 @@ Date sources distinguish no date, issue date, course-completion date and a grade
 
 Stored description/custom text and email-recipient settings are shown as escaped text. Image columns show identifiers, not image previews or proof that the image still exists. The report neither executes templates nor analyses historical PDFs, and it makes no configuration changes. Exported recipient/text columns can contain personal data entered by site administrators; include only the columns needed and protect downloaded reports. The plugin does not store another copy of these settings or send them externally.
 
+A [French inventory guide](docs/inventory-fr.md) explains the available settings and a focused six-column report.
+
 For native **Custom reports**, create a report using source **IOMAD Certificate inventory** under **Site administration → Reports → Report builder → Custom reports**. The same entity, columns, filters and conditions are available. Both discovery and data access require site administration rights; sharing a report audience does not grant these rights.
 
 The inventory reports current configuration. It cannot identify the template used in an old PDF, decide whether a template is appropriate, or describe every background, seal and signature from its template identifier. Inspect the native activity settings where necessary. Reports and their exports do not modify certificates.
