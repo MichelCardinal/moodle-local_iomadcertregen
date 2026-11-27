@@ -22,7 +22,7 @@ Native IOMAD library, history and access-policy compatibility checks remain sepa
 
 ## Requirements and installation
 
-- IOMAD branch range: **4.5, 5.0, 5.1 and 5.2**. Verified native interfaces are bounded by `classes/local/qualified.json` and `classes/local/publication_profiles.json`. Matching a version number alone is insufficient. Unknown native libraries or policy implementations, and missing/invalid template paths, may be refused. The unreleased custom-template changes are still undergoing qualification.
+- IOMAD branch range: **4.5, 5.0, 5.1 and 5.2**. Verified native interfaces are bounded by `classes/local/qualified.json` and `classes/local/publication_profiles.json`. Matching a version number alone is insufficient. Unknown native libraries or policy implementations, and missing/invalid template paths, may be refused. Local custom-template and export regression checks are complete; remote deployment and the new GitHub matrix remain pending qualification.
 - Tested source updates and runtimes are recorded in [TESTING.md](TESTING.md). Do not interpret the branch range as proof of every patch, PHP version, database or theme configuration.
 - Dependencies: `mod_iomadcertificate` and `local_iomad`, minimum version `2024100700`. Both dependencies are bundled in the [official IOMAD distribution](https://github.com/iomad/iomad). Plain Moodle without IOMAD is unsupported.
 - The standard A4 embedded/non-embedded, letter embedded/non-embedded, company and companykanji templates remain regression cases; custom templates are not restricted to that list. Outcome printing is excluded pending separate qualification.

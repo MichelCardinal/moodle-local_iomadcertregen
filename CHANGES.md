@@ -6,7 +6,8 @@
 - Render with copies of the native source objects. Reject stray output, syntax/runtime errors, unusable PDFs and acting-identity changes; preserve the original issue and saved certificate when preparation fails.
 - Add integration cases for custom layouts, newly enabled/formatted issue dates, preview/publication integrity, native preference reads, broken templates and escaping paths. Test the complete historical IOMAD 4.5.5 distribution and separately verified modern branch variants, without claiming universal patch support.
 - Add a bounded Moodle after_config hook for the verified historical activity download route. Preserve the protected learner endpoint checks, and reject incoherent historical framework/interface combinations.
-- Record five local full-suite passes (178 tests each), quality-check passes and historical HTTP acceptance (11 of 12 scenarios pass). Keep the historical compact-inventory CSV diagnostic and pending remote/matrix qualification explicit in TESTING.md.
+- Record five local full-suite passes (182 tests each), quality-check passes and historical HTTP acceptance (13 scenarios / 163 steps pass). Keep pending remote/matrix qualification explicit in TESTING.md.
+- Prepare native system-inventory table preferences before the export writer closes the session, fixing first-download CSV diagnostics while preserving selected sorting and administrator-only access. Add direct first-download and sorting/access regressions.
 - No schema, role, archive-policy or automatic-mail change. Pending pre-RC4 corrections require a fresh preparation after upgrade; retained published PDFs and archives are not rewritten by the upgrade.
 
 ## 1.0.0-rc3 — detailed certificate configuration inventory

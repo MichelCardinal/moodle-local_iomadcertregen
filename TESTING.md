@@ -2,23 +2,25 @@
 
 ## Unreleased custom-template development — local qualification
 
-This branch is `1.0.0-rc4-dev` / `2026112701`, with alpha maturity. It is not a stable or Marketplace-approved release. It has not been deployed to the remote demonstration site. RC3 results below remain historical and do not qualify this runtime change.
+This branch is `1.0.0-rc4-dev` / `2026112702`, with alpha maturity. It is not a stable or Marketplace-approved release. It has not been deployed to the remote demonstration site. RC3 results below remain historical and do not qualify this runtime change.
 
-The current strict full suite passes **178 tests** in each isolated environment below. PHP **8.3.36** is used throughout, with `max_input_vars=5000` and `session.upload_progress.enabled=0`. No ordinary laboratory course tables or native runtime source are changed.
+The current strict full suite passes **182 tests** in each isolated environment below. PHP **8.3.36** is used throughout, with `max_input_vars=5000` and `session.upload_progress.enabled=0`. No ordinary laboratory course tables or native runtime source are changed.
 
 | Native framework | Database | PHPUnit | Result |
 | --- | --- | --- | --- |
-| IOMAD 4.5.5, build 20250609 | MySQL 8.0.46 | 9.6.18 | 178 tests / 767 assertions pass |
-| IOMAD 4.5.13, build 20260810 | MySQL 8.0.46 | 9.6.34 | 178 tests / 767 assertions pass |
-| IOMAD 5.0.9, build 20260810 | MySQL 8.4.11 | 11.5.55 | 178 tests / 768 assertions pass |
-| IOMAD 5.1.6, build 20260810 | MySQL 8.4.11 | 11.5.55 | 178 tests / 768 assertions pass |
-| IOMAD 5.2.4, build 20261005 | MySQL 8.4.11 | 11.5.55 | 178 tests / 767 assertions pass |
+| IOMAD 4.5.5, build 20250609 | MySQL 8.0.46 | 9.6.18 | 182 tests / 783 assertions pass |
+| IOMAD 4.5.13, build 20260810 | MySQL 8.0.46 | 9.6.34 | 182 tests / 783 assertions pass |
+| IOMAD 5.0.9, build 20260810 | MySQL 8.4.11 | 11.5.55 | 182 tests / 784 assertions pass |
+| IOMAD 5.1.6, build 20260810 | MySQL 8.4.11 | 11.5.55 | 182 tests / 784 assertions pass |
+| IOMAD 5.2.4, build 20261005 | MySQL 8.4.11 | 11.5.55 | 182 tests / 783 assertions pass |
 
 The historical environment uses the complete official distribution at `ab4393b55c705df9962fd4c23018036039229f5c`. Its framework and history interfaces form a separate coherent fingerprint bundle. Combining older native interfaces with a newer framework failed during qualification and is not an accepted historical bundle. The 4.5.13 environment separately exercises historical certificate libraries without replacing its modern history/framework interfaces.
 
 Ten custom-template cases (70 assertions) cover current custom layouts/date settings on an existing issue, exact publication bytes, original issue identity/date preservation, changed PHP between preparation/confirmation/publication, native preference reads, broken/noisy/identity-changing templates and unsafe paths. Four legacy-route cases and a mixed-framework regression exercise the bounded historical download bridge. Syntax, Moodle CodeSniffer, PHPMD, savepoints, structure validation and PHPDoc pass. The temporary PHPDoc checker is removed after use; no diagnostic or quality rule is suppressed.
 
-Historical HTTP acceptance completes **12 scenarios: 11 pass, one fails**. The passing scenarios cover privileged native downloads, the real learner button, protected original/history files, bounded publication, custom-report CSV and authenticated export refusals. The failing compact system-inventory export contains an additional native closed-session mutation diagnostic (`$SESSION->flextable`) in its CSV. This is an unresolved historical-profile export limitation; the complete acceptance suite is not green. The fixture opens the Moodle site home after login, avoiding the historical company dashboard error for company-less fictitious users. No plugin scenario or diagnostic is suppressed and no native runtime is patched.
+Historical HTTP acceptance passes **13 scenarios / 163 steps**, including privileged native downloads, the real learner button, protected original/history files, bounded publication, direct first system-inventory CSV, custom-report CSV and authenticated export refusals. A supported login callback prepares the administrator inventory's native table preferences before Moodle's download writer closes the session. Four additional unit cases cover silent/idempotent preparation, preservation of selected sorting, ordinary-user refusal and unrelated/custom reports. The initial page sort, native filters and download formats remain in use; no native source, diagnostic, permission or session safeguard is suppressed.
+
+The fixture opens the Moodle site home after login, avoiding the historical company-dashboard error for company-less fictitious users. No plugin scenario is excluded. Earlier failing attempts remain recorded separately and are not presented as passing qualification.
 
 The workflow now proposes 16 pinned profiles, including historical 4.5.5 on PHP 8.2 and 8.3. That new matrix has not yet run on GitHub. There is no new PHP 8.4, PostgreSQL, SMTP inbox or remote-site qualification of this branch. No managed security scan completed for this change because the available scan service could not open this worktree; source inspection and regression tests are not presented as an independent audit.
 

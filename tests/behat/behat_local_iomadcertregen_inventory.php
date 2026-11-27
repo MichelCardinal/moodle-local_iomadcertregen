@@ -83,6 +83,17 @@ class behat_local_iomadcertregen_inventory extends behat_base {
      * @param string $source Native report type.
      */
     public function download_inventory(string $source): void {
+        $this->open_inventory($source);
+        $this->request_inventory($source, true);
+    }
+
+    /**
+     * Export before visiting a report page, with no table preferences in the HTTP session.
+     *
+     * @Then /^the "(system|custom)" certificate inventory downloads directly as CSV$/
+     * @param string $source Native report type.
+     */
+    public function download_inventory_directly(string $source): void {
         $this->request_inventory($source, true);
     }
 
@@ -112,9 +123,6 @@ class behat_local_iomadcertregen_inventory extends behat_base {
             'id' => $this->reports[$source], 'download' => 'csv', 'parameters' => json_encode([]),
         ]);
         try {
-            if ($allowed) {
-                $this->open_inventory($source);
-            }
             $session->visit($url->out(false));
             $body = $session->getDriver()->getContent();
             if (!$allowed) {
@@ -188,8 +196,14 @@ class behat_local_iomadcertregen_inventory extends behat_base {
             if (count($rows) !== 3) {
                 throw new Exception('Expected one header and two CSV activities; received: ' . json_encode($rows));
             }
-            foreach (['A4_non_embedded', 'letter_non_embedded'] as $offset => $template) {
-                $row = $rows[$offset + 1];
+            foreach (['A4_non_embedded', 'letter_non_embedded'] as $template) {
+                $matching = array_values(array_filter(array_slice($rows, 1), static function (array $row) use ($template): bool {
+                    return in_array($template, $row, true);
+                }));
+                if (count($matching) !== 1) {
+                    throw new Exception('The CSV must contain exactly one row for each fictional template.');
+                }
+                $row = reset($matching);
                 $expected = ['Fictional CSV category', 'Fictional course, "CSV"', 'Fictional ' . $template, $template,
                     get_string('issueddate', 'iomadcertificate'),
                     get_string('inventorydateformat3', 'local_iomadcertregen'),

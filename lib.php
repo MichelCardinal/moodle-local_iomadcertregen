@@ -90,10 +90,12 @@ function local_iomadcertregen_pluginfile($course, $cm, $context, $filearea, $arg
  * Preserve published bytes when the native activity's download button is used.
  *
  * This supported login callback runs before the native renderer and any native PDF write.
- * It protects native history file entry points and redirects the qualified activity download route.
+ * It protects native history file entry points, prepares inventory export preferences,
+ * and redirects the qualified activity download route.
  */
 function local_iomadcertregen_after_require_login(): void {
     \local_iomadcertregen\local\history_delivery::after_login();
+    \local_iomadcertregen\local\inventory_download::after_login();
     global $CFG, $SCRIPT;
     if (
         $SCRIPT !== '/mod/iomadcertificate/view.php' || CLI_SCRIPT || AJAX_SCRIPT || WS_SERVER

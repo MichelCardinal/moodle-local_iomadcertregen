@@ -15,6 +15,10 @@ Feature: Export certificate inventory through native report downloads
     When I log in as "admin"
     Then the "system" certificate inventory downloads both fictional templates as CSV
 
+  Scenario: Administrator downloads the system inventory before opening its page
+    When I log in as "admin"
+    Then the "system" certificate inventory downloads directly as CSV
+
   Scenario: Administrator exports the custom report inventory
     When I log in as "admin"
     Then the "custom" certificate inventory downloads both fictional templates as CSV
