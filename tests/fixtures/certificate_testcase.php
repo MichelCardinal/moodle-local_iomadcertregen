@@ -34,9 +34,10 @@ abstract class certificate_testcase extends \advanced_testcase {
     /**
      * Create a preliminary native issue without a saved original.
      *
+     * @param array $settings Optional initial native activity settings.
      * @return array Native fixture records.
      */
-    protected function native_fixture(): array {
+    protected function native_fixture(array $settings = []): array {
         global $CFG, $DB;
         $this->resetAfterTest();
         writer::reset();
@@ -48,10 +49,10 @@ abstract class certificate_testcase extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $learner = $generator->create_user(['firstname' => 'Example', 'lastname' => 'Learner']);
-        $module = $generator->create_module('iomadcertificate', [
+        $module = $generator->create_module('iomadcertificate', array_merge([
             'course' => $course->id, 'iomadcertificatetype' => 'A4_non_embedded',
             'printnumber' => 1, 'printdate' => 1, 'datefmt' => 3,
-        ]);
+        ], $settings));
         $issue = (object)[
             'userid' => $learner->id, 'iomadcertificateid' => $module->id,
             'code' => 'LAB0000001', 'timecreated' => 1705320000,
@@ -65,10 +66,11 @@ abstract class certificate_testcase extends \advanced_testcase {
     /**
      * Create a native issue with a PDF saved through the owner's API.
      *
+     * @param array $settings Optional initial native activity settings.
      * @return array Native fixture records.
      */
-    protected function fixture(): array {
-        $data = $this->native_fixture();
+    protected function fixture(array $settings = []): array {
+        $data = $this->native_fixture($settings);
         [$module, $learner, $cm, $course, $issue, $context] = $data;
         // The owner's save function is used only to establish a test fixture.
         $existed = array_key_exists('certuser', $GLOBALS);

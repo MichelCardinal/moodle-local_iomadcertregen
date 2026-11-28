@@ -1,3 +1,16 @@
+## 1.0.0-rc4 — installed custom templates
+
+- Correct an existing course issue with the activity's newly selected installed template and current printing settings, without registering every custom certificate.php hash.
+- Resolve template paths canonically inside the native template directory. Keep native library and history/access compatibility checks separate, with distinct errors.
+- Include the selected entry file's digest in reviewed source inputs, preventing confirmation or publication after its contents change.
+- Render with copies of the native source objects. Reject stray output, syntax/runtime errors, unusable PDFs and acting-identity changes; preserve the original issue and saved certificate when preparation fails.
+- Add integration cases for custom layouts, newly enabled/formatted issue dates, preview/publication integrity, native preference reads, broken templates and escaping paths. Test the complete historical IOMAD 4.5.5 distribution and separately verified modern branch variants, without claiming universal patch support.
+- Add a bounded Moodle after_config hook for the verified historical activity download route. Preserve the protected learner endpoint checks, and reject incoherent historical framework/interface combinations.
+- Record five local full-suite passes (183 tests each), quality-check passes and historical HTTP acceptance (13 scenarios / 163 steps pass). Development runtime GitHub qualification passes 13 of 16 profiles; the three native PHP 8.4 generator deprecations remain strict failures. Remote fictitious template and date-setting corrections, publication and exact archive/native PDF bytes are verified.
+- Prepare native system-inventory table preferences before the export writer closes the session, fixing first-download CSV diagnostics while preserving selected sorting and administrator-only access. Add direct first-download and sorting/access regressions.
+- Supply local beneficiary USER and site SITE presentation aliases without changing the authenticated global actor.
+- Promote the verified development runtime to a release candidate with a metadata-only savepoint; no schema, role, archive-policy or automatic-mail change. Pending pre-RC4 corrections require a fresh preparation after upgrade; retained published PDFs and archives are not rewritten by the upgrade.
+
 ## 1.0.0-rc3 — detailed certificate configuration inventory
 
 - Make all native IOMAD Certificate activity settings available as selectable columns in Moodle custom reports, including date source and format, grade source and format, delivery, notifications, required course time, layout images and stored text.
@@ -188,3 +201,9 @@ Database version `2026102302` changes no schema and does not recalculate existin
 - Local English, French and Spanish strings and PHPUnit service tests.
 
 Internal database versions: `2026102300` introduced the operation table; `2026102301` registers lifecycle cleanup while preserving existing records. No Marketplace release has been published.
+
+## RC4 development refinement — 2026112703
+
+- Supply beneficiary-local USER and site presentation copies for activity-style templates, while retaining the authenticated global user for permissions and audit attribution. No session impersonation or core/template edit.
+- Divert both qualified native handlers before their company checks, including administrative downloads in courses with no IOMAD company association. The protected destination continues to enforce course access and beneficiary scope.
+- Use PHPUnit9-compatible strict flags for both4.5 profiles and assert the actual13-scenario/163-step acceptance total. Earlier failed runs are retained as evidence.

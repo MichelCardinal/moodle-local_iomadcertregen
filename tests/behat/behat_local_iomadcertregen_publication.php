@@ -144,6 +144,36 @@ class behat_local_iomadcertregen_publication extends behat_base {
     }
 
     /**
+     * Exercise the privileged native view-other route before any native rendering occurs.
+     *
+     * @Then /^the native certificate download for "([^"]*)" in "([^"]*)" serves the published PDF$/
+     * @param string $username Explicit beneficiary.
+     * @param string $activity Activity name.
+     */
+    public function download_native_for_beneficiary(string $username, string $activity): void {
+        global $DB;
+        $userid = $DB->get_field('user', 'id', ['username' => $username], MUST_EXIST);
+        $certificate = $DB->get_record('iomadcertificate', ['name' => $activity], '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('iomadcertificate', $certificate->id);
+        $operation = $DB->get_record_select(
+            'local_iomadcertregen_op',
+            'cmid = :cmid AND userid = :userid AND publishedtime > 0',
+            ['cmid' => $cm->id, 'userid' => $userid],
+            '*',
+            MUST_EXIST
+        );
+        $session = $this->getSession();
+        $previous = $session->getCurrentUrl();
+        try {
+            $session->visit($this->locate_path('/mod/iomadcertificate/view.php?id=' . $cm->id .
+                '&action=download&userid=' . $userid));
+            $this->assert_published_response($operation);
+        } finally {
+            $session->visit($previous);
+        }
+    }
+
+    /**
      * Compare one publication to its captured native identity and original bytes.
      *
      * @param array $item Captured native evidence.
@@ -279,7 +309,7 @@ class behat_local_iomadcertregen_publication extends behat_base {
                 hash('sha256', $session->getDriver()->getContent()) !== $operation->pdfhash ||
                 !str_contains($session->getCurrentUrl(), '/local/iomadcertregen/learner.php')
         ) {
-            throw new Exception('The learner button did not deliver the reviewed PDF through its protected endpoint.');
+            throw new Exception('The native certificate route did not deliver the reviewed PDF through its protected endpoint.');
         }
     }
 }

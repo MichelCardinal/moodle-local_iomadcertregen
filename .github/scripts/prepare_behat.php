@@ -54,8 +54,10 @@ $incompatible = [
         '0ea3c4a8c243462a0589d3712541c38bcc7c2416bb22e6d134d9d67dbee6c955',
 ];
 if ((int)$CFG->branch < 501) {
-    $incompatible['auth/iomadsaml2/tests/behat/behat_auth_saml2.php'] =
-        '95b8b334909e1f7289e8cc4866309c684f76d95411c9a9ef323db38bc063a876';
+    $incompatible['auth/iomadsaml2/tests/behat/behat_auth_saml2.php'] = [
+        '95b8b334909e1f7289e8cc4866309c684f76d95411c9a9ef323db38bc063a876',
+        '8f614e4dd33bb73fa0422e0fd60a71143d7956cb3fc30d65f27c6435e1ff4b08',
+    ];
 }
 if ((int)$CFG->branch === 502) {
     // Native generator is misplaced in the step-context directory and is not a Behat context.
@@ -68,10 +70,11 @@ foreach ($contexts as $name => $path) {
     if (!isset($incompatible[$relative])) {
         continue;
     }
-    if (hash_file('sha256', $path) !== $incompatible[$relative]) {
+    $hash = hash_file('sha256', $path);
+    if (!in_array($hash, (array)$incompatible[$relative], true)) {
         throw new coding_exception('Changed third-party acceptance context; review its compatibility before exclusion.');
     }
-    $excluded[] = ['context' => $name, 'path' => $relative, 'sha256' => $incompatible[$relative]];
+    $excluded[] = ['context' => $name, 'path' => $relative, 'sha256' => $hash];
     unset($contexts[$name]);
 }
 $remapped = [];

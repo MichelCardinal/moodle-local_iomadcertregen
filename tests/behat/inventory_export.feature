@@ -4,7 +4,9 @@ Feature: Export certificate inventory through native report downloads
   I need actual CSV data and protected report audiences
 
   Background:
-    Given the following "users" exist:
+    Given the following config values are set as admin:
+      | defaulthomepage | 0 |
+    And the following "users" exist:
       | username        | firstname | lastname | email              |
       | inventoryviewer | Fictional | Viewer   | viewer@example.com |
     And a fictional certificate inventory is available for CSV review
@@ -12,6 +14,10 @@ Feature: Export certificate inventory through native report downloads
   Scenario: Administrator exports the system inventory
     When I log in as "admin"
     Then the "system" certificate inventory downloads both fictional templates as CSV
+
+  Scenario: Administrator downloads the system inventory before opening its page
+    When I log in as "admin"
+    Then the "system" certificate inventory downloads directly as CSV
 
   Scenario: Administrator exports the custom report inventory
     When I log in as "admin"

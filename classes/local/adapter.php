@@ -32,7 +32,7 @@ final class adapter {
     public const MAX_PDF_BYTES = 20 * 1024 * 1024;
 
     /**
-     * Check the qualified branch, libraries and selected native template.
+     * Check the native libraries and resolve the site's installed template.
      *
      * @param \stdClass $certificate Native activity.
      */
@@ -42,15 +42,11 @@ final class adapter {
         if ($profile === null || !empty($certificate->printoutcome)) {
             throw new \moodle_exception('unsupported', 'local_iomadcertregen');
         }
-        $type = $certificate->iomadcertificatetype;
-        $template = 'mod/iomadcertificate/type/' . $type . '/certificate.php';
-        if (!isset($profile['templates'][$template])) {
-            throw new \moodle_exception('unsupportedtemplate', 'local_iomadcertregen');
-        }
-        foreach ($profile['libraries'] + [$template => $profile['templates'][$template]] as $path => $hash) {
+        self::template_file($certificate);
+        foreach ($profile['libraries'] as $path => $hash) {
             $full = $CFG->dirroot . '/' . $path;
             if (!is_readable($full) || !in_array(hash_file('sha256', $full), (array)$hash, true)) {
-                throw new \moodle_exception('unsupportedtemplate', 'local_iomadcertregen');
+                throw new \moodle_exception('unsupportedlibrary', 'local_iomadcertregen');
             }
         }
         require_once($CFG->dirroot . '/mod/iomadcertificate/lib.php');
@@ -58,6 +54,30 @@ final class adapter {
         if ($profile['renderer'] === 'legacy') {
             require_once($CFG->dirroot . '/local/iomad_track/db/install.php');
         }
+    }
+
+    /**
+     * Resolve installed PHP code without accepting traversal, streams or links outside its directory.
+     *
+     * Templates are trusted server code installed by the site maintainer, just as in
+     * the native activity. A digest identifies their current contents; it is not an
+     * approval list or a PHP sandbox. The plugin does not offer a template upload.
+     *
+     * @param \stdClass $certificate Native activity.
+     * @return string Canonical template filename.
+     */
+    public static function template_file(\stdClass $certificate): string {
+        return installed_template::file($certificate);
+    }
+
+    /**
+     * Identify the exact installed template used for preparation and subsequent review.
+     *
+     * @param \stdClass $certificate Native activity.
+     * @return string SHA256 of the installed template.
+     */
+    public static function template_hash(\stdClass $certificate): string {
+        return installed_template::hash($certificate);
     }
 
     /**
@@ -197,25 +217,44 @@ final class adapter {
      * @return string PDF contents.
      */
     public static function render($certificate, $user, $cm, $course, $issue): string {
-        global $CFG;
         self::require_compatible($certificate);
-        if ((int)$CFG->branch >= 501) {
-            // The qualified 5.1/5.2 handler omits the template's $iomadcertificate alias.
-            // Supply the native template scope locally; do not modify IOMAD's handler.
-            require_once($CFG->libdir . '/pdflib.php');
-            $iomadcertificate = $certificate;
-            $certuser = $user;
-            $certrecord = $issue;
-            require($CFG->dirroot . '/mod/iomadcertificate/type/' . $certificate->iomadcertificatetype . '/certificate.php');
-            if ($iomadcertificate !== $certificate || $certuser !== $user || $certrecord !== $issue || !($pdf instanceof \pdf)) {
-                throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
-            }
-            $content = $pdf->Output('', 'S');
-        } else {
-            $content = xmldb_local_iomad_track_create_certificate($certificate, $user, $cm, $course, $issue);
+        return installed_template::render(
+            [$certificate, $user, $cm, $course, $issue],
+            static fn(...$records) => self::render_template(...$records)
+        );
+    }
+
+    /**
+     * Execute the installed template with the explicit native beneficiary scope.
+     *
+     * @param \stdClass $certificate Activity copy.
+     * @param \stdClass $user Beneficiary copy.
+     * @param \stdClass $cm Module copy.
+     * @param \stdClass $course Course copy.
+     * @param \stdClass $issue Existing issue copy.
+     * @return string PDF bytes returned without browser delivery.
+     */
+    private static function render_template($certificate, $user, $cm, $course, $issue): string {
+        global $CFG;
+        // Reproduce the presentation variables without changing the authenticated global user.
+        // Some site templates use the native activity's $USER rather than $certuser.
+        $USER = clone $user;
+        $SITE = clone get_site();
+        $iomadcertificate = $certificate;
+        $certuser = $user;
+        $certrecord = $issue;
+        if (
+            (int)$cm->course !== (int)$course->id || (int)$USER->id !== (int)$certrecord->userid ||
+                (int)$SITE->id !== (int)SITEID
+        ) {
+            throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
         }
-        self::require_valid_pdf($content);
-        return $content;
+        require_once($CFG->libdir . '/pdflib.php');
+        require(self::template_file($certificate));
+        if ($iomadcertificate !== $certificate || $certuser !== $user || $certrecord !== $issue || !($pdf instanceof \pdf)) {
+            throw new \moodle_exception('generationfailed', 'local_iomadcertregen');
+        }
+        return $pdf->Output('', 'S');
     }
 
     /**

@@ -1,5 +1,47 @@
 # Validation and reproducibility
 
+## RC4 candidate qualification
+
+RC4 uses version `2026112800`, release `1.0.0-rc4`, maturity `MATURITY_RC`. Its operational PHP, schema, capabilities, language strings, tests and workflow are those of the qualified development commit `5e13e0ea687cc2a43f1b2d890358de4b70fc1b3d` (version2026112703). Promotion changes only version/maturity metadata, a native metadata-only upgrade savepoint, and documentation. Earlier development ZIPs and RC3 releases remain immutable. Candidate-specific checks are recorded separately below; the preceding runtime results are not silently relabelled as a new candidate matrix.
+
+[Development run46082578934](https://github.com/MichelCardinal/moodle-local_iomadcertregen/actions/runs/46082578934) has completed: **13 of 16 profiles pass**. All sixteen suites complete **183 tests /789 assertions**, including the three strict PHP8.4 profiles that fail due to one native generator deprecation. All six quality checks pass. Each of the four PHP8.3/PostgreSQL HTTP profiles passes **13 scenarios /163 steps**. The overall workflow is **failure**, not green. No native source or diagnostic was changed to obtain these results.
+
+The reference modern baseline is PHP8.3.37 on the pinned IOMAD4.5.15,5.0.11,5.1.8 and5.2.4 variants, with MySQL and PostgreSQL as selected in the workflow. Historical4.5.5 passes PHP8.2.36/MySQL8.4 and PHP8.3.37/MySQL8.0. PHP8.2.36 also passes the selected5.0/5.1 MySQL profiles. PHP8.1.34 is a CLI compatibility check only, not a current hosting recommendation. Exact native commits are pinned in the workflow; matching a branch/version label alone does not qualify a modified or newer distribution.
+
+A private remote IOMAD4.5.5 /PHP8.2.36 /MySQL8.4.9 /NewLearning12.0.0 site was upgraded to development2703. Fictitious issued-certificate corrections verified a site-specific template with the correct beneficiary and then a native template with newly enabled issue-date printing. Both native report PDF downloads equal their confirmed previews byte-for-byte; both administrative archives equal the preceding native PDFs. The issue ID, code, recorded date and one-learner count remain unchanged. No email was sent. The remote student's own activity button was not re-tested; that route is exercised in local historical HTTP and modern PostgreSQL acceptance. These private branded PDFs, backups and site data are excluded from public sources and ZIPs. This is a scoped theme check, not universal theme certification.
+
+The upstream generator issue [2822](https://github.com/iomad/iomad/issues/2822) is already closed as completed, and newer official revisions include a fix. The three failing pinned source commits predate that fix. Newer revisions also change native history/publication interfaces and require a separate compatibility review and full qualification. RC4 does not qualify them solely because the generator changed, and no pending IOMAD reply is implied.
+
+### Candidate promotion checks on 28 November 2026
+
+Only version.php and the metadata-only savepoint differ in executable source from development2703. The final promotion passes the 14 permission/retention/delegation regression cases (42 assertions) on historical4.5.5 and5.2.4 isolated PHPUnit environments. The six quality commands pass, including savepoints and PHPDoc. The earlier32-case promotion attempt also passed on both branches, but its receipt predates savepoint consolidation and is not used as exact final-source evidence. The initial additional savepoint exceeded PHPMD's NPath threshold; consolidating metadata-only savepoints resolves it without suppressing the rule or removing any data migration.
+
+Candidate runtime, tests and workflow remain byte-identical to development2703 except the two declared metadata paths. Source, tag and installation-archive identity are included in the release manifest. The associated GitHub commit checks supply the candidate-specific Linux matrix; the development run linked above remains separately identifiable. No Marketplace approval is inferred from promotion.
+
+### Local development evidence
+
+The current2703 strict full suite passes **183 tests** in each isolated environment below. PHP **8.3.36** is used throughout, with `max_input_vars=5000` and `session.upload_progress.enabled=0`. No ordinary laboratory course tables or native runtime source are changed.
+
+| Native framework | Database | PHPUnit | Result |
+| --- | --- | --- | --- |
+| IOMAD 4.5.5, build 20250609 | MySQL 8.0.46 | 9.6.18 | 183 tests / 789 assertions pass |
+| IOMAD 4.5.13, build 20260810 | MySQL 8.0.46 | 9.6.34 | 183 tests / 789 assertions pass |
+| IOMAD 5.0.9, build 20260810 | MySQL 8.4.11 | 11.5.55 | 183 tests / 790 assertions pass |
+| IOMAD 5.1.6, build 20260810 | MySQL 8.4.11 | 11.5.55 | 183 tests / 790 assertions pass |
+| IOMAD 5.2.4, build 20261005 | MySQL 8.4.11 | 11.5.55 | 183 tests / 789 assertions pass |
+
+The historical environment uses the complete official distribution at `ab4393b55c705df9962fd4c23018036039229f5c`. Its framework and history interfaces form a separate coherent fingerprint bundle. Combining older native interfaces with a newer framework failed during qualification and is not an accepted historical bundle. The 4.5.13 environment separately exercises historical certificate libraries without replacing its modern history/framework interfaces.
+
+Eleven custom-template cases (76 assertions) cover current custom layouts/date settings on an existing issue, exact publication bytes, original issue identity/date preservation, changed PHP between preparation/confirmation/publication, native preference reads, broken/noisy/identity-changing templates and unsafe paths. Four legacy-route cases and a mixed-framework regression exercise the bounded historical download bridge. Syntax, Moodle CodeSniffer, PHPMD, savepoints, structure validation and PHPDoc pass. The temporary PHPDoc checker is removed after use; no diagnostic or quality rule is suppressed.
+
+Historical HTTP acceptance passes **13 scenarios / 163 steps**, including privileged native downloads, the real learner button, protected original/history files, bounded publication, direct first system-inventory CSV, custom-report CSV and authenticated export refusals. A supported login callback prepares the administrator inventory's native table preferences before Moodle's download writer closes the session. Four additional unit cases cover silent/idempotent preparation, preservation of selected sorting, ordinary-user refusal and unrelated/custom reports. The initial page sort, native filters and download formats remain in use; no native source, diagnostic, permission or session safeguard is suppressed.
+
+The fixture opens the Moodle site home after login, avoiding the historical company-dashboard error for company-less fictitious users. No plugin scenario is excluded. Earlier failing attempts remain recorded separately and are not presented as passing qualification.
+
+The workflow has 16 pinned profiles, including historical4.5.5 on PHP8.2 and8.3. Run46079864887 exposed workflow issues (PHPUnit9 flags and an outdated acceptance count), and a privileged native download intercepted too late. Build2703 corrects these, and the completed replacement run is reported above. No strict clean PHP8.4 or SMTP inbox-delivery qualification is claimed. No managed security scan completed for this change because the available scan service could not open this worktree; source inspection and regression tests are not presented as an independent audit.
+
+English strings are packaged; French and Spanish remain matching local drafts outside the ZIP, without an AMOS-publication claim. Updating to RC4 includes the template entry file in reviewed input fingerprints: pending earlier preparations need fresh review. Existing published personal snapshots and administrative archives are retained. A saved native original PDF is still required. Templates must follow the native rendering contract; hard-coded dates or other ignored settings are not automatically repaired, and arbitrary PHP or its external effects are not guaranteed.
+
 ## Completed GitHub qualification of RC3 — 27 November 2026
 
 [Run 46049214689](https://github.com/MichelCardinal/moodle-local_iomadcertregen/actions/runs/46049214689) tested commit `dbfc0c55397eb71c897780f96c354e56e62c0911` against the 14 pinned profiles in the workflow. Eleven profiles passed. Three strict PHP 8.4.28 profiles failed on the native IOMAD Certificate generator's implicit-nullability deprecation; the overall workflow conclusion remains **failure**, not a completely green matrix.

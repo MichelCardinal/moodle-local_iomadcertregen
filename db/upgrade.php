@@ -52,9 +52,10 @@ function xmldb_local_iomadcertregen_upgrade(int $oldversion): bool {
     if ($oldversion < 2026102412) {
         upgrade_plugin_savepoint(true, 2026102412, 'local', 'iomadcertregen');
     }
-    // RC2 changed only configuration reads; its metadata-only savepoint is superseded by RC3.
-    if ($oldversion < 2026112700) {
-        upgrade_plugin_savepoint(true, 2026112700, 'local', 'iomadcertregen');
+    // Earlier RC metadata-only savepoints are superseded; no existing PDF or deadline is rewritten.
+
+    if ($oldversion < 2026112800) {
+        upgrade_plugin_savepoint(true, 2026112800, 'local', 'iomadcertregen');
     }
 
     return true;
